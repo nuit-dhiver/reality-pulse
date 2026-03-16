@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the model name for the created USDZ file.
@@ -8,7 +8,7 @@ Choose the model name for the created USDZ file.
 import SwiftUI
 
 struct ModelNameField: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var modelName: String = ""
 
     var body: some View {
@@ -18,14 +18,14 @@ struct ModelNameField: View {
         }
         .onChange(of: modelName) {
             if !modelName.isEmpty {
-                appDataModel.modelName = modelName
+                draft.modelName = modelName
             } else {
-                appDataModel.modelName = nil
+                draft.modelName = nil
             }
         }
         .onAppear {
-            guard let appModelName = appDataModel.modelName else { return }
-            modelName = appModelName
+            guard let name = draft.modelName else { return }
+            modelName = name
         }
     }
 }

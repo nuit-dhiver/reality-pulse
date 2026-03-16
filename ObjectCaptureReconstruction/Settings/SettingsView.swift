@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the image and model folders, the model name, and the reconstruction options.
@@ -26,11 +26,6 @@ struct SettingsView: View {
                 ReconstructionOptionsView()
             }
             .padding(.leading, 13)
-            
-            Divider()
-                .padding(.horizontal, -20)
-            
-            ProcessButton()
         }
     }
 }

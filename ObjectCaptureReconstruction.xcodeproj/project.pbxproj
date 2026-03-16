@@ -7,18 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		26B095472C091BC80097324A /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B095462C091BC80097324A /* TopBarView.swift */; };
-		26B095492C091BEA0097324A /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B095482C091BEA0097324A /* BottomBarView.swift */; };
 		26B0954B2C091C770097324A /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B0954A2C091C770097324A /* ThumbnailView.swift */; };
 		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
 		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
 		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
 		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
-		F974D56C2BE1CF0600EFACBA /* ProcessingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D56B2BE1CF0600EFACBA /* ProcessingView.swift */; };
-		F99368C32BE3118600DAA789 /* ModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99368C22BE3118600DAA789 /* ModelView.swift */; };
 		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
-		F9F1BEDC2C6433340066F3D3 /* ReprocessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1BEDB2C6433340066F3D3 /* ReprocessView.swift */; };
-		F9F1BEDD2C6433340066F3D3 /* ReconstructionProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1BEDA2C6433340066F3D3 /* ReconstructionProgressView.swift */; };
+		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
+		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
+		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
+		0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */; };
+		4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5722048B055E10C8C4635BA /* JobScheduler.swift */; };
+		8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C4F782DCEACB71739E8182 /* JobStore.swift */; };
+		05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */; };
+		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
+		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
+		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +42,16 @@
 		F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
 		F9F1BEDA2C6433340066F3D3 /* ReconstructionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionProgressView.swift; sourceTree = "<group>"; };
 		F9F1BEDB2C6433340066F3D3 /* ReprocessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprocessView.swift; sourceTree = "<group>"; };
+		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
+		AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionJob.swift; sourceTree = "<group>"; };
+		958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleConfig.swift; sourceTree = "<group>"; };
+		E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDraft.swift; sourceTree = "<group>"; };
+		A5722048B055E10C8C4635BA /* JobScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobScheduler.swift; sourceTree = "<group>"; };
+		B0C4F782DCEACB71739E8182 /* JobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStore.swift; sourceTree = "<group>"; };
+		B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDashboardView.swift; sourceTree = "<group>"; };
+		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
+		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
+		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -133,6 +147,10 @@
 				26B0954A2C091C770097324A /* ThumbnailView.swift */,
 				26B095232C091B810097324A /* Processing */,
 				26B095212C091B740097324A /* Settings */,
+				AAC7DC5DCD23638D271D3093 /* Models */,
+				992CB303C65294FA4C0E9608 /* Scheduler */,
+				195BAF6352F89DD77AFC2745 /* Store */,
+				E195DA07BD54DDE970F27E56 /* Queue */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -145,6 +163,44 @@
 			);
 			name = LICENSE;
 			path = .;
+			sourceTree = "<group>";
+		};
+		AAC7DC5DCD23638D271D3093 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5A00FFF0EB8B4E921061918F /* */,
+				AFC5AB62125CB98EAA9DF3F6 /* */,
+				958B6CDE5F744C8A9E27719D /* */,
+				E3A4F851B39B9C4EA08E7C13 /* */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		992CB303C65294FA4C0E9608 /* Scheduler */ = {
+			isa = PBXGroup;
+			children = (
+				A5722048B055E10C8C4635BA /* */,
+			);
+			path = Scheduler;
+			sourceTree = "<group>";
+		};
+		195BAF6352F89DD77AFC2745 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				B0C4F782DCEACB71739E8182 /* */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		E195DA07BD54DDE970F27E56 /* Queue */ = {
+			isa = PBXGroup;
+			children = (
+				B18D78DD28112179ED6A17EA /* */,
+				BCE344691F76FD3CE82E7FCF /* */,
+				33550E6E2F6D8F14E9A9C282 /* */,
+				37404910B7FC7310289216C7 /* */,
+			);
+			path = Queue;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,17 +273,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F99368C32BE3118600DAA789 /* ModelView.swift in Sources */,
-				F9F1BEDC2C6433340066F3D3 /* ReprocessView.swift in Sources */,
-				F9F1BEDD2C6433340066F3D3 /* ReconstructionProgressView.swift in Sources */,
-				26B095492C091BEA0097324A /* BottomBarView.swift in Sources */,
 				F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */,
-				26B095472C091BC80097324A /* TopBarView.swift in Sources */,
-				F974D56C2BE1CF0600EFACBA /* ProcessingView.swift in Sources */,
 				F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */,
 				F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */,
 				26B0954B2C091C770097324A /* ThumbnailView.swift in Sources */,
 				F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */,
+				4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */,
+				4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */,
+				5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */,
+				0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */,
+				4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */,
+				8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */,
+				05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */,
+				665189C5915C218406A40D61 /* JobRowView.swift in Sources */,
+				DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */,
+				5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

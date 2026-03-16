@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Option to ignore the iOS bounding box during reconstruction.
@@ -9,14 +9,14 @@ import SwiftUI
 import RealityKit
 
 struct IgnoreBoundingBoxView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
 
     var body: some View {
-        @Bindable var appDataModel = appDataModel
+        @Bindable var draft = draft
         
         LabeledContent("Crop:") {
-            Toggle("Ignore iOS bounding box", isOn: $appDataModel.sessionConfiguration.ignoreBoundingBox)
+            Toggle("Ignore iOS bounding box", isOn: $draft.sessionConfiguration.ignoreBoundingBox)
         }
-        .disabled(!appDataModel.boundingBoxAvailable)
+        .disabled(!draft.boundingBoxAvailable)
     }
 }

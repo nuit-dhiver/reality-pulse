@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the output format to use for all textures.
@@ -9,20 +9,20 @@ import SwiftUI
 import RealityKit
 
 struct TextureFormatView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
 
     var body: some View {
-        @Bindable var appDataModel = appDataModel
+        @Bindable var draft = draft
 
-        Picker("Texture Format:", selection: $appDataModel.sessionConfiguration.customDetailSpecification.textureFormat) {
+        Picker("Texture Format:", selection: $draft.sessionConfiguration.customDetailSpecification.textureFormat) {
             Text("PNG")
                 .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureFormat.png)
             
             Text("JPEG")
                 .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureFormat.jpeg(compressionQuality: 0.8))
         }
-        .onChange(of: appDataModel.sessionConfiguration.customDetailSpecification.textureFormat) {
-            appDataModel.detailLevelOptionUnderQualityMenu = .custom
+        .onChange(of: draft.sessionConfiguration.customDetailSpecification.textureFormat) {
+            draft.detailLevelOptionUnderQualityMenu = .custom
         }
     }
 }

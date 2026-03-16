@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Option to isolate the object or to include the environment in the created model.
@@ -9,7 +9,7 @@ import SwiftUI
 import RealityKit
 
 struct MaskingView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var selectedMaskOption = MaskingOption.isolateFromEnvironment
 
     var body: some View {
@@ -24,13 +24,13 @@ struct MaskingView: View {
         .onChange(of: selectedMaskOption, initial: false) {
             switch selectedMaskOption {
             case .isolateFromEnvironment:
-                appDataModel.sessionConfiguration.isObjectMaskingEnabled = true
+                draft.sessionConfiguration.isObjectMaskingEnabled = true
             case .includeEnvironment:
-                appDataModel.sessionConfiguration.isObjectMaskingEnabled = false
+                draft.sessionConfiguration.isObjectMaskingEnabled = false
             }
         }
         .onAppear {
-            if appDataModel.sessionConfiguration.isObjectMaskingEnabled {
+            if draft.sessionConfiguration.isObjectMaskingEnabled {
                 selectedMaskOption = .isolateFromEnvironment
             } else {
                 selectedMaskOption = .includeEnvironment
