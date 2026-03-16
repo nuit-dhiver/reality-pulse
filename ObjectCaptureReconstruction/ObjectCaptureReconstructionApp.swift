@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Top-level app structure of the view hierarchy.
@@ -12,10 +12,10 @@ struct ObjectCaptureReconstructionApp: App {
     static let subsystem: String = "com.example.apple-samplecode.ObjectCaptureReconstruction"
 
     var body: some Scene {
-        Window("ObjectCaptureReconstruction", id: "main") {
+        Window("Reality Pulse", id: "main") {
             ContentView()
-                .frame(width: 400, height: 360)
+                .frame(minWidth: 700, minHeight: 500)
         }
-        .windowResizability(.contentSize)
+        .defaultSize(width: 800, height: 600)
     }
 }

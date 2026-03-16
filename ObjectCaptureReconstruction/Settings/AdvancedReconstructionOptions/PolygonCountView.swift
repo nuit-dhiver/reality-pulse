@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Set the upper limit on polygons in the model mesh.
@@ -9,17 +9,17 @@ import SwiftUI
 import RealityKit
 
 struct PolygonCountView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
 
     var body: some View {
-        @Bindable var appDataModel = appDataModel
+        @Bindable var draft = draft
 
         LabeledContent("Max Polygon Count:") {
-            TextField("", value: $appDataModel.sessionConfiguration.customDetailSpecification.maximumPolygonCount, formatter: NumberFormatter())
+            TextField("", value: $draft.sessionConfiguration.customDetailSpecification.maximumPolygonCount, formatter: NumberFormatter())
                 .textFieldStyle(.roundedBorder)
         }
-        .onChange(of: appDataModel.sessionConfiguration.customDetailSpecification.maximumPolygonCount, initial: false) {
-            appDataModel.detailLevelOptionUnderQualityMenu = .custom
+        .onChange(of: draft.sessionConfiguration.customDetailSpecification.maximumPolygonCount, initial: false) {
+            draft.detailLevelOptionUnderQualityMenu = .custom
         }
     }
 }

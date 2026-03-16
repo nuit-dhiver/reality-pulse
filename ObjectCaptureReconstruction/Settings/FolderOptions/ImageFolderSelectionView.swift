@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the image folder.
@@ -14,7 +14,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
 struct ImageFolderSelectionView: View {
     @Binding var selectedFolder: URL?
 
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var showFileImporter = false
 
     var body: some View {
@@ -46,8 +46,8 @@ struct ImageFolderSelectionView: View {
                 if !gotAccess { return }
                 selectedFolder = directory
             case .failure(let error):
-                appDataModel.alertMessage = "\(error)"
-                appDataModel.state = .error
+                draft.alertMessage = "\(error)"
+                draft.hasError = true
             }
         }
 

@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the folder for storing the created models.
@@ -8,7 +8,7 @@ Choose the folder for storing the created models.
 import SwiftUI
 
 struct ModelFolderView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var showFileImporter = false
 
     var body: some View {
@@ -17,7 +17,7 @@ struct ModelFolderView: View {
                 showFileImporter.toggle()
             } label: {
                 HStack {
-                    if let selectedFolder = appDataModel.modelFolder {
+                    if let selectedFolder = draft.modelFolder {
                         HStack {
                             Image(nsImage: NSWorkspace.shared.icon(for: .folder))
                                 .resizable()
@@ -37,10 +37,10 @@ struct ModelFolderView: View {
                 case .success(let directory):
                     let gotAccess = directory.startAccessingSecurityScopedResource()
                     if !gotAccess { return }
-                    appDataModel.modelFolder = directory
+                    draft.modelFolder = directory
                 case .failure(let error):
-                    appDataModel.alertMessage = "\(error)"
-                    appDataModel.state = .error
+                    draft.alertMessage = "\(error)"
+                    draft.hasError = true
                 }
             }
         }

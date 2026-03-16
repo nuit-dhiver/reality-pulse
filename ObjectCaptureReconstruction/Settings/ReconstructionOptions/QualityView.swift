@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the level of detail for the created model.
@@ -9,14 +9,14 @@ import SwiftUI
 import RealityKit
 
 struct QualityView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var showAdvancedOptions = false
 
     var body: some View {
-        @Bindable var appDataModel = appDataModel
+        @Bindable var draft = draft
         
         HStack {
-            Picker("Quality:", selection: $appDataModel.detailLevelOptionUnderQualityMenu) {
+            Picker("Quality:", selection: $draft.detailLevelOptionUnderQualityMenu) {
                 Text("Preview")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.preview)
                 
@@ -46,9 +46,9 @@ struct QualityView: View {
         .popover(isPresented: $showAdvancedOptions) {
             AdvancedReconstructionOptions()
         }
-        .onChange(of: appDataModel.detailLevelOptionUnderQualityMenu) {
-            if appDataModel.detailLevelOptionUnderQualityMenu != .custom {
-                appDataModel.sessionConfiguration.customDetailSpecification = PhotogrammetrySession.Configuration.CustomDetailSpecification()
+        .onChange(of: draft.detailLevelOptionUnderQualityMenu) {
+            if draft.detailLevelOptionUnderQualityMenu != .custom {
+                draft.sessionConfiguration.customDetailSpecification = PhotogrammetrySession.Configuration.CustomDetailSpecification()
             }
         }
     }

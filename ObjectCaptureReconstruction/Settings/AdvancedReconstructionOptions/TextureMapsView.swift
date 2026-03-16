@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the output texture maps to include in the output model.
@@ -9,7 +9,7 @@ import SwiftUI
 import RealityKit
 
 struct TextureMapsView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var selectedTextureMap = PhotogrammetrySession.Configuration.CustomDetailSpecification().outputTextureMaps.rawValue
 
     var body: some View {
@@ -34,11 +34,11 @@ struct TextureMapsView: View {
         }
         .onChange(of: selectedTextureMap, initial: false) {
             let newValue = PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs(rawValue: selectedTextureMap)
-            appDataModel.sessionConfiguration.customDetailSpecification.outputTextureMaps = newValue
-            appDataModel.detailLevelOptionUnderQualityMenu = .custom
+            draft.sessionConfiguration.customDetailSpecification.outputTextureMaps = newValue
+            draft.detailLevelOptionUnderQualityMenu = .custom
         }
         .onAppear {
-            selectedTextureMap = appDataModel.sessionConfiguration.customDetailSpecification.outputTextureMaps.rawValue
+            selectedTextureMap = draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.rawValue
         }
     }
 }

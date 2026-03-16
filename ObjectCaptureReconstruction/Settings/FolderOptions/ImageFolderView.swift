@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the image folder.
@@ -13,7 +13,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
                             category: "ImageFolderView")
 
 struct ImageFolderView: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
     @State private var selectedFolder: URL?
     @State private var imageURLs: [URL] = []
     @State private var numImages: Int?
@@ -57,14 +57,14 @@ struct ImageFolderView: View {
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10)
             .onAppear {
-                selectedFolder = appDataModel.imageFolder
+                selectedFolder = draft.imageFolder
             }
         }
         .frame(height: 110)
         .onChange(of: selectedFolder) {
-            appDataModel.boundingBoxAvailable = false
+            draft.boundingBoxAvailable = false
             metadataAvailability = ImageHelper.MetadataAvailability()
-            appDataModel.imageFolder = selectedFolder
+            draft.imageFolder = selectedFolder
         }
         .dropDestination(for: URL.self) { items, location in
             guard !items.isEmpty else { return false }
@@ -83,23 +83,22 @@ struct ImageFolderView: View {
                 numImages = nil
                 imageURLs = []
                 metadataAvailability = ImageHelper.MetadataAvailability()
-                appDataModel.boundingBoxAvailable = false
+                draft.boundingBoxAvailable = false
                 return
             }
 
             imageURLs = ImageHelper.getListOfURLs(from: selectedFolder)
             if imageURLs.isEmpty {
-                appDataModel.state = .error
-                appDataModel.alertMessage = "\(String(describing: PhotogrammetrySession.Error.invalidImages(selectedFolder)))"
+                draft.hasError = true
+                draft.alertMessage = "\(String(describing: PhotogrammetrySession.Error.invalidImages(selectedFolder)))"
                 self.selectedFolder = nil
                 return
             }
 
             numImages = imageURLs.count
 
-            // Check whether enough metadata is available.
             metadataAvailability = await ImageHelper.loadMetadataAvailability(from: imageURLs)
-            appDataModel.boundingBoxAvailable = metadataAvailability.boundingBox
+            draft.boundingBoxAvailable = metadataAvailability.boundingBox
         }
     }
 

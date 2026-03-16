@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose customizable options on the reconstructed model and textures and process multiple detail levels.
@@ -9,10 +9,10 @@ import SwiftUI
 import RealityKit
 
 struct AdvancedReconstructionOptions: View {
-    @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @Environment(JobDraft.self) private var draft: JobDraft
 
     var body: some View {
-        @Bindable var appDataModel = appDataModel
+        @Bindable var draft = draft
 
         VStack(alignment: .leading) {
             Text("Advanced Reconstruction Options")
@@ -29,22 +29,22 @@ struct AdvancedReconstructionOptions: View {
                 Divider()
                 
                 LabeledContent("Processing") {
-                    Toggle("Process multiple detail levels", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.isSelected)
+                    Toggle("Process multiple detail levels", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.isSelected)
                 }
                 
                 Menu("Choose detail levels") {
-                    Toggle("Preview", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.preview)
+                    Toggle("Preview", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.preview)
 
-                    Toggle("Reduced", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.reduced)
+                    Toggle("Reduced", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.reduced)
 
-                    Toggle("Medium", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.medium)
+                    Toggle("Medium", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.medium)
 
-                    Toggle("Full", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.full)
+                    Toggle("Full", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.full)
 
-                    Toggle("Raw", isOn: $appDataModel.detailLevelOptionsUnderAdvancedMenu.raw)
+                    Toggle("Raw", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.raw)
 
                 }
-                .disabled(!appDataModel.detailLevelOptionsUnderAdvancedMenu.isSelected)
+                .disabled(!draft.detailLevelOptionsUnderAdvancedMenu.isSelected)
             }
         }
         .padding()
