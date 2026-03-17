@@ -30,8 +30,5 @@ struct TextureResolutionView: View {
             Text("16K")
                 .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureDimension.sixteenK)
         }
-        .onChange(of: draft.sessionConfiguration.customDetailSpecification.maximumTextureDimension, initial: false) {
-            draft.detailLevelOptionUnderQualityMenu = .custom
-        }
     }
 }

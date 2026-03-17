@@ -35,7 +35,6 @@ struct TextureMapsView: View {
         .onChange(of: selectedTextureMap, initial: false) {
             let newValue = PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs(rawValue: selectedTextureMap)
             draft.sessionConfiguration.customDetailSpecification.outputTextureMaps = newValue
-            draft.detailLevelOptionUnderQualityMenu = .custom
         }
         .onAppear {
             selectedTextureMap = draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.rawValue

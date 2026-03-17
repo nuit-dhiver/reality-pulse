@@ -58,7 +58,6 @@
 		26B095222C091B740097324A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AdvancedReconstructionOptions/AdvancedReconstructionOptions.swift,
 				AdvancedReconstructionOptions/PolygonCountView.swift,
 				AdvancedReconstructionOptions/TextureFormatView.swift,
 				AdvancedReconstructionOptions/TextureMapsView.swift,
@@ -74,6 +73,8 @@
 				ReconstructionOptions/IgnoreBoundingBoxView.swift,
 				ReconstructionOptions/MaskingView.swift,
 				ReconstructionOptions/MeshTypeView.swift,
+				ReconstructionOptions/MultiModelOutputView.swift,
+				ReconstructionOptions/OutputPreviewView.swift,
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
 				SettingsView.swift,
