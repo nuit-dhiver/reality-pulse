@@ -36,8 +36,10 @@ struct JobSetupView: View {
             Divider()
                 .padding(.top, 8)
 
-            SettingsView()
-                .padding()
+            ScrollView {
+                SettingsView()
+                    .padding()
+            }
 
             Divider()
                 .padding(.horizontal, -20)
