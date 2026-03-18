@@ -100,7 +100,7 @@ struct ScheduleSettingsView: View {
             }
             .padding()
         }
-        .frame(minWidth: 380, minHeight: 300)
+        .frame(minWidth: 456, minHeight: 360)
         .onAppear {
             let config = appDataModel.scheduler.scheduleConfig
             useDelayedStart = config.delayedStart != nil
