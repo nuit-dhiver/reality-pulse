@@ -2,7 +2,9 @@
 See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
-Choose the level of detail for the created model.
+Choose the level of detail for the created model. When "Custom" is
+selected, inline controls for polygon count, texture maps, format,
+and resolution appear directly below the picker.
 */
 
 import SwiftUI
@@ -10,41 +12,45 @@ import RealityKit
 
 struct QualityView: View {
     @Environment(JobDraft.self) private var draft: JobDraft
-    @State private var showAdvancedOptions = false
 
     var body: some View {
         @Bindable var draft = draft
-        
-        HStack {
+
+        VStack(alignment: .leading, spacing: 8) {
             Picker("Quality:", selection: $draft.detailLevelOptionUnderQualityMenu) {
-                Text("Preview")
+                Text("Preview — Fastest, low detail")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.preview)
-                
-                Text("Reduced")
+
+                Text("Reduced — Faster, moderate detail")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.reduced)
-                
-                Text("Medium")
+
+                Text("Medium — Balanced speed & detail")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.medium)
-                
-                Text("Full")
+
+                Text("Full — Slower, high detail")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.full)
-                
-                Text("Raw")
+
+                Text("Raw — Slowest, maximum detail")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.raw)
-                
-                Text("Custom")
+
+                Divider()
+
+                Text("Custom — Set polygon & texture limits")
                     .tag(RealityFoundation.PhotogrammetrySession.Request.Detail.custom)
             }
             .pickerStyle(.menu)
-            
-            Button {
-                showAdvancedOptions = true
-            } label: {
-                Text("Advanced...")
+
+            if draft.detailLevelOptionUnderQualityMenu == .custom {
+                GroupBox("Custom Detail Settings") {
+                    Form {
+                        PolygonCountView()
+                        TextureMapsView()
+                        TextureFormatView()
+                        TextureResolutionView()
+                    }
+                }
+                .padding(.leading, 4)
             }
-        }
-        .popover(isPresented: $showAdvancedOptions) {
-            AdvancedReconstructionOptions()
         }
         .onChange(of: draft.detailLevelOptionUnderQualityMenu) {
             if draft.detailLevelOptionUnderQualityMenu != .custom {

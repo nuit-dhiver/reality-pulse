@@ -18,8 +18,5 @@ struct PolygonCountView: View {
             TextField("", value: $draft.sessionConfiguration.customDetailSpecification.maximumPolygonCount, formatter: NumberFormatter())
                 .textFieldStyle(.roundedBorder)
         }
-        .onChange(of: draft.sessionConfiguration.customDetailSpecification.maximumPolygonCount, initial: false) {
-            draft.detailLevelOptionUnderQualityMenu = .custom
-        }
     }
 }

@@ -21,8 +21,5 @@ struct TextureFormatView: View {
             Text("JPEG")
                 .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureFormat.jpeg(compressionQuality: 0.8))
         }
-        .onChange(of: draft.sessionConfiguration.customDetailSpecification.textureFormat) {
-            draft.detailLevelOptionUnderQualityMenu = .custom
-        }
     }
 }

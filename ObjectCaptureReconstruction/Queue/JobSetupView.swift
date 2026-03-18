@@ -36,8 +36,10 @@ struct JobSetupView: View {
             Divider()
                 .padding(.top, 8)
 
-            SettingsView()
-                .padding()
+            ScrollView {
+                SettingsView()
+                    .padding()
+            }
 
             Divider()
                 .padding(.horizontal, -20)
@@ -46,7 +48,7 @@ struct JobSetupView: View {
                 .padding()
         }
         .environment(draft)
-        .frame(minWidth: 400, minHeight: 360)
+        .frame(minWidth: 480, minHeight: 432)
         .alert(draft.alertMessage, isPresented: $draft.hasError) {
             Button("OK") {}
         }

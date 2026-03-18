@@ -14,8 +14,8 @@ struct ObjectCaptureReconstructionApp: App {
     var body: some Scene {
         Window("Reality Pulse", id: "main") {
             ContentView()
-                .frame(minWidth: 700, minHeight: 500)
+                .frame(minWidth: 840, minHeight: 600)
         }
-        .defaultSize(width: 800, height: 600)
+        .defaultSize(width: 960, height: 720)
     }
 }

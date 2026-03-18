@@ -3,42 +3,53 @@ See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the output texture maps to include in the output model.
+TextureMapOutputs is an OptionSet so multiple maps can be selected.
 */
 
 import SwiftUI
 import RealityKit
 
+private typealias TMO = PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs
+
 struct TextureMapsView: View {
     @Environment(JobDraft.self) private var draft: JobDraft
-    @State private var selectedTextureMap = PhotogrammetrySession.Configuration.CustomDetailSpecification().outputTextureMaps.rawValue
 
     var body: some View {
-        Picker("Texture Maps:", selection: $selectedTextureMap) {
-            Text("Diffuse Color")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.diffuseColor.rawValue)
-            
-            Text("Normal")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.normal.rawValue)
-            
-            Text("Roughness")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.roughness.rawValue)
-            
-            Text("Displacement")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.displacement.rawValue)
-            
-            Text("Ambient Occlusion")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.ambientOcclusion.rawValue)
-            
-            Text("All")
-                .tag(PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs.all.rawValue)
+        LabeledContent("Texture Maps:") {
+            VStack(alignment: .leading, spacing: 4) {
+                mapToggle("Diffuse Color", map: .diffuseColor)
+                mapToggle("Normal", map: .normal)
+                mapToggle("Roughness", map: .roughness)
+                mapToggle("Displacement", map: .displacement)
+                mapToggle("Ambient Occlusion", map: .ambientOcclusion)
+
+                Divider()
+
+                Toggle("All", isOn: allBinding)
+            }
+            .toggleStyle(.checkbox)
         }
-        .onChange(of: selectedTextureMap, initial: false) {
-            let newValue = PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs(rawValue: selectedTextureMap)
-            draft.sessionConfiguration.customDetailSpecification.outputTextureMaps = newValue
-            draft.detailLevelOptionUnderQualityMenu = .custom
-        }
-        .onAppear {
-            selectedTextureMap = draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.rawValue
-        }
+    }
+
+    private func mapToggle(_ label: String, map: TMO) -> some View {
+        Toggle(label, isOn: Binding(
+            get: { draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.contains(map) },
+            set: { enabled in
+                if enabled {
+                    draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.insert(map)
+                } else {
+                    draft.sessionConfiguration.customDetailSpecification.outputTextureMaps.remove(map)
+                }
+            }
+        ))
+    }
+
+    private var allBinding: Binding<Bool> {
+        Binding(
+            get: { draft.sessionConfiguration.customDetailSpecification.outputTextureMaps == .all },
+            set: { enabled in
+                draft.sessionConfiguration.customDetailSpecification.outputTextureMaps = enabled ? .all : []
+            }
+        )
     }
 }
