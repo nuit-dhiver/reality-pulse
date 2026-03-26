@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct ObjectCaptureReconstructionApp: App {
-    static let subsystem: String = "com.example.apple-samplecode.ObjectCaptureReconstruction"
+    static let subsystem: String = "com.realitypulse.app"
 
     var body: some Scene {
         Window("Reality Pulse", id: "main") {

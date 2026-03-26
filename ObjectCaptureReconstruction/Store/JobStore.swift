@@ -21,7 +21,7 @@ class JobStore {
 
     init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let storeDir = appSupport.appending(path: "ObjectCaptureReconstruction")
+        let storeDir = appSupport.appending(path: "RealityPulse")
 
         // Ensure the directory exists.
         try? FileManager.default.createDirectory(at: storeDir, withIntermediateDirectories: true)

@@ -32,7 +32,7 @@
 		3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		971147DC9E6FE3FF0398B220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		F974D1162BE0484500EFACBA /* Object Capture Reconstruction.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Object Capture Reconstruction.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F974D1162BE0484500EFACBA /* Reality Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reality Pulse.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectCaptureReconstructionApp.swift; sourceTree = "<group>"; };
 		F974D11B2BE0484500EFACBA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F974D11D2BE0484700EFACBA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -133,7 +133,7 @@
 		F974D1172BE0484500EFACBA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F974D1162BE0484500EFACBA /* Object Capture Reconstruction.app */,
+				F974D1162BE0484500EFACBA /* Reality Pulse.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -221,7 +221,7 @@
 			);
 			name = ObjectCaptureReconstruction;
 			productName = ObjectCaptureReconstruction;
-			productReference = F974D1162BE0484500EFACBA /* Object Capture Reconstruction.app */;
+			productReference = F974D1162BE0484500EFACBA /* Reality Pulse.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -439,8 +439,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
-				PRODUCT_NAME = "Object Capture Reconstruction";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.realitypulse.app${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
@@ -475,8 +475,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
-				PRODUCT_NAME = "Object Capture Reconstruction";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.realitypulse.app${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
