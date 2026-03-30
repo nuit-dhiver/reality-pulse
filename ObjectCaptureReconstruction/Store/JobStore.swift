@@ -18,6 +18,7 @@ class JobStore {
 
     private let jobsFileURL: URL
     private let scheduleFileURL: URL
+    private let sfmJobsFileURL: URL
 
     init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
@@ -28,6 +29,7 @@ class JobStore {
 
         jobsFileURL = storeDir.appending(path: "jobs.json")
         scheduleFileURL = storeDir.appending(path: "schedule.json")
+        sfmJobsFileURL = storeDir.appending(path: "sfm_jobs.json")
     }
 
     // MARK: - Jobs
@@ -84,6 +86,40 @@ class JobStore {
         } catch {
             logger.warning("Failed to load schedule: \(error)")
             return ScheduleConfig()
+        }
+    }
+
+    // MARK: - SfM Jobs
+
+    func saveSfMJobs(_ jobs: [SfMJob]) {
+        do {
+            let data = try JSONEncoder().encode(jobs)
+            try data.write(to: sfmJobsFileURL, options: .atomic)
+            logger.log("Saved \(jobs.count) SfM job(s) to disk.")
+        } catch {
+            logger.warning("Failed to save SfM jobs: \(error)")
+        }
+    }
+
+    func loadSfMJobs() -> [SfMJob] {
+        guard FileManager.default.fileExists(atPath: sfmJobsFileURL.path()) else { return [] }
+        do {
+            let data = try Data(contentsOf: sfmJobsFileURL)
+            var jobs = try JSONDecoder().decode([SfMJob].self, from: data)
+
+            for index in jobs.indices {
+                _ = jobs[index].resolveBookmarks()
+                if jobs[index].status == .running {
+                    jobs[index].status = .pending
+                    jobs[index].progress = 0
+                }
+            }
+
+            logger.log("Loaded \(jobs.count) SfM job(s) from disk.")
+            return jobs
+        } catch {
+            logger.warning("Failed to load SfM jobs: \(error)")
+            return []
         }
     }
 }
