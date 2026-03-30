@@ -49,6 +49,12 @@ actor COLMAPRunner {
     ) async throws -> URL {
         isCancelled = false
 
+        // Ensure the full output directory tree exists.
+        try FileManager.default.createDirectory(
+            at: outputFolder,
+            withIntermediateDirectories: true
+        )
+
         let databasePath = outputFolder.appending(path: "database.db").path()
         let sparsePath = outputFolder.appending(path: "sparse")
 
@@ -147,6 +153,10 @@ actor COLMAPRunner {
         currentProcess = process
 
         logger.log("Running: colmap \(args.joined(separator: " "))")
+
+        guard FileManager.default.isExecutableFile(atPath: colmapBinaryURL.path()) else {
+            throw COLMAPError.binaryNotFound
+        }
 
         try process.run()
 

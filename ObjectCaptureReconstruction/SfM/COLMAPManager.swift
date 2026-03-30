@@ -13,8 +13,8 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
                             category: "COLMAPManager")
 
 /// Manages the lifecycle of the COLMAP binary: download, cache, verify, and locate.
-@MainActor
-class COLMAPManager: ObservableObject {
+@MainActor @Observable
+class COLMAPManager {
 
     // MARK: - Configuration
 
@@ -34,7 +34,7 @@ class COLMAPManager: ObservableObject {
         case error(String)
     }
 
-    @Published private(set) var status: Status = .notInstalled
+    private(set) var status: Status = .notInstalled
 
     // MARK: - Paths
 
@@ -80,35 +80,54 @@ class COLMAPManager: ObservableObject {
         logger.log("Downloading COLMAP from \(Self.downloadURL)")
         status = .downloading(progress: 0)
 
-        let (tempURL, _) = try await downloadWithProgress(from: Self.downloadURL)
+        do {
+            let (tempURL, _) = try await downloadWithProgress(from: Self.downloadURL)
 
-        defer {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
+            defer {
+                try? FileManager.default.removeItem(at: tempURL)
+            }
 
-        // Verify checksum if configured.
-        if let expected = Self.expectedSHA256 {
-            let actual = try sha256(of: tempURL)
-            guard actual == expected.lowercased() else {
-                let msg = "SHA-256 mismatch: expected \(expected), got \(actual)"
+            // Verify checksum if configured.
+            if let expected = Self.expectedSHA256 {
+                let actual = try sha256(of: tempURL)
+                guard actual == expected.lowercased() else {
+                    let msg = "SHA-256 mismatch: expected \(expected), got \(actual)"
+                    logger.error("\(msg)")
+                    status = .error(msg)
+                    throw COLMAPError.checksumMismatch(expected: expected, actual: actual)
+                }
+                logger.log("SHA-256 verified.")
+            }
+
+            // Extract archive.
+            try await extractArchive(at: tempURL)
+
+            // Mark executable.
+            if FileManager.default.fileExists(atPath: binaryURL.path()) {
+                try FileManager.default.setAttributes(
+                    [.posixPermissions: 0o755],
+                    ofItemAtPath: binaryURL.path()
+                )
+            }
+
+            // Verify the binary actually exists and is executable.
+            guard isInstalled else {
+                let msg = "COLMAP binary not found after extraction. The download URL may be incorrect."
                 logger.error("\(msg)")
                 status = .error(msg)
-                throw COLMAPError.checksumMismatch(expected: expected, actual: actual)
+                throw COLMAPError.binaryNotFound
             }
-            logger.log("SHA-256 verified.")
+
+            refreshStatus()
+            logger.log("COLMAP installed successfully.")
+        } catch let error as COLMAPError {
+            throw error
+        } catch {
+            let msg = "Download failed: \(error.localizedDescription)"
+            logger.error("\(msg)")
+            status = .error(msg)
+            throw error
         }
-
-        // Extract archive.
-        try await extractArchive(at: tempURL)
-
-        // Mark executable.
-        try FileManager.default.setAttributes(
-            [.posixPermissions: 0o755],
-            ofItemAtPath: binaryURL.path()
-        )
-
-        refreshStatus()
-        logger.log("COLMAP installed successfully.")
     }
 
     /// Remove the cached COLMAP binary.

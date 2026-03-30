@@ -133,6 +133,13 @@ class JobScheduler {
         processingTask = Task { await processQueue() }
     }
 
+    /// Whether any pending job requires COLMAP.
+    var hasPendingSfMWork: Bool {
+        let hasSfmJobs = sfmJobs.contains { $0.status == .pending }
+        let hasReconWithSfM = jobs.contains { $0.status == .pending && $0.runSfMFirst }
+        return hasSfmJobs || hasReconWithSfM
+    }
+
     func pause() {
         isPaused = true
         logger.log("Scheduler paused.")
@@ -246,12 +253,21 @@ class JobScheduler {
 
         // Resolve bookmarks for sandbox access.
         let (imageURL, modelURL) = jobs[index].resolveBookmarks()
-        let imageAccess = imageURL?.startAccessingSecurityScopedResource() ?? false
-        let modelAccess = modelURL?.startAccessingSecurityScopedResource() ?? false
+
+        guard let imageURL, let modelURL else {
+            jobs[index].status = .failed
+            jobs[index].errorMessage = "Cannot access saved folders. Please remove and re-add the job."
+            sendNotification(title: "Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        let imageAccess = imageURL.startAccessingSecurityScopedResource()
+        let modelAccess = modelURL.startAccessingSecurityScopedResource()
 
         defer {
-            if imageAccess { imageURL?.stopAccessingSecurityScopedResource() }
-            if modelAccess { modelURL?.stopAccessingSecurityScopedResource() }
+            if imageAccess { imageURL.stopAccessingSecurityScopedResource() }
+            if modelAccess { modelURL.stopAccessingSecurityScopedResource() }
         }
 
         let config = jobs[index].sessionConfiguration.toSessionConfiguration()
@@ -382,12 +398,21 @@ class JobScheduler {
 
         // Resolve bookmarks for sandbox access.
         let (imageURL, outputURL) = sfmJobs[index].resolveBookmarks()
-        let imageAccess = imageURL?.startAccessingSecurityScopedResource() ?? false
-        let outputAccess = outputURL?.startAccessingSecurityScopedResource() ?? false
+
+        guard let imageURL, let outputURL else {
+            sfmJobs[index].status = .failed
+            sfmJobs[index].errorMessage = "Cannot access saved folders. Please remove and re-add the job."
+            sendNotification(title: "SfM Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        let imageAccess = imageURL.startAccessingSecurityScopedResource()
+        let outputAccess = outputURL.startAccessingSecurityScopedResource()
 
         defer {
-            if imageAccess { imageURL?.stopAccessingSecurityScopedResource() }
-            if outputAccess { outputURL?.stopAccessingSecurityScopedResource() }
+            if imageAccess { imageURL.stopAccessingSecurityScopedResource() }
+            if outputAccess { outputURL.stopAccessingSecurityScopedResource() }
         }
 
         do {
