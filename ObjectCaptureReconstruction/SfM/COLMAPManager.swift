@@ -80,6 +80,11 @@ class COLMAPManager {
         logger.log("Downloading COLMAP from \(Self.downloadURL)")
         status = .downloading(progress: 0)
 
+        // Clean up any leftover files from a previous failed install.
+        if FileManager.default.fileExists(atPath: binaryURL.path()) {
+            try? FileManager.default.removeItem(at: binaryURL)
+        }
+
         do {
             let (tempURL, _) = try await downloadWithProgress(from: Self.downloadURL)
 
@@ -212,6 +217,9 @@ class COLMAPManager {
 
         guard process.terminationStatus == 0 else {
             // Fallback: maybe it's a plain binary, not an archive.
+            if FileManager.default.fileExists(atPath: binaryURL.path()) {
+                try FileManager.default.removeItem(at: binaryURL)
+            }
             try FileManager.default.moveItem(at: archiveURL, to: binaryURL)
             return
         }
