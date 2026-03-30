@@ -80,16 +80,24 @@ class COLMAPManager {
         logger.log("Downloading COLMAP from \(Self.downloadURL)")
         status = .downloading(progress: 0)
 
-        // Clean up any leftover files from a previous failed install.
-        if FileManager.default.fileExists(atPath: binaryURL.path()) {
-            try? FileManager.default.removeItem(at: binaryURL)
-        }
+        // Wipe the entire store directory and recreate it to ensure a clean slate.
+        try? FileManager.default.removeItem(at: storeDirectory)
+        try FileManager.default.createDirectory(at: storeDirectory, withIntermediateDirectories: true)
 
         do {
-            let (tempURL, _) = try await downloadWithProgress(from: Self.downloadURL)
+            let (tempURL, response) = try await downloadWithProgress(from: Self.downloadURL)
 
             defer {
                 try? FileManager.default.removeItem(at: tempURL)
+            }
+
+            // Validate HTTP response.
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200..<300).contains(httpResponse.statusCode) {
+                let msg = "Download failed: HTTP \(httpResponse.statusCode)"
+                logger.error("\(msg)")
+                status = .error(msg)
+                throw COLMAPError.invalidOutput(msg)
             }
 
             // Verify checksum if configured.
@@ -206,39 +214,54 @@ class COLMAPManager {
     }
 
     private func extractArchive(at archiveURL: URL) async throws {
+        // Extract to a temporary directory first, then move the binary out.
+        let extractDir = FileManager.default.temporaryDirectory
+            .appending(path: "colmap-extract-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: extractDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: extractDir) }
+
         let process = Process()
         process.executableURL = URL(filePath: "/usr/bin/tar")
-        process.arguments = ["-xzf", archiveURL.path(), "-C", storeDirectory.path()]
+        process.arguments = ["-xzf", archiveURL.path(), "-C", extractDir.path()]
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
 
         try process.run()
         process.waitUntilExit()
 
-        guard process.terminationStatus == 0 else {
-            // Fallback: maybe it's a plain binary, not an archive.
-            if FileManager.default.fileExists(atPath: binaryURL.path()) {
-                try FileManager.default.removeItem(at: binaryURL)
+        if process.terminationStatus == 0 {
+            // Find the colmap binary in the extracted contents.
+            if let foundBinary = findBinary(named: Self.binaryName, in: extractDir) {
+                try? FileManager.default.removeItem(at: binaryURL)
+                try FileManager.default.moveItem(at: foundBinary, to: binaryURL)
+            } else {
+                throw COLMAPError.invalidOutput("Archive extracted but no '\(Self.binaryName)' binary found inside.")
             }
-            try FileManager.default.moveItem(at: archiveURL, to: binaryURL)
-            return
-        }
-
-        // If extraction created a nested directory, move the binary up.
-        let extracted = try FileManager.default.contentsOfDirectory(at: storeDirectory, includingPropertiesForKeys: nil)
-        if let nested = extracted.first(where: { $0.lastPathComponent != Self.binaryName && $0.hasDirectoryPath }) {
-            let nestedBinary = nested.appending(path: Self.binaryName)
-            if FileManager.default.fileExists(atPath: nestedBinary.path()) {
-                if FileManager.default.fileExists(atPath: binaryURL.path()) {
-                    try FileManager.default.removeItem(at: binaryURL)
-                }
-                try FileManager.default.moveItem(at: nestedBinary, to: binaryURL)
-                try FileManager.default.removeItem(at: nested)
-            }
+        } else {
+            // Not a tar archive — treat the raw download as the binary itself.
+            try? FileManager.default.removeItem(at: binaryURL)
+            try FileManager.default.copyItem(at: archiveURL, to: binaryURL)
         }
 
         // Try to extract version info.
         await saveVersionInfo()
+    }
+
+    /// Recursively search for a binary by name in a directory.
+    private func findBinary(named name: String, in directory: URL) -> URL? {
+        guard let enumerator = FileManager.default.enumerator(
+            at: directory,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else { return nil }
+
+        for case let fileURL as URL in enumerator {
+            if fileURL.lastPathComponent == name {
+                let isFile = (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) ?? false
+                if isFile { return fileURL }
+            }
+        }
+        return nil
     }
 
     private func saveVersionInfo() async {
