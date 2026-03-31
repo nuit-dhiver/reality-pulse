@@ -19,8 +19,7 @@ class COLMAPManager {
     // MARK: - Configuration
 
     /// URL to fetch the pre-compiled COLMAP binary for Apple Silicon.
-    /// Update this to point to your project's hosted release artifact.
-    static let downloadURL = URL(string: "https://github.com/colmap/colmap/releases/latest/download/colmap-arm64-apple-darwin.tar.gz")!
+    static let downloadURL = URL(string: "https://github.com/nuit-dhiver/colmap/releases/download/Beta/colmap")!
 
     /// Expected SHA-256 hex digest of the downloaded archive. Set to `nil` to skip verification.
     static var expectedSHA256: String?
@@ -180,8 +179,9 @@ class COLMAPManager {
         let totalBytes = response.expectedContentLength
         var receivedBytes: Int64 = 0
 
+        // Use a neutral temp filename (the download may be a plain binary, not an archive).
         let tempURL = FileManager.default.temporaryDirectory
-            .appending(path: "colmap-download-\(UUID().uuidString).tar.gz")
+            .appending(path: "colmap-download-\(UUID().uuidString)")
         FileManager.default.createFile(atPath: tempURL.path(), contents: nil)
 
         let fileHandle = try FileHandle(forWritingTo: tempURL)
