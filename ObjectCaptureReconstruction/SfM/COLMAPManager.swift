@@ -18,8 +18,8 @@ class COLMAPManager {
 
     // MARK: - Configuration
 
-    /// URL to fetch the pre-compiled COLMAP binary for Apple Silicon.
-    static let downloadURL = URL(string: "https://github.com/nuit-dhiver/colmap/releases/download/Beta/colmap")!
+    /// URL to fetch the pre-compiled COLMAP binary for Apple Silicon (tar.gz archive).
+    static let downloadURL = URL(string: "https://github.com/nuit-dhiver/colmap/releases/download/Beta/colmap.tar.gz")!
 
     /// Expected SHA-256 hex digest of the downloaded archive. Set to `nil` to skip verification.
     static var expectedSHA256: String?
@@ -179,9 +179,8 @@ class COLMAPManager {
         let totalBytes = response.expectedContentLength
         var receivedBytes: Int64 = 0
 
-        // Use a neutral temp filename (the download may be a plain binary, not an archive).
         let tempURL = FileManager.default.temporaryDirectory
-            .appending(path: "colmap-download-\(UUID().uuidString)")
+            .appending(path: "colmap-download-\(UUID().uuidString).tar.gz")
         FileManager.default.createFile(atPath: tempURL.path(), contents: nil)
 
         let fileHandle = try FileHandle(forWritingTo: tempURL)
@@ -214,54 +213,26 @@ class COLMAPManager {
     }
 
     private func extractArchive(at archiveURL: URL) async throws {
-        // Extract to a temporary directory first, then move the binary out.
-        let extractDir = FileManager.default.temporaryDirectory
-            .appending(path: "colmap-extract-\(UUID().uuidString)")
-        try FileManager.default.createDirectory(at: extractDir, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: extractDir) }
-
+        // The archive contains ./colmap at its root — extract directly into storeDirectory.
         let process = Process()
         process.executableURL = URL(filePath: "/usr/bin/tar")
-        process.arguments = ["-xzf", archiveURL.path(), "-C", extractDir.path()]
+        process.arguments = ["-xzf", archiveURL.path(), "-C", storeDirectory.path()]
         process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
+
+        let stderrPipe = Pipe()
+        process.standardError = stderrPipe
 
         try process.run()
         process.waitUntilExit()
 
-        if process.terminationStatus == 0 {
-            // Find the colmap binary in the extracted contents.
-            if let foundBinary = findBinary(named: Self.binaryName, in: extractDir) {
-                try? FileManager.default.removeItem(at: binaryURL)
-                try FileManager.default.moveItem(at: foundBinary, to: binaryURL)
-            } else {
-                throw COLMAPError.invalidOutput("Archive extracted but no '\(Self.binaryName)' binary found inside.")
-            }
-        } else {
-            // Not a tar archive — treat the raw download as the binary itself.
-            try? FileManager.default.removeItem(at: binaryURL)
-            try FileManager.default.copyItem(at: archiveURL, to: binaryURL)
+        guard process.terminationStatus == 0 else {
+            let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+            let stderrMsg = String(data: stderrData, encoding: .utf8) ?? "unknown error"
+            throw COLMAPError.invalidOutput("tar failed: \(stderrMsg)")
         }
 
         // Try to extract version info.
         await saveVersionInfo()
-    }
-
-    /// Recursively search for a binary by name in a directory.
-    private func findBinary(named name: String, in directory: URL) -> URL? {
-        guard let enumerator = FileManager.default.enumerator(
-            at: directory,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        ) else { return nil }
-
-        for case let fileURL as URL in enumerator {
-            if fileURL.lastPathComponent == name {
-                let isFile = (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) ?? false
-                if isFile { return fileURL }
-            }
-        }
-        return nil
     }
 
     private func saveVersionInfo() async {
