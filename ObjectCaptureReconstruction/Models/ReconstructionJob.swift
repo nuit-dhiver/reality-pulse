@@ -26,6 +26,10 @@ struct ReconstructionJob: Identifiable, Codable {
     var boundingBoxAvailable: Bool = false
     var createdAt: Date
 
+    /// Whether to run SfM (COLMAP camera pose estimation) before reconstruction.
+    var runSfMFirst: Bool = false
+    var sfmConfiguration: CodableSfMConfiguration?
+
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?

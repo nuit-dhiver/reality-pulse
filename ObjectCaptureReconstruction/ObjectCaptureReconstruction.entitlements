@@ -8,5 +8,7 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>com.apple.security.temporary-exception.sbpl</key>
+	<string>(allow process-exec (subpath "/Users") (subpath "/Library"))</string>
 </dict>
 </plist>

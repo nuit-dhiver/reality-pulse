@@ -22,7 +22,7 @@ struct QueueDashboardView: View {
             Divider()
 
             // Job list
-            if appDataModel.scheduler.jobs.isEmpty {
+            if appDataModel.scheduler.jobs.isEmpty && appDataModel.scheduler.sfmJobs.isEmpty {
                 emptyState
             } else {
                 jobList
@@ -58,31 +58,64 @@ struct QueueDashboardView: View {
 
     private var jobList: some View {
         List {
-            ForEach(appDataModel.scheduler.jobs) { job in
-                JobRowView(job: job)
-                    .contextMenu {
-                        if job.status == .pending {
-                            Button("Edit") {
-                                appDataModel.editingJob = job
-                                appDataModel.showingJobSetup = true
-                            }
-                        }
+            // SfM jobs section
+            if !appDataModel.scheduler.sfmJobs.isEmpty {
+                Section("SfM Jobs") {
+                    ForEach(appDataModel.scheduler.sfmJobs) { job in
+                        SfMJobRowView(job: job)
+                            .contextMenu {
+                                if job.status == .failed {
+                                    Button("Retry") {
+                                        appDataModel.scheduler.retrySfMJob(job)
+                                    }
+                                }
 
-                        if job.status == .failed {
-                            Button("Retry") {
-                                appDataModel.scheduler.retryJob(job)
-                            }
-                        }
+                                if job.status == .pending || job.status == .failed || job.status == .cancelled {
+                                    Button("Remove", role: .destructive) {
+                                        appDataModel.scheduler.removeSfMJob(job)
+                                    }
+                                }
 
-                        if job.status == .pending || job.status == .failed || job.status == .cancelled {
-                            Button("Remove", role: .destructive) {
-                                appDataModel.scheduler.removeJob(job)
+                                if job.status == .completed {
+                                    Button("Open in Finder") {
+                                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: job.colmapOutputDirectory.path())
+                                    }
+                                }
                             }
-                        }
                     }
+                }
             }
-            .onMove { source, destination in
-                appDataModel.scheduler.moveJob(from: source, to: destination)
+
+            // Reconstruction jobs section
+            if !appDataModel.scheduler.jobs.isEmpty {
+                Section("Reconstruction Jobs") {
+                    ForEach(appDataModel.scheduler.jobs) { job in
+                        JobRowView(job: job)
+                            .contextMenu {
+                                if job.status == .pending {
+                                    Button("Edit") {
+                                        appDataModel.editingJob = job
+                                        appDataModel.showingJobSetup = true
+                                    }
+                                }
+
+                                if job.status == .failed {
+                                    Button("Retry") {
+                                        appDataModel.scheduler.retryJob(job)
+                                    }
+                                }
+
+                                if job.status == .pending || job.status == .failed || job.status == .cancelled {
+                                    Button("Remove", role: .destructive) {
+                                        appDataModel.scheduler.removeJob(job)
+                                    }
+                                }
+                            }
+                    }
+                    .onMove { source, destination in
+                        appDataModel.scheduler.moveJob(from: source, to: destination)
+                    }
+                }
             }
         }
         .listStyle(.inset(alternatesRowBackgrounds: true))
@@ -134,13 +167,16 @@ private struct QueueHeaderView: View {
 
     private var statusSummary: String {
         let scheduler = appDataModel.scheduler
-        let total = scheduler.jobs.count
+        let total = scheduler.totalJobCount
         let completed = scheduler.completedJobCount
         let pending = scheduler.pendingJobCount
 
         if scheduler.isRunning {
             if scheduler.isPaused {
                 return "Paused — \(completed)/\(total) complete"
+            }
+            if !scheduler.currentSfMPhase.isEmpty {
+                return "\(scheduler.currentSfMPhase) — \(completed)/\(total) complete"
             }
             return "Processing — \(completed)/\(total) complete"
         }
@@ -172,6 +208,12 @@ private struct QueueFooterView: View {
             }
 
             Spacer()
+
+            Button {
+                appDataModel.showingSfMJobSetup = true
+            } label: {
+                Label("Add SfM Job", systemImage: "viewfinder")
+            }
 
             Button {
                 appDataModel.editingJob = nil

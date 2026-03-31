@@ -29,6 +29,12 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     var detailLevelOptionUnderQualityMenu: PhotogrammetrySession.Request.Detail = .medium
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
 
+    // MARK: - SfM pre-step
+
+    /// Whether to run SfM (camera pose estimation) before reconstruction.
+    var runSfMFirst: Bool = false
+    var sfmConfiguration: CodableSfMConfiguration = CodableSfMConfiguration()
+
     // MARK: - Error surface (used by ImageFolderView, ModelFolderView, etc.)
 
     var alertMessage: String = ""
@@ -49,6 +55,9 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         sessionConfiguration = job.sessionConfiguration.toSessionConfiguration()
         detailLevelOptionUnderQualityMenu = job.primaryDetailLevel.toFrameworkType
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
+
+        runSfMFirst = job.runSfMFirst
+        sfmConfiguration = job.sfmConfiguration ?? CodableSfMConfiguration()
     }
 
     // MARK: - Conversion
@@ -69,6 +78,8 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
             additionalDetailLevels: detailLevelOptionsUnderAdvancedMenu
         )
         job.boundingBoxAvailable = boundingBoxAvailable
+        job.runSfMFirst = runSfMFirst
+        job.sfmConfiguration = runSfMFirst ? sfmConfiguration : nil
         return job
     }
 

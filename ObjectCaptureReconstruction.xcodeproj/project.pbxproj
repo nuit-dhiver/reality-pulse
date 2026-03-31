@@ -11,6 +11,7 @@
 		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
 		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
 		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
+		DD0002DD0002DD01 /* colmap-bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD0002DD0002DD02 /* colmap-bundle */; };
 		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
 		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
 		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
@@ -23,6 +24,17 @@
 		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
 		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
 		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
+		CC0001CC0001CC01 /* COLMAPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA01 /* COLMAPManager.swift */; };
+		CC0001CC0001CC02 /* COLMAPRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA02 /* COLMAPRunner.swift */; };
+		CC0001CC0001CC03 /* COLMAPBinaryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA03 /* COLMAPBinaryExporter.swift */; };
+		CC0001CC0001CC04 /* COLMAPBinaryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA04 /* COLMAPBinaryParser.swift */; };
+		CC0001CC0001CC05 /* SfMConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA05 /* SfMConfiguration.swift */; };
+		CC0001CC0001CC06 /* SfMResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA06 /* SfMResult.swift */; };
+		CC0001CC0001CC07 /* SfMJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA07 /* SfMJob.swift */; };
+		CC0001CC0001CC08 /* SfMProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001AA0001AA08 /* SfMProgressTracker.swift */; };
+		CC0001CC0001CC09 /* SfMJobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB01 /* SfMJobSetupView.swift */; };
+		CC0001CC0001CC10 /* SfMJobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB02 /* SfMJobRowView.swift */; };
+		CC0001CC0001CC11 /* COLMAPStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB03 /* COLMAPStatusView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +64,18 @@
 		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
 		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
 		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA01 /* COLMAPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPManager.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA02 /* COLMAPRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPRunner.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA03 /* COLMAPBinaryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPBinaryExporter.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA04 /* COLMAPBinaryParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPBinaryParser.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA05 /* SfMConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMConfiguration.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA06 /* SfMResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMResult.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA07 /* SfMJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJob.swift; sourceTree = "<group>"; };
+		AA0001AA0001AA08 /* SfMProgressTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMProgressTracker.swift; sourceTree = "<group>"; };
+		BB0001BB0001BB01 /* SfMJobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobSetupView.swift; sourceTree = "<group>"; };
+		BB0001BB0001BB02 /* SfMJobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobRowView.swift; sourceTree = "<group>"; };
+		BB0001BB0001BB03 /* COLMAPStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPStatusView.swift; sourceTree = "<group>"; };
+		DD0002DD0002DD02 /* colmap-bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "colmap-bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -78,6 +102,7 @@
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
 				SettingsView.swift,
+				SfMOptions/SfMOptionsView.swift,
 			);
 			target = F974D1152BE0484500EFACBA /* ObjectCaptureReconstruction */;
 		};
@@ -152,6 +177,8 @@
 				992CB303C65294FA4C0E9608 /* Scheduler */,
 				195BAF6352F89DD77AFC2745 /* Store */,
 				E195DA07BD54DDE970F27E56 /* Queue */,
+				DD0001DD0001DD01 /* SfM */,
+				DD0002DD0002DD03 /* Resources */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -200,8 +227,34 @@
 				BCE344691F76FD3CE82E7FCF /* */,
 				33550E6E2F6D8F14E9A9C282 /* */,
 				37404910B7FC7310289216C7 /* */,
+				BB0001BB0001BB01 /* SfMJobSetupView.swift */,
+				BB0001BB0001BB02 /* SfMJobRowView.swift */,
+				BB0001BB0001BB03 /* COLMAPStatusView.swift */,
 			);
 			path = Queue;
+			sourceTree = "<group>";
+		};
+		DD0001DD0001DD01 /* SfM */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001AA0001AA01 /* COLMAPManager.swift */,
+				AA0001AA0001AA02 /* COLMAPRunner.swift */,
+				AA0001AA0001AA03 /* COLMAPBinaryExporter.swift */,
+				AA0001AA0001AA04 /* COLMAPBinaryParser.swift */,
+				AA0001AA0001AA05 /* SfMConfiguration.swift */,
+				AA0001AA0001AA06 /* SfMResult.swift */,
+				AA0001AA0001AA07 /* SfMJob.swift */,
+				AA0001AA0001AA08 /* SfMProgressTracker.swift */,
+			);
+			path = SfM;
+			sourceTree = "<group>";
+		};
+		DD0002DD0002DD03 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DD0002DD0002DD02 /* colmap-bundle */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -264,6 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */,
+				DD0002DD0002DD01 /* colmap-bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +343,17 @@
 				665189C5915C218406A40D61 /* JobRowView.swift in Sources */,
 				DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */,
 				5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */,
+				CC0001CC0001CC01 /* COLMAPManager.swift in Sources */,
+				CC0001CC0001CC02 /* COLMAPRunner.swift in Sources */,
+				CC0001CC0001CC03 /* COLMAPBinaryExporter.swift in Sources */,
+				CC0001CC0001CC04 /* COLMAPBinaryParser.swift in Sources */,
+				CC0001CC0001CC05 /* SfMConfiguration.swift in Sources */,
+				CC0001CC0001CC06 /* SfMResult.swift in Sources */,
+				CC0001CC0001CC07 /* SfMJob.swift in Sources */,
+				CC0001CC0001CC08 /* SfMProgressTracker.swift in Sources */,
+				CC0001CC0001CC09 /* SfMJobSetupView.swift in Sources */,
+				CC0001CC0001CC10 /* SfMJobRowView.swift in Sources */,
+				CC0001CC0001CC11 /* COLMAPStatusView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

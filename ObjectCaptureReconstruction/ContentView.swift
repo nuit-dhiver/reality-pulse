@@ -19,6 +19,10 @@ struct ContentView: View {
                 JobSetupView(existingJob: appDataModel.editingJob)
                     .environment(appDataModel)
             }
+            .sheet(isPresented: $appDataModel.showingSfMJobSetup) {
+                SfMJobSetupView()
+                    .environment(appDataModel)
+            }
             .sheet(isPresented: $appDataModel.showingScheduleSettings) {
                 ScheduleSettingsView()
                     .environment(appDataModel)

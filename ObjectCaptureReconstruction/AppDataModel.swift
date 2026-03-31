@@ -32,6 +32,9 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     /// Whether the job-setup sheet is presented.
     var showingJobSetup = false
 
+    /// Whether the SfM job-setup sheet is presented.
+    var showingSfMJobSetup = false
+
     /// Whether the schedule-settings sheet is presented.
     var showingScheduleSettings = false
 
