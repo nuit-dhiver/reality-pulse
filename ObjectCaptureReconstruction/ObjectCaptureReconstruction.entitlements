@@ -8,8 +8,6 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<key>com.apple.security.files.downloads.read-write</key>
-	<true/>
 	<key>com.apple.security.temporary-exception.sbpl</key>
 	<string>(allow process-exec (subpath "/Users") (subpath "/Library"))</string>
 </dict>

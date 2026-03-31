@@ -21,14 +21,6 @@ struct QueueDashboardView: View {
 
             Divider()
 
-            // COLMAP status banner (shown when not installed or downloading)
-            if case .installed = appDataModel.scheduler.colmapManager.status {
-                // Installed — hide the banner
-            } else {
-                COLMAPStatusView()
-                Divider()
-            }
-
             // Job list
             if appDataModel.scheduler.jobs.isEmpty && appDataModel.scheduler.sfmJobs.isEmpty {
                 emptyState
@@ -165,13 +157,7 @@ private struct QueueHeaderView: View {
                 .foregroundStyle(.red)
             } else if appDataModel.scheduler.pendingJobCount > 0 {
                 Button("Start") {
-                    if appDataModel.scheduler.hasPendingSfMWork &&
-                       !appDataModel.scheduler.colmapManager.isInstalled {
-                        appDataModel.alertMessage = "COLMAP is required for SfM jobs but is not installed. Please install it from the banner below."
-                        appDataModel.state = .error
-                    } else {
-                        appDataModel.scheduler.start()
-                    }
+                    appDataModel.scheduler.start()
                 }
                 .buttonStyle(.borderedProminent)
             }

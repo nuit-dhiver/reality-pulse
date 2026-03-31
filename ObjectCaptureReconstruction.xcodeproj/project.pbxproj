@@ -11,6 +11,7 @@
 		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
 		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
 		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
+		DD0002DD0002DD01 /* colmap in Resources */ = {isa = PBXBuildFile; fileRef = DD0002DD0002DD02 /* colmap */; };
 		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
 		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
 		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
@@ -74,6 +75,7 @@
 		BB0001BB0001BB01 /* SfMJobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobSetupView.swift; sourceTree = "<group>"; };
 		BB0001BB0001BB02 /* SfMJobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobRowView.swift; sourceTree = "<group>"; };
 		BB0001BB0001BB03 /* COLMAPStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPStatusView.swift; sourceTree = "<group>"; };
+		DD0002DD0002DD02 /* colmap */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = colmap; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -176,6 +178,7 @@
 				195BAF6352F89DD77AFC2745 /* Store */,
 				E195DA07BD54DDE970F27E56 /* Queue */,
 				DD0001DD0001DD01 /* SfM */,
+				DD0002DD0002DD03 /* Resources */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -246,6 +249,14 @@
 			path = SfM;
 			sourceTree = "<group>";
 		};
+		DD0002DD0002DD03 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DD0002DD0002DD02 /* colmap */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -306,6 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */,
+				DD0002DD0002DD01 /* colmap in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
