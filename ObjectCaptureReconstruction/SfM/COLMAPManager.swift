@@ -213,49 +213,59 @@ class COLMAPManager {
     }
 
     private func extractArchive(at archiveURL: URL) async throws {
-        // The archive contains ./colmap at its root — extract directly into storeDirectory.
-        let process = Process()
-        process.executableURL = URL(filePath: "/usr/bin/tar")
-        process.arguments = ["-xzf", archiveURL.path(), "-C", storeDirectory.path()]
-        process.standardOutput = FileHandle.nullDevice
+        // Run tar in a background thread — waitUntilExit() is blocking.
+        let storeDir = storeDirectory.path()
+        let archivePath = archiveURL.path()
 
-        let stderrPipe = Pipe()
-        process.standardError = stderrPipe
+        try await Task.detached(priority: .userInitiated) {
+            let process = Process()
+            process.executableURL = URL(filePath: "/usr/bin/tar")
+            process.arguments = ["-xzf", archivePath, "-C", storeDir]
+            process.standardOutput = FileHandle.nullDevice
 
-        try process.run()
-        process.waitUntilExit()
+            let stderrPipe = Pipe()
+            process.standardError = stderrPipe
 
-        guard process.terminationStatus == 0 else {
-            let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
-            let stderrMsg = String(data: stderrData, encoding: .utf8) ?? "unknown error"
-            throw COLMAPError.invalidOutput("tar failed: \(stderrMsg)")
-        }
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else {
+                let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+                let stderrMsg = String(data: stderrData, encoding: .utf8) ?? "unknown error"
+                throw COLMAPError.invalidOutput("tar failed: \(stderrMsg)")
+            }
+        }.value
 
         // Try to extract version info.
         await saveVersionInfo()
     }
 
     private func saveVersionInfo() async {
-        let process = Process()
-        process.executableURL = binaryURL
-        process.arguments = ["--version"]
+        let binaryPath = binaryURL.path()
+        let versionFilePath = storeDirectory.appending(path: "version.txt").path()
 
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = FileHandle.nullDevice
+        await Task.detached(priority: .background) {
+            let process = Process()
+            process.executableURL = URL(filePath: binaryPath)
+            process.arguments = ["--version"]
 
-        do {
-            try process.run()
-            process.waitUntilExit()
+            let pipe = Pipe()
+            process.standardOutput = pipe
+            process.standardError = FileHandle.nullDevice
 
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                let versionFile = storeDirectory.appending(path: "version.txt")
-                try output.write(to: versionFile, atomically: true, encoding: .utf8)
+            do {
+                try process.run()
+                process.waitUntilExit()
+
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !output.isEmpty {
+                    try? output.write(toFile: versionFilePath, atomically: true, encoding: .utf8)
+                }
+            } catch {
+                // Version detection is best-effort — ignore failures.
             }
-        } catch {
-            logger.warning("Could not determine COLMAP version: \(error)")
-        }
+        }.value
     }
 
     // MARK: - Checksum
