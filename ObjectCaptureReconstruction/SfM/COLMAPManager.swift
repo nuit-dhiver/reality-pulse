@@ -26,23 +26,32 @@ class COLMAPManager {
 
     // MARK: - Paths
 
-    /// Full path to the bundled COLMAP executable.
+    /// Full path to the bundled COLMAP executable inside colmap-bundle/.
     var binaryURL: URL {
-        if let url = Bundle.main.url(forResource: "colmap", withExtension: nil) {
-            logger.info("Found colmap via forResource: \(url.path)")
-            return url
-        }
         if let resourceURL = Bundle.main.resourceURL {
-            let url = resourceURL.appendingPathComponent("colmap")
-            logger.info("Constructed colmap path from resourceURL: \(url.path)")
+            let url = resourceURL
+                .appendingPathComponent("colmap-bundle")
+                .appendingPathComponent("bin")
+                .appendingPathComponent("colmap")
+            logger.info("COLMAP binary path: \(url.path)")
             return url
         }
         let url = Bundle.main.bundleURL
             .appendingPathComponent("Contents")
             .appendingPathComponent("Resources")
+            .appendingPathComponent("colmap-bundle")
+            .appendingPathComponent("bin")
             .appendingPathComponent("colmap")
         logger.info("Fallback colmap path: \(url.path)")
         return url
+    }
+
+    /// Path to the bundled dylib directory (colmap-bundle/lib/).
+    var libraryDirectoryURL: URL {
+        binaryURL
+            .deletingLastPathComponent()  // bin/
+            .deletingLastPathComponent()  // colmap-bundle/
+            .appendingPathComponent("lib")
     }
 
     var isInstalled: Bool {

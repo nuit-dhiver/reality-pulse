@@ -97,15 +97,13 @@ struct SfMConfiguration: Codable, Equatable {
             "--database_path", databasePath,
             "--image_path", imagePath,
             "--ImageReader.camera_model", cameraModelString,
-            "--SiftExtraction.max_num_features", "\(effectiveMaxFeatures)"
+            "--SiftExtraction.max_num_features", "\(effectiveMaxFeatures)",
+            // Bundled COLMAP is built without CUDA; always disable GPU.
+            "--FeatureExtraction.use_gpu", "0"
         ]
 
         if sharedIntrinsics {
             args += ["--ImageReader.single_camera", "1"]
-        }
-
-        if !useGPU {
-            args += ["--SiftExtraction.use_gpu", "0"]
         }
 
         return args
@@ -113,16 +111,12 @@ struct SfMConfiguration: Codable, Equatable {
 
     /// Arguments for `colmap exhaustive_matcher` or `sequential_matcher`.
     func matcherArgs(databasePath: String) -> [String] {
-        var args = [
+        [
             matcherType == .exhaustive ? "exhaustive_matcher" : "sequential_matcher",
-            "--database_path", databasePath
+            "--database_path", databasePath,
+            // Bundled COLMAP is built without CUDA; always disable GPU.
+            "--FeatureMatching.use_gpu", "0"
         ]
-
-        if !useGPU {
-            args += ["--SiftMatching.use_gpu", "0"]
-        }
-
-        return args
     }
 
     /// Arguments for `colmap mapper`.

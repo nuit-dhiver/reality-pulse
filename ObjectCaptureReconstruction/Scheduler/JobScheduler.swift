@@ -290,7 +290,8 @@ class JobScheduler {
                 try await colmapManager.ensureAvailable()
 
                 let sfmOutputDir = jobs[index].modelFolder.appending(path: "\(jobName)-sfm")
-                let runner = COLMAPRunner(colmapBinaryURL: colmapManager.binaryURL)
+                let runner = COLMAPRunner(colmapBinaryURL: colmapManager.binaryURL,
+                                         libraryDirectoryURL: colmapManager.libraryDirectoryURL)
                 currentCOLMAPRunner = runner
 
                 let sparseDir = try await runner.run(
@@ -421,7 +422,8 @@ class JobScheduler {
             let sfmOutputDir = sfmJobs[index].colmapOutputDirectory
             let config = sfmJobs[index].sfmConfiguration.toSfMConfiguration()
 
-            let runner = COLMAPRunner(colmapBinaryURL: colmapManager.binaryURL)
+            let runner = COLMAPRunner(colmapBinaryURL: colmapManager.binaryURL,
+                                     libraryDirectoryURL: colmapManager.libraryDirectoryURL)
             currentCOLMAPRunner = runner
 
             let sparseDir = try await runner.run(

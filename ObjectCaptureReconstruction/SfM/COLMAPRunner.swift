@@ -30,11 +30,13 @@ actor COLMAPRunner {
     }
 
     private let colmapBinaryURL: URL
+    private let libraryDirectoryURL: URL?
     private var currentProcess: Process?
     private var isCancelled = false
 
-    init(colmapBinaryURL: URL) {
+    init(colmapBinaryURL: URL, libraryDirectoryURL: URL? = nil) {
         self.colmapBinaryURL = colmapBinaryURL
+        self.libraryDirectoryURL = libraryDirectoryURL
     }
 
     // MARK: - Public API
@@ -147,6 +149,14 @@ actor COLMAPRunner {
         let process = Process()
         process.executableURL = colmapBinaryURL
         process.arguments = args
+
+        // Set DYLD_LIBRARY_PATH as a fallback so dyld can find the bundled libs
+        // even if @loader_path resolution fails inside a sandbox.
+        if let libDir = libraryDirectoryURL {
+            var env = ProcessInfo.processInfo.environment
+            env["DYLD_LIBRARY_PATH"] = libDir.path
+            process.environment = env
+        }
 
         let stdoutPipe = Pipe()
         let stderrPipe = Pipe()
