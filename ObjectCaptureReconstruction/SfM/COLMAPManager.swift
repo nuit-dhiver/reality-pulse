@@ -28,12 +28,29 @@ class COLMAPManager {
 
     /// Full path to the bundled COLMAP executable.
     var binaryURL: URL {
-        Bundle.main.url(forResource: "colmap", withExtension: nil)
-            ?? Bundle.main.bundleURL.appending(path: "Contents/Resources/colmap")
+        if let url = Bundle.main.url(forResource: "colmap", withExtension: nil) {
+            logger.info("Found colmap via forResource: \(url.path)")
+            return url
+        }
+        if let resourceURL = Bundle.main.resourceURL {
+            let url = resourceURL.appendingPathComponent("colmap")
+            logger.info("Constructed colmap path from resourceURL: \(url.path)")
+            return url
+        }
+        let url = Bundle.main.bundleURL
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("Resources")
+            .appendingPathComponent("colmap")
+        logger.info("Fallback colmap path: \(url.path)")
+        return url
     }
 
     var isInstalled: Bool {
-        FileManager.default.isExecutableFile(atPath: binaryURL.path())
+        let path = binaryURL.path
+        let exists = FileManager.default.fileExists(atPath: path)
+        let executable = FileManager.default.isExecutableFile(atPath: path)
+        logger.info("COLMAP check — path: \(path), exists: \(exists), executable: \(executable)")
+        return executable
     }
 
     // MARK: - Init
@@ -46,11 +63,13 @@ class COLMAPManager {
 
     /// Ensure the bundled COLMAP binary is available.
     func ensureAvailable() async throws {
+        let url = binaryURL
+        logger.info("ensureAvailable — binaryURL: \(url.path), isInstalled: \(self.isInstalled)")
+        logger.info("Bundle.main.bundlePath: \(Bundle.main.bundlePath)")
         if isInstalled {
-            logger.log("COLMAP binary available at \(self.binaryURL.path())")
             return
         }
-        let msg = "Bundled COLMAP binary not found at \(binaryURL.path()). The app may be corrupted — try reinstalling."
+        let msg = "Bundled COLMAP binary not found at \(url.path). The app may be corrupted — try reinstalling."
         logger.error("\(msg)")
         status = .error(msg)
         throw COLMAPError.binaryNotFound
@@ -64,7 +83,7 @@ class COLMAPManager {
             return
         }
         status = .installed(version: "bundled")
-        logger.log("COLMAP binary found at \(self.binaryURL.path())")
+        logger.log("COLMAP binary found at \(self.binaryURL.path)")
     }
 }
 

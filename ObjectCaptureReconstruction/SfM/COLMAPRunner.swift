@@ -55,7 +55,10 @@ actor COLMAPRunner {
             withIntermediateDirectories: true
         )
 
-        let databasePath = outputFolder.appending(path: "database.db").path()
+        let outputExists = FileManager.default.fileExists(atPath: outputFolder.path)
+        logger.info("Output folder: \(outputFolder.path), exists: \(outputExists)")
+
+        let databasePath = outputFolder.appending(path: "database.db").path
         let sparsePath = outputFolder.appending(path: "sparse")
 
         try FileManager.default.createDirectory(
@@ -71,7 +74,7 @@ actor COLMAPRunner {
         try await runCOLMAP(
             args: configuration.featureExtractorArgs(
                 databasePath: databasePath,
-                imagePath: imageFolder.path()
+                imagePath: imageFolder.path
             ),
             phase: .featureExtraction,
             progressHandler: progressHandler
@@ -100,8 +103,8 @@ actor COLMAPRunner {
         try await runCOLMAP(
             args: configuration.mapperArgs(
                 databasePath: databasePath,
-                imagePath: imageFolder.path(),
-                outputPath: sparsePath.path()
+                imagePath: imageFolder.path,
+                outputPath: sparsePath.path
             ),
             phase: .sparseReconstruction,
             progressHandler: progressHandler
@@ -122,7 +125,7 @@ actor COLMAPRunner {
             throw COLMAPError.invalidOutput("No sparse reconstruction models found in output directory.")
         }
 
-        logger.log("SfM complete. Primary model at: \(firstModel.path())")
+        logger.log("SfM complete. Primary model at: \(firstModel.path)")
         return firstModel
     }
 
@@ -154,7 +157,7 @@ actor COLMAPRunner {
 
         logger.log("Running: colmap \(args.joined(separator: " "))")
 
-        guard FileManager.default.isExecutableFile(atPath: colmapBinaryURL.path()) else {
+        guard FileManager.default.isExecutableFile(atPath: colmapBinaryURL.path) else {
             throw COLMAPError.binaryNotFound
         }
 
