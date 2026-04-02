@@ -23,6 +23,10 @@ struct ContentView: View {
                 SfMJobSetupView()
                     .environment(appDataModel)
             }
+            .sheet(isPresented: $appDataModel.showingGaussianSplatJobSetup) {
+                GaussianSplatJobSetupView()
+                    .environment(appDataModel)
+            }
             .sheet(isPresented: $appDataModel.showingScheduleSettings) {
                 ScheduleSettingsView()
                     .environment(appDataModel)

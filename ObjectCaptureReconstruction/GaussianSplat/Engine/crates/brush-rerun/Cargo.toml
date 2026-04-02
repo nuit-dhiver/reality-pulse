@@ -1,0 +1,26 @@
+[package]
+name = "brush-rerun"
+edition.workspace = true
+version.workspace = true
+readme.workspace = true
+license.workspace = true
+
+[dependencies]
+clap.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+
+# These are needed for visualize_tools API (even noop on WASM)
+burn = { workspace = true, features = ["autodiff"] }
+brush-render.path = "../brush-render"
+brush-train.path = "../brush-train"
+brush-dataset.path = "../brush-dataset"
+burn-cubecl.workspace = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+rerun.workspace = true
+glam.workspace = true
+image.workspace = true
+
+[lints]
+workspace = true

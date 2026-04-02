@@ -35,6 +35,13 @@
 		CC0001CC0001CC09 /* SfMJobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB01 /* SfMJobSetupView.swift */; };
 		CC0001CC0001CC10 /* SfMJobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB02 /* SfMJobRowView.swift */; };
 		CC0001CC0001CC11 /* COLMAPStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001BB0001BB03 /* COLMAPStatusView.swift */; };
+		AB2001AB2001AB01 /* CodableGaussianSplatTrainingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB01 /* CodableGaussianSplatTrainingConfiguration.swift */; };
+		AB2001AB2001AB02 /* GaussianSplatTrainingJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB02 /* GaussianSplatTrainingJob.swift */; };
+		AB2001AB2001AB03 /* GaussianSplatJobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB03 /* GaussianSplatJobSetupView.swift */; };
+		AB2001AB2001AB04 /* GaussianSplatJobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB04 /* GaussianSplatJobRowView.swift */; };
+		AB2001AB2001AB05 /* GaussianSplatDatasetPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB05 /* GaussianSplatDatasetPreparer.swift */; };
+		AB2001AB2001AB06 /* GaussianSplatTrainingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB06 /* GaussianSplatTrainingManager.swift */; };
+		AB2001AB2001AB07 /* GaussianSplatTrainingRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1001AB1001AB07 /* GaussianSplatTrainingRunner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +82,13 @@
 		BB0001BB0001BB01 /* SfMJobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobSetupView.swift; sourceTree = "<group>"; };
 		BB0001BB0001BB02 /* SfMJobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SfMJobRowView.swift; sourceTree = "<group>"; };
 		BB0001BB0001BB03 /* COLMAPStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COLMAPStatusView.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB01 /* CodableGaussianSplatTrainingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableGaussianSplatTrainingConfiguration.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB02 /* GaussianSplatTrainingJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatTrainingJob.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB03 /* GaussianSplatJobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatJobSetupView.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB04 /* GaussianSplatJobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatJobRowView.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB05 /* GaussianSplatDatasetPreparer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatDatasetPreparer.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB06 /* GaussianSplatTrainingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatTrainingManager.swift; sourceTree = "<group>"; };
+		AB1001AB1001AB07 /* GaussianSplatTrainingRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplatTrainingRunner.swift; sourceTree = "<group>"; };
 		DD0002DD0002DD02 /* colmap-bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "colmap-bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,6 +135,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AB3001AB3001AB01 /* Build Brush Training Bridge */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Brush Training Bridge";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(FRAMEWORKS_FOLDER_PATH)/libbrush_training_bridge.dylib",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nREPO_ROOT=\"${SRCROOT}\"\nENGINE_ROOT=\"${REPO_ROOT}/ObjectCaptureReconstruction/GaussianSplat/Engine\"\n\"${ENGINE_ROOT}/build/macos-build.sh\"\nmkdir -p \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\ncp \"${ENGINE_ROOT}/target/release/libbrush_training_bridge.dylib\" \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libbrush_training_bridge.dylib\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXGroup section */
 		26B095232C091B810097324A /* Processing */ = {
@@ -176,6 +213,7 @@
 				AAC7DC5DCD23638D271D3093 /* Models */,
 				992CB303C65294FA4C0E9608 /* Scheduler */,
 				195BAF6352F89DD77AFC2745 /* Store */,
+				AB4001AB4001AB01 /* GaussianSplat */,
 				E195DA07BD54DDE970F27E56 /* Queue */,
 				DD0001DD0001DD01 /* SfM */,
 				DD0002DD0002DD03 /* Resources */,
@@ -200,6 +238,8 @@
 				AFC5AB62125CB98EAA9DF3F6 /* */,
 				958B6CDE5F744C8A9E27719D /* */,
 				E3A4F851B39B9C4EA08E7C13 /* */,
+				AB1001AB1001AB01 /* CodableGaussianSplatTrainingConfiguration.swift */,
+				AB1001AB1001AB02 /* GaussianSplatTrainingJob.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -230,8 +270,20 @@
 				BB0001BB0001BB01 /* SfMJobSetupView.swift */,
 				BB0001BB0001BB02 /* SfMJobRowView.swift */,
 				BB0001BB0001BB03 /* COLMAPStatusView.swift */,
+				AB1001AB1001AB03 /* GaussianSplatJobSetupView.swift */,
+				AB1001AB1001AB04 /* GaussianSplatJobRowView.swift */,
 			);
 			path = Queue;
+			sourceTree = "<group>";
+		};
+		AB4001AB4001AB01 /* GaussianSplat */ = {
+			isa = PBXGroup;
+			children = (
+				AB1001AB1001AB05 /* GaussianSplatDatasetPreparer.swift */,
+				AB1001AB1001AB06 /* GaussianSplatTrainingManager.swift */,
+				AB1001AB1001AB07 /* GaussianSplatTrainingRunner.swift */,
+			);
+			path = GaussianSplat;
 			sourceTree = "<group>";
 		};
 		DD0001DD0001DD01 /* SfM */ = {
@@ -265,6 +317,7 @@
 			buildConfigurationList = F974D1242BE0484700EFACBA /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstruction" */;
 			buildPhases = (
 				F974D1122BE0484500EFACBA /* Sources */,
+				AB3001AB3001AB01 /* Build Brush Training Bridge */,
 				F974D1132BE0484500EFACBA /* Frameworks */,
 				F974D1142BE0484500EFACBA /* Resources */,
 			);
@@ -328,6 +381,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB2001AB2001AB05 /* GaussianSplatDatasetPreparer.swift in Sources */,
+				AB2001AB2001AB06 /* GaussianSplatTrainingManager.swift in Sources */,
+				AB2001AB2001AB07 /* GaussianSplatTrainingRunner.swift in Sources */,
 				F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */,
 				F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */,
 				F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */,
@@ -354,6 +410,10 @@
 				CC0001CC0001CC09 /* SfMJobSetupView.swift in Sources */,
 				CC0001CC0001CC10 /* SfMJobRowView.swift in Sources */,
 				CC0001CC0001CC11 /* COLMAPStatusView.swift in Sources */,
+				AB2001AB2001AB01 /* CodableGaussianSplatTrainingConfiguration.swift in Sources */,
+				AB2001AB2001AB02 /* GaussianSplatTrainingJob.swift in Sources */,
+				AB2001AB2001AB03 /* GaussianSplatJobSetupView.swift in Sources */,
+				AB2001AB2001AB04 /* GaussianSplatJobRowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,7 +458,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -462,7 +522,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -492,7 +552,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -528,7 +588,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

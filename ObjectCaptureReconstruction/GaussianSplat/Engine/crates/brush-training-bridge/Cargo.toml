@@ -1,0 +1,22 @@
+[package]
+name = "brush-training-bridge"
+edition.workspace = true
+version.workspace = true
+readme.workspace = true
+license.workspace = true
+
+[lib]
+name = "brush_training_bridge"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+brush-process = { path = "../brush-process", features = ["training"] }
+brush-vfs.path = "../brush-vfs"
+
+burn-cubecl.workspace = true
+tokio = { workspace = true, features = ["rt", "sync"] }
+tokio-stream.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true
