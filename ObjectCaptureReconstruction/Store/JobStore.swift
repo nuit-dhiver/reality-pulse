@@ -19,6 +19,7 @@ class JobStore {
     private let jobsFileURL: URL
     private let scheduleFileURL: URL
     private let sfmJobsFileURL: URL
+    private let gaussianSplatJobsFileURL: URL
 
     init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
@@ -30,6 +31,7 @@ class JobStore {
         jobsFileURL = storeDir.appending(path: "jobs.json")
         scheduleFileURL = storeDir.appending(path: "schedule.json")
         sfmJobsFileURL = storeDir.appending(path: "sfm_jobs.json")
+        gaussianSplatJobsFileURL = storeDir.appending(path: "gaussian_splat_jobs.json")
     }
 
     // MARK: - Jobs
@@ -119,6 +121,41 @@ class JobStore {
             return jobs
         } catch {
             logger.warning("Failed to load SfM jobs: \(error)")
+            return []
+        }
+    }
+
+    // MARK: - Gaussian Splat Jobs
+
+    func saveGaussianSplatJobs(_ jobs: [GaussianSplatTrainingJob]) {
+        do {
+            let data = try JSONEncoder().encode(jobs)
+            try data.write(to: gaussianSplatJobsFileURL, options: .atomic)
+            logger.log("Saved \(jobs.count) Gaussian Splat job(s) to disk.")
+        } catch {
+            logger.warning("Failed to save Gaussian Splat jobs: \(error)")
+        }
+    }
+
+    func loadGaussianSplatJobs() -> [GaussianSplatTrainingJob] {
+        guard FileManager.default.fileExists(atPath: gaussianSplatJobsFileURL.path()) else { return [] }
+        do {
+            let data = try Data(contentsOf: gaussianSplatJobsFileURL)
+            var jobs = try JSONDecoder().decode([GaussianSplatTrainingJob].self, from: data)
+
+            for index in jobs.indices {
+                _ = jobs[index].resolveBookmarks()
+                if jobs[index].status == .running {
+                    jobs[index].status = .pending
+                    jobs[index].progress = 0
+                    jobs[index].currentPhase = ""
+                }
+            }
+
+            logger.log("Loaded \(jobs.count) Gaussian Splat job(s) from disk.")
+            return jobs
+        } catch {
+            logger.warning("Failed to load Gaussian Splat jobs: \(error)")
             return []
         }
     }

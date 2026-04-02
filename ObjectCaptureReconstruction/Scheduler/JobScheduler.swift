@@ -23,6 +23,7 @@ class JobScheduler {
 
     private(set) var jobs: [ReconstructionJob] = []
     private(set) var sfmJobs: [SfMJob] = []
+    private(set) var gaussianSplatJobs: [GaussianSplatTrainingJob] = []
     var scheduleConfig: ScheduleConfig = ScheduleConfig()
 
     private(set) var isRunning = false
@@ -31,12 +32,14 @@ class JobScheduler {
     private(set) var currentProgress: Double = 0
     private(set) var estimatedTimeRemaining: TimeInterval?
     private(set) var currentSfMPhase: String = ""
+    private(set) var currentTrainingPhase: String = ""
 
     // MARK: - Internal
 
     private var processingTask: Task<Void, Never>?
     private var currentSession: PhotogrammetrySession?
     private var currentCOLMAPRunner: COLMAPRunner?
+    private var currentTrainingRunner: GaussianSplatTrainingRunner?
     let colmapManager = COLMAPManager()
     private let store = JobStore()
 
@@ -45,12 +48,14 @@ class JobScheduler {
     func persist() {
         store.saveJobs(jobs)
         store.saveSfMJobs(sfmJobs)
+        store.saveGaussianSplatJobs(gaussianSplatJobs)
         store.saveSchedule(scheduleConfig)
     }
 
     func loadFromDisk() {
         jobs = store.loadJobs()
         sfmJobs = store.loadSfMJobs()
+        gaussianSplatJobs = store.loadGaussianSplatJobs()
         scheduleConfig = store.loadSchedule()
     }
 
@@ -91,15 +96,19 @@ class JobScheduler {
     }
 
     var pendingJobCount: Int {
-        jobs.filter { $0.status == .pending }.count + sfmJobs.filter { $0.status == .pending }.count
+        jobs.filter { $0.status == .pending }.count
+            + sfmJobs.filter { $0.status == .pending }.count
+            + gaussianSplatJobs.filter { $0.status == .pending }.count
     }
 
     var completedJobCount: Int {
-        jobs.filter { $0.status == .completed }.count + sfmJobs.filter { $0.status == .completed }.count
+        jobs.filter { $0.status == .completed }.count
+            + sfmJobs.filter { $0.status == .completed }.count
+            + gaussianSplatJobs.filter { $0.status == .completed }.count
     }
 
     var totalJobCount: Int {
-        jobs.count + sfmJobs.count
+        jobs.count + sfmJobs.count + gaussianSplatJobs.count
     }
 
     // MARK: - SfM Queue management
@@ -123,6 +132,27 @@ class JobScheduler {
         persist()
     }
 
+    // MARK: - Gaussian Splat Queue management
+
+    func addGaussianSplatJob(_ job: GaussianSplatTrainingJob) {
+        gaussianSplatJobs.append(job)
+        persist()
+    }
+
+    func removeGaussianSplatJob(_ job: GaussianSplatTrainingJob) {
+        gaussianSplatJobs.removeAll { $0.id == job.id }
+        persist()
+    }
+
+    func retryGaussianSplatJob(_ job: GaussianSplatTrainingJob) {
+        guard let index = gaussianSplatJobs.firstIndex(where: { $0.id == job.id }) else { return }
+        gaussianSplatJobs[index].status = .pending
+        gaussianSplatJobs[index].progress = 0
+        gaussianSplatJobs[index].currentPhase = ""
+        gaussianSplatJobs[index].errorMessage = nil
+        persist()
+    }
+
     // MARK: - Scheduler control
 
     func start() {
@@ -137,7 +167,10 @@ class JobScheduler {
     var hasPendingSfMWork: Bool {
         let hasSfmJobs = sfmJobs.contains { $0.status == .pending }
         let hasReconWithSfM = jobs.contains { $0.status == .pending && $0.runSfMFirst }
-        return hasSfmJobs || hasReconWithSfM
+        let hasTrainingWithSfM = gaussianSplatJobs.contains {
+            $0.status == .pending && $0.inputMode == .runCOLMAPInApp
+        }
+        return hasSfmJobs || hasReconWithSfM || hasTrainingWithSfM
     }
 
     func pause() {
@@ -162,6 +195,10 @@ class JobScheduler {
             Task { await runner.cancel() }
             currentCOLMAPRunner = nil
         }
+        if let runner = currentTrainingRunner {
+            Task { await runner.cancel() }
+            currentTrainingRunner = nil
+        }
 
         isRunning = false
         isPaused = false
@@ -174,12 +211,16 @@ class JobScheduler {
             if let idx = sfmJobs.firstIndex(where: { $0.id == id }) {
                 sfmJobs[idx].status = .cancelled
             }
+            if let idx = gaussianSplatJobs.firstIndex(where: { $0.id == id }) {
+                gaussianSplatJobs[idx].status = .cancelled
+            }
         }
 
         currentJobId = nil
         currentProgress = 0
         estimatedTimeRemaining = nil
         currentSfMPhase = ""
+        currentTrainingPhase = ""
         persist()
     }
 
@@ -192,11 +233,14 @@ class JobScheduler {
             currentProgress = 0
             estimatedTimeRemaining = nil
             currentSfMPhase = ""
+            currentTrainingPhase = ""
 
             let succeeded = jobs.filter { $0.status == .completed }.count
                 + sfmJobs.filter { $0.status == .completed }.count
+                + gaussianSplatJobs.filter { $0.status == .completed }.count
             let failed = jobs.filter { $0.status == .failed }.count
                 + sfmJobs.filter { $0.status == .failed }.count
+                + gaussianSplatJobs.filter { $0.status == .failed }.count
             sendNotification(
                 title: "Queue Complete",
                 body: "\(succeeded) succeeded, \(failed) failed"
@@ -229,6 +273,8 @@ class JobScheduler {
             // Pick the next pending job from either queue (SfM jobs first, then reconstruction).
             if let sfmIndex = sfmJobs.firstIndex(where: { $0.status == .pending }) {
                 await processSfMJob(at: sfmIndex)
+            } else if let trainingIndex = gaussianSplatJobs.firstIndex(where: { $0.status == .pending }) {
+                await processGaussianSplatJob(at: trainingIndex)
             } else if let reconIndex = jobs.firstIndex(where: { $0.status == .pending }) {
                 await processJob(at: reconIndex)
             } else {
@@ -382,6 +428,183 @@ class JobScheduler {
     }
 
     // MARK: - SfM Job Processing
+
+    private func processGaussianSplatJob(at index: Int) async {
+        let jobId = gaussianSplatJobs[index].id
+        currentJobId = jobId
+        currentProgress = 0
+        estimatedTimeRemaining = nil
+        currentTrainingPhase = ""
+
+        gaussianSplatJobs[index].status = .running
+        gaussianSplatJobs[index].progress = 0
+        gaussianSplatJobs[index].currentPhase = "Preparing"
+        persist()
+
+        let jobName = gaussianSplatJobs[index].jobName
+        let inputMode = gaussianSplatJobs[index].inputMode
+        let trainingConfiguration = gaussianSplatJobs[index].trainingConfiguration
+        let sfmConfiguration = gaussianSplatJobs[index].sfmConfiguration.toSfMConfiguration()
+        logger.log("Starting Gaussian Splat job: \(jobName) (\(jobId))")
+
+        let (imageURL, outputURL, importedCOLMAPURL) = gaussianSplatJobs[index].resolveBookmarks()
+
+        guard let imageURL, let outputURL else {
+            gaussianSplatJobs[index].status = .failed
+            gaussianSplatJobs[index].errorMessage = "Cannot access saved folders. Please remove and re-add the job."
+            gaussianSplatJobs[index].currentPhase = ""
+            sendNotification(title: "Gaussian Splat Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        if inputMode == .useExistingCOLMAP && importedCOLMAPURL == nil {
+            gaussianSplatJobs[index].status = .failed
+            gaussianSplatJobs[index].errorMessage = "Cannot access saved COLMAP folder. Please remove and re-add the job."
+            gaussianSplatJobs[index].currentPhase = ""
+            sendNotification(title: "Gaussian Splat Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        let imageAccess = imageURL.startAccessingSecurityScopedResource()
+        let outputAccess = outputURL.startAccessingSecurityScopedResource()
+        let importedCOLMAPAccess = importedCOLMAPURL?.startAccessingSecurityScopedResource() ?? false
+
+        defer {
+            if imageAccess { imageURL.stopAccessingSecurityScopedResource() }
+            if outputAccess { outputURL.stopAccessingSecurityScopedResource() }
+            if importedCOLMAPAccess, let importedCOLMAPURL {
+                importedCOLMAPURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        do {
+            let trainingOutputDirectory = gaussianSplatJobs[index].trainingOutputDirectory
+            if FileManager.default.fileExists(atPath: trainingOutputDirectory.path()) {
+                try FileManager.default.removeItem(at: trainingOutputDirectory)
+            }
+            try FileManager.default.createDirectory(at: trainingOutputDirectory, withIntermediateDirectories: true)
+
+            let colmapModelDirectory: URL
+            if inputMode == .runCOLMAPInApp {
+                currentSfMPhase = "SfM: Preparing"
+                gaussianSplatJobs[index].currentPhase = currentSfMPhase
+
+                try await colmapManager.ensureAvailable()
+
+                let sfmOutputDirectory = trainingOutputDirectory.appending(path: "colmap-work")
+                let runner = COLMAPRunner(
+                    colmapBinaryURL: colmapManager.binaryURL,
+                    libraryDirectoryURL: colmapManager.libraryDirectoryURL
+                )
+                currentCOLMAPRunner = runner
+
+                colmapModelDirectory = try await runner.run(
+                    configuration: sfmConfiguration,
+                    imageFolder: gaussianSplatJobs[index].imageFolder,
+                    outputFolder: sfmOutputDirectory
+                ) { [weak self] update in
+                    await MainActor.run {
+                        guard let self else { return }
+                        let overallProgress = update.fraction * 0.25
+                        self.currentSfMPhase = "SfM: \(update.phase.rawValue)"
+                        self.currentProgress = overallProgress
+                        if let currentIndex = self.gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                            self.gaussianSplatJobs[currentIndex].progress = overallProgress
+                            self.gaussianSplatJobs[currentIndex].currentPhase = self.currentSfMPhase
+                        }
+                    }
+                }
+
+                currentCOLMAPRunner = nil
+                currentSfMPhase = ""
+            } else {
+                colmapModelDirectory = importedCOLMAPURL ?? outputURL
+            }
+
+            currentTrainingPhase = "Preparing Dataset"
+            gaussianSplatJobs[index].currentPhase = currentTrainingPhase
+            if inputMode != .runCOLMAPInApp {
+                currentProgress = 0.05
+                gaussianSplatJobs[index].progress = 0.05
+            }
+
+            let preparedDataset = try GaussianSplatDatasetPreparer().prepareDataset(
+                imageFolder: imageURL,
+                colmapDirectory: colmapModelDirectory,
+                workingDirectory: trainingOutputDirectory
+            )
+
+            let trainingRunner = GaussianSplatTrainingRunner()
+            currentTrainingRunner = trainingRunner
+
+            let result = try await trainingRunner.run(
+                datasetRoot: preparedDataset.datasetRoot,
+                exportsDirectory: preparedDataset.exportsDirectory,
+                configuration: trainingConfiguration
+            ) { [weak self] update in
+                await MainActor.run {
+                    guard let self else { return }
+                    let offset = inputMode == .runCOLMAPInApp ? 0.25 : 0.0
+                    let scale = inputMode == .runCOLMAPInApp ? 0.75 : 1.0
+                    let overallProgress = min(offset + update.fraction * scale, 1.0)
+
+                    self.currentProgress = overallProgress
+                    self.currentTrainingPhase = update.phase
+
+                    if let currentIndex = self.gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                        self.gaussianSplatJobs[currentIndex].progress = overallProgress
+                        self.gaussianSplatJobs[currentIndex].currentPhase = update.phase
+                    }
+                }
+            }
+
+            currentTrainingRunner = nil
+            currentTrainingPhase = ""
+
+            if Task.isCancelled {
+                if let currentIndex = gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                    gaussianSplatJobs[currentIndex].status = .cancelled
+                }
+            } else if let currentIndex = gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                gaussianSplatJobs[currentIndex].status = .completed
+                gaussianSplatJobs[currentIndex].progress = 1
+                gaussianSplatJobs[currentIndex].currentPhase = ""
+                gaussianSplatJobs[currentIndex].resultSummary = GaussianSplatTrainingResultSummary(
+                    exportedPLYCount: result.exportedPLYCount,
+                    totalIterations: result.totalIterations
+                )
+            }
+
+            logger.log("Gaussian Splat job complete with \(result.exportedPLYCount) export(s)")
+        } catch is CancellationError {
+            currentCOLMAPRunner = nil
+            currentTrainingRunner = nil
+            currentSfMPhase = ""
+            currentTrainingPhase = ""
+            if let currentIndex = gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                gaussianSplatJobs[currentIndex].status = .cancelled
+                gaussianSplatJobs[currentIndex].currentPhase = ""
+            }
+        } catch {
+            logger.warning("Gaussian Splat job \(jobId) failed: \(error)")
+            currentCOLMAPRunner = nil
+            currentTrainingRunner = nil
+            currentSfMPhase = ""
+            currentTrainingPhase = ""
+            if let currentIndex = gaussianSplatJobs.firstIndex(where: { $0.id == jobId }) {
+                gaussianSplatJobs[currentIndex].status = .failed
+                gaussianSplatJobs[currentIndex].errorMessage = "\(error)"
+                gaussianSplatJobs[currentIndex].currentPhase = ""
+            }
+            sendNotification(title: "Gaussian Splat Job Failed", body: jobName)
+        }
+
+        currentSfMPhase = ""
+        currentTrainingPhase = ""
+        persist()
+    }
 
     private func processSfMJob(at index: Int) async {
         let jobId = sfmJobs[index].id

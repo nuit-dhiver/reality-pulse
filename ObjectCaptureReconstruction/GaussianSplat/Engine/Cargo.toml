@@ -1,0 +1,100 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/brush-training-bridge",
+    "crates/brush-dataset",
+    "crates/brush-kernel",
+    "crates/brush-prefix-sum",
+    "crates/brush-process",
+    "crates/brush-render",
+    "crates/brush-render-bwd",
+    "crates/brush-rerun",
+    "crates/brush-serde",
+    "crates/brush-serde-macros",
+    "crates/brush-sort",
+    "crates/brush-train",
+    "crates/brush-vfs",
+    "crates/brush-wgsl",
+    "crates/colmap-reader",
+    "crates/lpips",
+    "crates/rrfd",
+]
+default-members = ["crates/brush-training-bridge"]
+
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+readme = "README.md"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+glam = { version = "0.30", features = ["serde"] }
+bytemuck = "1.20"
+image = { version = "0.25", default-features = false, features = [
+    "png",
+    "webp",
+    "jpeg",
+    "exr",
+] }
+serde = { version = "1.0.215", default-features = false, features = [
+    "derive",
+    "alloc",
+] }
+serde_json = { version = "1.0.133", default-features = false }
+
+rand = "0.10.0"
+tracing = "0.1.41"
+
+tokio = { version = "1.42.0", default-features = false }
+tokio_with_wasm = "0.9"
+tokio-stream = "0.1"
+tokio-util = { version = "0.7.13", features = ["io"] }
+
+anyhow = "1.0.94"
+thiserror = "2.0"
+
+reqwest = { version = "0.13", default-features = false, features = ["stream"] }
+
+clap = { version = "4.5.23", features = ["derive"] }
+
+web-time = "1.1.0"
+async-fn-stream = "0.3"
+assert_approx_eq = "1.1.0"
+log = "0.4.22"
+wasm-bindgen-futures = "0.4"
+wasm-streams = "0.5"
+
+rayon = "1.11"
+
+naga_oil = { version = "0.22", default-features = false }
+wgpu = { version = "29", default-features = false, features = ["naga-ir"] }
+
+serde-ply = "0.2.1"
+
+burn = { git = "https://github.com/tracel-ai/burn", features = ["wgpu"] }
+burn-cubecl = { git = "https://github.com/tracel-ai/burn" }
+burn-ir = { git = "https://github.com/tracel-ai/burn" }
+burn-wgpu = { git = "https://github.com/tracel-ai/burn", features = ["exclusive-memory-only"] }
+burn-fusion = { git = "https://github.com/tracel-ai/burn" }
+
+rerun = { version = "0.31", default-features = false, features = ["sdk", "glam"] }
+
+ball-tree = "0.5.1"
+web-sys = { version = "0.3.74" }
+async_zip = { version = "0.0.18", default-features = false, features = ["tokio", "deflate"] }
+hashbrown = "0.16"
+alphanumeric-sort = "1.5.3"
+
+[profile.dev]
+opt-level = 1
+debug = 1
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+unused_import_braces = "warn"
+unused_lifetimes = "warn"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+needless_borrow = "warn"
+semicolon_if_nothing_returned = "warn"

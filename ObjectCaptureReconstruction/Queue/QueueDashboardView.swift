@@ -22,7 +22,9 @@ struct QueueDashboardView: View {
             Divider()
 
             // Job list
-            if appDataModel.scheduler.jobs.isEmpty && appDataModel.scheduler.sfmJobs.isEmpty {
+            if appDataModel.scheduler.jobs.isEmpty
+                && appDataModel.scheduler.sfmJobs.isEmpty
+                && appDataModel.scheduler.gaussianSplatJobs.isEmpty {
                 emptyState
             } else {
                 jobList
@@ -79,6 +81,33 @@ struct QueueDashboardView: View {
                                 if job.status == .completed {
                                     Button("Open in Finder") {
                                         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: job.colmapOutputDirectory.path())
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+
+            if !appDataModel.scheduler.gaussianSplatJobs.isEmpty {
+                Section("Gaussian Splat Jobs") {
+                    ForEach(appDataModel.scheduler.gaussianSplatJobs) { job in
+                        GaussianSplatJobRowView(job: job)
+                            .contextMenu {
+                                if job.status == .failed {
+                                    Button("Retry") {
+                                        appDataModel.scheduler.retryGaussianSplatJob(job)
+                                    }
+                                }
+
+                                if job.status == .pending || job.status == .failed || job.status == .cancelled {
+                                    Button("Remove", role: .destructive) {
+                                        appDataModel.scheduler.removeGaussianSplatJob(job)
+                                    }
+                                }
+
+                                if job.status == .completed {
+                                    Button("Open in Finder") {
+                                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: job.trainingOutputDirectory.path())
                                     }
                                 }
                             }
@@ -175,6 +204,9 @@ private struct QueueHeaderView: View {
             if scheduler.isPaused {
                 return "Paused — \(completed)/\(total) complete"
             }
+            if !scheduler.currentTrainingPhase.isEmpty {
+                return "\(scheduler.currentTrainingPhase) — \(completed)/\(total) complete"
+            }
             if !scheduler.currentSfMPhase.isEmpty {
                 return "\(scheduler.currentSfMPhase) — \(completed)/\(total) complete"
             }
@@ -213,6 +245,12 @@ private struct QueueFooterView: View {
                 appDataModel.showingSfMJobSetup = true
             } label: {
                 Label("Add SfM Job", systemImage: "viewfinder")
+            }
+
+            Button {
+                appDataModel.showingGaussianSplatJobSetup = true
+            } label: {
+                Label("Add Gaussian Splat Job", systemImage: "sparkles")
             }
 
             Button {
