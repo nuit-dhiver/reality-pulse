@@ -26,6 +26,7 @@ class JobScheduler {
 
     private(set) var isRunning = false
     private(set) var isPaused = false
+    private(set) var isPauseRequested = false
     private(set) var currentJobId: UUID?
     private(set) var currentProgress: Double = 0
     private(set) var estimatedTimeRemaining: TimeInterval?
@@ -98,34 +99,53 @@ class JobScheduler {
         guard !isRunning else { return }
         isRunning = true
         isPaused = false
+        isPauseRequested = false
         logger.log("Scheduler started.")
         processingTask = Task { await processQueue() }
     }
 
     func pause() {
-        isPaused = true
-        logger.log("Scheduler paused.")
+        guard isRunning else { return }
+        guard !isPaused && !isPauseRequested else { return }
+
+        if currentJobId != nil {
+            isPauseRequested = true
+            logger.log("Pause requested. Current job will continue until completion because PhotogrammetrySession does not support pausing.")
+        } else {
+            isPaused = true
+            logger.log("Scheduler paused between jobs.")
+        }
     }
 
     func resume() {
-        guard isPaused else { return }
-        isPaused = false
-        logger.log("Scheduler resumed.")
+        guard isPaused || isPauseRequested else { return }
+
+        let hadPendingPauseRequest = isPauseRequested
+        isPauseRequested = false
+
+        if isPaused {
+            isPaused = false
+            logger.log("Scheduler resumed.")
+        } else if hadPendingPauseRequest {
+            logger.log("Pending pause request cleared.")
+        }
     }
 
     func cancel() {
         logger.log("Scheduler cancelled.")
+        let cancellingJobId = currentJobId
         processingTask?.cancel()
         currentSession?.cancel()
         currentSession = nil
         isRunning = false
         isPaused = false
+        isPauseRequested = false
         currentJobId = nil
         currentProgress = 0
         estimatedTimeRemaining = nil
 
         // Mark the running job as cancelled.
-        if let id = currentJobId, let idx = jobs.firstIndex(where: { $0.id == id }) {
+        if let id = cancellingJobId, let idx = jobs.firstIndex(where: { $0.id == id }) {
             jobs[idx].status = .cancelled
         }
         persist()
@@ -152,6 +172,8 @@ class JobScheduler {
         }
 
         while !Task.isCancelled {
+            activatePauseIfNeeded()
+
             // Wait while paused.
             while isPaused && !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
@@ -171,6 +193,9 @@ class JobScheduler {
             }
             if Task.isCancelled { break }
 
+            activatePauseIfNeeded()
+            if isPaused { continue }
+
             // Pick the next pending job.
             guard let index = jobs.firstIndex(where: { $0.status == .pending }) else {
                 logger.log("No more pending jobs.")
@@ -186,6 +211,7 @@ class JobScheduler {
         currentJobId = jobId
         currentProgress = 0
         estimatedTimeRemaining = nil
+        var loggedWindowClosureDuringActiveJob = false
 
         jobs[index].status = .running
         jobs[index].progress = 0
@@ -227,12 +253,9 @@ class JobScheduler {
             // Consume session outputs.
             outputLoop: for try await output in session.outputs {
                 if Task.isCancelled { break }
-                // Re-check time window between outputs.
-                if !scheduleConfig.isWithinAllowedWindow() {
-                    logger.log("Time window closed during processing. Pausing until window reopens.")
-                    while !scheduleConfig.isWithinAllowedWindow() && !Task.isCancelled {
-                        try await Task.sleep(for: .seconds(30))
-                    }
+                if !scheduleConfig.isWithinAllowedWindow() && !loggedWindowClosureDuringActiveJob {
+                    logger.log("Allowed time window closed during processing. Continuing the active job because PhotogrammetrySession does not support pausing.")
+                    loggedWindowClosureDuringActiveJob = true
                 }
 
                 switch output {
@@ -293,7 +316,15 @@ class JobScheduler {
             sendNotification(title: "Job Failed", body: jobName)
         }
 
+        currentJobId = nil
         persist()
+    }
+
+    private func activatePauseIfNeeded() {
+        guard isPauseRequested, currentJobId == nil else { return }
+        isPauseRequested = false
+        isPaused = true
+        logger.log("Scheduler paused between jobs.")
     }
 
     // MARK: - Session creation (nonisolated to avoid blocking main actor)

@@ -93,54 +93,68 @@ struct QueueDashboardView: View {
 
 private struct QueueHeaderView: View {
     @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    
+    private var scheduler: JobScheduler {
+        appDataModel.scheduler
+    }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
                 Text("Job Queue")
                     .font(.headline)
 
                 Text(statusSummary)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                if scheduler.isRunning {
+                    if scheduler.isPaused || scheduler.isPauseRequested {
+                        Button("Resume") {
+                            scheduler.resume()
+                        }
+                    } else {
+                        Button(pauseButtonTitle) {
+                            scheduler.pause()
+                        }
+                    }
+
+                    Button("Stop") {
+                        scheduler.cancel()
+                    }
+                    .foregroundStyle(.red)
+                } else if scheduler.pendingJobCount > 0 {
+                    Button("Start") {
+                        scheduler.start()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             }
 
-            Spacer()
-
-            if appDataModel.scheduler.isRunning {
-                if appDataModel.scheduler.isPaused {
-                    Button("Resume") {
-                        appDataModel.scheduler.resume()
-                    }
-                } else {
-                    Button("Pause") {
-                        appDataModel.scheduler.pause()
-                    }
-                }
-
-                Button("Stop") {
-                    appDataModel.scheduler.cancel()
-                }
-                .foregroundStyle(.red)
-            } else if appDataModel.scheduler.pendingJobCount > 0 {
-                Button("Start") {
-                    appDataModel.scheduler.start()
-                }
-                .buttonStyle(.borderedProminent)
+            if let pauseExplanation {
+                Text(pauseExplanation)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
             }
         }
         .padding()
     }
 
     private var statusSummary: String {
-        let scheduler = appDataModel.scheduler
         let total = scheduler.jobs.count
         let completed = scheduler.completedJobCount
         let pending = scheduler.pendingJobCount
 
         if scheduler.isRunning {
             if scheduler.isPaused {
-                return "Paused — \(completed)/\(total) complete"
+                return "Queue paused between jobs — \(completed)/\(total) complete"
+            }
+            if scheduler.isPauseRequested {
+                return "Pause requested — current job will finish before stopping"
             }
             return "Processing — \(completed)/\(total) complete"
         }
@@ -148,6 +162,22 @@ private struct QueueHeaderView: View {
         if total == 0 { return "Empty" }
         if pending == 0 && completed == total { return "All \(total) jobs complete" }
         return "\(pending) pending, \(completed) complete"
+    }
+
+    private var pauseButtonTitle: String {
+        scheduler.currentJobId == nil ? "Pause" : "Pause After Job"
+    }
+
+    private var pauseExplanation: String? {
+        if scheduler.isPauseRequested {
+            return "Apple Object Capture does not support pausing an in-progress reconstruction. The queue will stop before the next job starts."
+        }
+
+        if scheduler.isRunning && scheduler.currentJobId != nil {
+            return "Pausing takes effect between jobs only. If the schedule window closes mid-job, the active reconstruction continues until it completes or is cancelled."
+        }
+
+        return nil
     }
 }
 
