@@ -222,9 +222,10 @@ class JobScheduler {
             )
             currentSession = session
             try session.process(requests: requests)
+            var didReceiveProcessingComplete = false
 
             // Consume session outputs.
-            for try await output in session.outputs {
+            outputLoop: for try await output in session.outputs {
                 if Task.isCancelled { break }
                 // Re-check time window between outputs.
                 if !scheduleConfig.isWithinAllowedWindow() {
@@ -252,6 +253,13 @@ class JobScheduler {
 
                 case .processingComplete:
                     logger.log("Processing complete for job \(jobId).")
+                    didReceiveProcessingComplete = true
+                    currentProgress = 1.0
+                    estimatedTimeRemaining = nil
+                    if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
+                        jobs[idx].progress = 1.0
+                    }
+                    break outputLoop
 
                 default:
                     continue
@@ -263,6 +271,12 @@ class JobScheduler {
             if Task.isCancelled {
                 if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                     jobs[idx].status = .cancelled
+                }
+            } else if !didReceiveProcessingComplete {
+                logger.warning("Session output ended before processingComplete for job \(jobId).")
+                if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
+                    jobs[idx].status = .failed
+                    jobs[idx].errorMessage = "Processing ended before completion signal."
                 }
             } else if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .completed
