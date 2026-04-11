@@ -13,6 +13,7 @@
 		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
 		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
 		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* VideoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */; };
 		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
 		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
 		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
@@ -40,6 +41,7 @@
 		F974D56B2BE1CF0600EFACBA /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
 		F99368C22BE3118600DAA789 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoHelper.swift; sourceTree = "<group>"; };
 		F9F1BEDA2C6433340066F3D3 /* ReconstructionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionProgressView.swift; sourceTree = "<group>"; };
 		F9F1BEDB2C6433340066F3D3 /* ReprocessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprocessView.swift; sourceTree = "<group>"; };
 		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				FolderOptions/ImageMetadataView.swift,
 				FolderOptions/ModelFolderView.swift,
 				FolderOptions/ModelNameField.swift,
+				FolderOptions/VideoInputView.swift,
 				ProcessButton/ProcessButton.swift,
 				ReconstructionOptions/IgnoreBoundingBoxView.swift,
 				ReconstructionOptions/MaskingView.swift,
@@ -145,6 +148,7 @@
 				F974D11B2BE0484500EFACBA /* ContentView.swift */,
 				F974D5692BE1BCB600EFACBA /* AppDataModel.swift */,
 				F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */,
 				26B0954A2C091C770097324A /* ThumbnailView.swift */,
 				26B095232C091B810097324A /* Processing */,
 				26B095212C091B740097324A /* Settings */,
@@ -275,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* VideoHelper.swift in Sources */,
 				F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */,
 				F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */,
 				26B0954B2C091C770097324A /* ThumbnailView.swift in Sources */,
