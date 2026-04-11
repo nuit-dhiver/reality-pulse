@@ -16,12 +16,24 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
 
 @MainActor @Observable class JobDraft {
 
+    // MARK: - Input mode
+
+    enum InputMode: String, CaseIterable {
+        case images
+        case video
+    }
+
+    var inputMode: InputMode = .images
+
     // MARK: - Folder / name (same names as old AppDataModel)
 
     var imageFolder: URL?
     var modelFolder: URL?
     var modelName: String?
     var boundingBoxAvailable = false
+
+    /// The source video file selected by the user (video input mode only).
+    var videoFile: URL?
 
     // MARK: - Session configuration (live framework type for picker bindings)
 
@@ -75,7 +87,13 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     /// Validate required fields and set the error state if anything is missing.
     func validate() -> Bool {
         if imageFolder == nil {
-            alertMessage = "Image folder is not selected"
+            if inputMode == .video {
+                alertMessage = videoFile == nil
+                    ? "No video file selected"
+                    : "Frame extraction is not complete yet"
+            } else {
+                alertMessage = "Image folder is not selected"
+            }
             hasError = true
             return false
         }
