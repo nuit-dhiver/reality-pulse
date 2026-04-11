@@ -22,8 +22,9 @@ struct FolderOptionsView: View {
             .pickerStyle(.segmented)
             .onChange(of: draft.inputMode) {
                 // Clear input-related state when the mode is switched.
-                // Any in-flight video extraction is cancelled via VideoInputView's onDisappear
-                // modifier, which fires when the view is removed from the hierarchy here.
+                // Any in-flight video extraction started by VideoInputView is automatically
+                // cancelled when VideoInputView's onDisappear fires as a result of this
+                // mode change (see VideoInputView.onDisappear for that cleanup).
                 draft.imageFolder = nil
                 draft.videoFile = nil
                 draft.boundingBoxAvailable = false

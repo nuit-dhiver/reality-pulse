@@ -75,7 +75,11 @@ class VideoHelper {
         }
 
         // Build the list of sample times at the requested cadence.
-        let frameInterval = 1.0 / max(framesPerSecond, 0.5)
+        let clampedFPS = max(framesPerSecond, 0.5)
+        if clampedFPS != framesPerSecond {
+            logger.warning("framesPerSecond (\(framesPerSecond)) is below minimum; clamped to \(clampedFPS).")
+        }
+        let frameInterval = 1.0 / clampedFPS
         var times: [CMTime] = []
         var t = 0.0
         while t < durationSeconds {
