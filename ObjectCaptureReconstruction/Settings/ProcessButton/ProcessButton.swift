@@ -28,7 +28,7 @@ struct ProcessButton: View {
 
             Button(isEditing ? "Save Changes" : "Add to Queue") {
                 guard draft.validate() else { return }
-                guard let job = draft.toJob() else { return }
+                guard let job = draft.toJob(existingId: appDataModel.editingJob?.id) else { return }
                 logger.log("Adding job to queue: \(job.modelName)")
 
                 if isEditing, let editingJob = appDataModel.editingJob {

@@ -7,32 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */; };
+		0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */; };
 		26B0954B2C091C770097324A /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B0954A2C091C770097324A /* ThumbnailView.swift */; };
+		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
+		4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5722048B055E10C8C4635BA /* JobScheduler.swift */; };
+		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
+		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
+		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
+		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
+		8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C4F782DCEACB71739E8182 /* JobStore.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* VideoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */; };
+		C0A7E6000010000000000001 /* ModelExportFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A7E6000010000000000002 /* ModelExportFormat.swift */; };
+		C0A7E6000010000000000003 /* OBJToGLTFConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A7E6000010000000000004 /* OBJToGLTFConverter.swift */; };
+		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
 		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
 		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
 		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
 		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
 		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
-		A1B2C3D4E5F6A7B8C9D0E1F2 /* VideoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */; };
-		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
-		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
-		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
-		0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */; };
-		4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5722048B055E10C8C4635BA /* JobScheduler.swift */; };
-		8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C4F782DCEACB71739E8182 /* JobStore.swift */; };
-		05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */; };
-		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
-		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
-		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		26B095462C091BC80097324A /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		26B095482C091BEA0097324A /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
 		26B0954A2C091C770097324A /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
+		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
+		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
 		3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
 		79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleConfig.swift; sourceTree = "<group>"; };
 		971147DC9E6FE3FF0398B220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoHelper.swift; sourceTree = "<group>"; };
+		A5722048B055E10C8C4635BA /* JobScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobScheduler.swift; sourceTree = "<group>"; };
+		AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionJob.swift; sourceTree = "<group>"; };
+		B0C4F782DCEACB71739E8182 /* JobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStore.swift; sourceTree = "<group>"; };
+		B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDashboardView.swift; sourceTree = "<group>"; };
+		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
+		C0A7E6000010000000000002 /* ModelExportFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelExportFormat.swift; sourceTree = "<group>"; };
+		C0A7E6000010000000000004 /* OBJToGLTFConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OBJToGLTFConverter.swift; sourceTree = "<group>"; };
+		E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDraft.swift; sourceTree = "<group>"; };
 		F974D1162BE0484500EFACBA /* Object Capture Reconstruction.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Object Capture Reconstruction.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectCaptureReconstructionApp.swift; sourceTree = "<group>"; };
 		F974D11B2BE0484500EFACBA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -41,19 +56,8 @@
 		F974D56B2BE1CF0600EFACBA /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
 		F99368C22BE3118600DAA789 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoHelper.swift; sourceTree = "<group>"; };
 		F9F1BEDA2C6433340066F3D3 /* ReconstructionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionProgressView.swift; sourceTree = "<group>"; };
 		F9F1BEDB2C6433340066F3D3 /* ReprocessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprocessView.swift; sourceTree = "<group>"; };
-		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
-		AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionJob.swift; sourceTree = "<group>"; };
-		958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleConfig.swift; sourceTree = "<group>"; };
-		E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDraft.swift; sourceTree = "<group>"; };
-		A5722048B055E10C8C4635BA /* JobScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobScheduler.swift; sourceTree = "<group>"; };
-		B0C4F782DCEACB71739E8182 /* JobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStore.swift; sourceTree = "<group>"; };
-		B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDashboardView.swift; sourceTree = "<group>"; };
-		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
-		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
-		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -73,6 +77,7 @@
 				FolderOptions/ModelNameField.swift,
 				FolderOptions/VideoInputView.swift,
 				ProcessButton/ProcessButton.swift,
+				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/IgnoreBoundingBoxView.swift,
 				ReconstructionOptions/MaskingView.swift,
 				ReconstructionOptions/MeshTypeView.swift,
@@ -101,6 +106,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		195BAF6352F89DD77AFC2745 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				B0C4F782DCEACB71739E8182 /* JobStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
 		26B095232C091B810097324A /* Processing */ = {
 			isa = PBXGroup;
 			children = (
@@ -114,12 +127,43 @@
 			path = Processing;
 			sourceTree = "<group>";
 		};
+		992CB303C65294FA4C0E9608 /* Scheduler */ = {
+			isa = PBXGroup;
+			children = (
+				A5722048B055E10C8C4635BA /* JobScheduler.swift */,
+			);
+			path = Scheduler;
+			sourceTree = "<group>";
+		};
+		AAC7DC5DCD23638D271D3093 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */,
+				AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */,
+				958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */,
+				E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */,
+				C0A7E6000010000000000002 /* ModelExportFormat.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		BD87F13DD4B2159CCB69FFA2 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
 				79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */,
 			);
 			name = Configuration;
+			sourceTree = "<group>";
+		};
+		E195DA07BD54DDE970F27E56 /* Queue */ = {
+			isa = PBXGroup;
+			children = (
+				B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */,
+				BCE344691F76FD3CE82E7FCF /* JobRowView.swift */,
+				33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */,
+				37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */,
+			);
+			path = Queue;
 			sourceTree = "<group>";
 		};
 		F974D10D2BE0484500EFACBA = {
@@ -151,6 +195,7 @@
 				A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */,
 				26B0954A2C091C770097324A /* ThumbnailView.swift */,
 				26B095232C091B810097324A /* Processing */,
+				C0A7E6000010000000000005 /* Export */,
 				26B095212C091B740097324A /* Settings */,
 				AAC7DC5DCD23638D271D3093 /* Models */,
 				992CB303C65294FA4C0E9608 /* Scheduler */,
@@ -161,6 +206,14 @@
 			path = ObjectCaptureReconstruction;
 			sourceTree = "<group>";
 		};
+		C0A7E6000010000000000005 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				C0A7E6000010000000000004 /* OBJToGLTFConverter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
 		FE08FBE5E15C9B39D4421FC8 /* LICENSE */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,44 +221,6 @@
 			);
 			name = LICENSE;
 			path = .;
-			sourceTree = "<group>";
-		};
-		AAC7DC5DCD23638D271D3093 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				5A00FFF0EB8B4E921061918F /* */,
-				AFC5AB62125CB98EAA9DF3F6 /* */,
-				958B6CDE5F744C8A9E27719D /* */,
-				E3A4F851B39B9C4EA08E7C13 /* */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		992CB303C65294FA4C0E9608 /* Scheduler */ = {
-			isa = PBXGroup;
-			children = (
-				A5722048B055E10C8C4635BA /* */,
-			);
-			path = Scheduler;
-			sourceTree = "<group>";
-		};
-		195BAF6352F89DD77AFC2745 /* Store */ = {
-			isa = PBXGroup;
-			children = (
-				B0C4F782DCEACB71739E8182 /* */,
-			);
-			path = Store;
-			sourceTree = "<group>";
-		};
-		E195DA07BD54DDE970F27E56 /* Queue */ = {
-			isa = PBXGroup;
-			children = (
-				B18D78DD28112179ED6A17EA /* */,
-				BCE344691F76FD3CE82E7FCF /* */,
-				33550E6E2F6D8F14E9A9C282 /* */,
-				37404910B7FC7310289216C7 /* */,
-			);
-			path = Queue;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -294,6 +309,8 @@
 				665189C5915C218406A40D61 /* JobRowView.swift in Sources */,
 				DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */,
 				5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */,
+				C0A7E6000010000000000001 /* ModelExportFormat.swift in Sources */,
+				C0A7E6000010000000000003 /* OBJToGLTFConverter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

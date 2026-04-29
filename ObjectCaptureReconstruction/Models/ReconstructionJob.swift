@@ -19,6 +19,7 @@ struct ReconstructionJob: Identifiable, Codable {
     var sessionConfiguration: CodableSessionConfiguration
     var primaryDetailLevel: CodableDetailLevel
     var additionalDetailLevels: CodableDetailLevelOptions
+    var exportFormats: Set<ModelExportFormat>
 
     var status: JobStatus = .pending
     var progress: Double = 0
@@ -31,20 +32,23 @@ struct ReconstructionJob: Identifiable, Codable {
     var modelFolderBookmark: Data?
 
     init(
+        id: UUID = UUID(),
         imageFolder: URL,
         modelFolder: URL,
         modelName: String,
         sessionConfiguration: CodableSessionConfiguration = CodableSessionConfiguration(),
         primaryDetailLevel: CodableDetailLevel = .medium,
-        additionalDetailLevels: CodableDetailLevelOptions = CodableDetailLevelOptions()
+        additionalDetailLevels: CodableDetailLevelOptions = CodableDetailLevelOptions(),
+        exportFormats: Set<ModelExportFormat> = [.usdz]
     ) {
-        self.id = UUID()
+        self.id = id
         self.imageFolder = imageFolder
         self.modelFolder = modelFolder
         self.modelName = modelName
         self.sessionConfiguration = sessionConfiguration
         self.primaryDetailLevel = primaryDetailLevel
         self.additionalDetailLevels = additionalDetailLevels
+        self.exportFormats = exportFormats.isEmpty ? [.usdz] : exportFormats
         self.createdAt = Date()
 
         self.imageFolderBookmark = try? imageFolder.bookmarkData(
@@ -76,9 +80,102 @@ struct ReconstructionJob: Identifiable, Codable {
 
     /// Build `PhotogrammetrySession.Request` entries for all requested detail levels.
     func createReconstructionRequests() -> [PhotogrammetrySession.Request] {
-        allRequestedDetailLevels.map { level in
-            let url = modelFolder.appending(path: "\(modelName)-\(level.rawValue).usdz")
-            return .modelFile(url: url, detail: level.toFrameworkType)
+        createModelExportRequests().map(\.photogrammetryRequest)
+    }
+
+    /// Build Object Capture requests plus final export targets for each detail level.
+    func createModelExportRequests() -> [ModelExportRequest] {
+        let formats = exportFormats.isEmpty ? Set([.usdz]) : exportFormats
+        return allRequestedDetailLevels
+            .sorted { $0.rawValue < $1.rawValue }
+            .flatMap { level -> [ModelExportRequest] in
+                var requests: [ModelExportRequest] = []
+
+                if formats.contains(.usdz) {
+                    let url = modelFolder.appending(path: "\(modelName)-\(level.rawValue).usdz")
+                    requests.append(ModelExportRequest(
+                        detailLevel: level,
+                        photogrammetryRequest: .modelFile(url: url, detail: level.toFrameworkType),
+                        targets: [ModelExportTarget(format: .usdz, url: url)],
+                        intermediateDirectory: nil
+                    ))
+                }
+
+                let gltfFormats = formats.intersection([.gltf, .glb])
+                if !gltfFormats.isEmpty {
+                    let sourceDirectory = modelFolder.appending(
+                        path: ".\(modelName)-\(level.rawValue)-gltf-source-\(id.uuidString)"
+                    )
+                    let targets = gltfFormats
+                        .sorted { $0.rawValue < $1.rawValue }
+                        .map { format in
+                            ModelExportTarget(
+                                format: format,
+                                url: modelFolder.appending(path: "\(modelName)-\(level.rawValue).\(format.fileExtension)")
+                            )
+                        }
+                    requests.append(ModelExportRequest(
+                        detailLevel: level,
+                        photogrammetryRequest: .modelFile(url: sourceDirectory, detail: level.toFrameworkType),
+                        targets: targets,
+                        intermediateDirectory: sourceDirectory
+                    ))
+                }
+
+                return requests
+            }
+    }
+
+    func outputFilenames() -> [String] {
+        let formats = exportFormats.isEmpty ? Set([.usdz]) : exportFormats
+        return allRequestedDetailLevels
+            .sorted { $0.rawValue < $1.rawValue }
+            .flatMap { level in
+                formats
+                    .sorted { $0.rawValue < $1.rawValue }
+                    .map { "\(modelName)-\(level.rawValue).\($0.fileExtension)" }
+            }
+    }
+
+    // MARK: - Codable
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case imageFolder
+        case modelFolder
+        case modelName
+        case sessionConfiguration
+        case primaryDetailLevel
+        case additionalDetailLevels
+        case exportFormats
+        case status
+        case progress
+        case errorMessage
+        case boundingBoxAvailable
+        case createdAt
+        case imageFolderBookmark
+        case modelFolderBookmark
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        imageFolder = try container.decode(URL.self, forKey: .imageFolder)
+        modelFolder = try container.decode(URL.self, forKey: .modelFolder)
+        modelName = try container.decode(String.self, forKey: .modelName)
+        sessionConfiguration = try container.decode(CodableSessionConfiguration.self, forKey: .sessionConfiguration)
+        primaryDetailLevel = try container.decode(CodableDetailLevel.self, forKey: .primaryDetailLevel)
+        additionalDetailLevels = try container.decode(CodableDetailLevelOptions.self, forKey: .additionalDetailLevels)
+        exportFormats = try container.decodeIfPresent(Set<ModelExportFormat>.self, forKey: .exportFormats) ?? [.usdz]
+        status = try container.decodeIfPresent(JobStatus.self, forKey: .status) ?? .pending
+        progress = try container.decodeIfPresent(Double.self, forKey: .progress) ?? 0
+        errorMessage = try container.decodeIfPresent(String.self, forKey: .errorMessage)
+        boundingBoxAvailable = try container.decodeIfPresent(Bool.self, forKey: .boundingBoxAvailable) ?? false
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        imageFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .imageFolderBookmark)
+        modelFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .modelFolderBookmark)
+        if exportFormats.isEmpty {
+            exportFormats = [.usdz]
         }
     }
 
@@ -156,4 +253,23 @@ struct CodableDetailLevelOptions: Codable, Equatable {
     var medium: Bool = false
     var full: Bool = false
     var raw: Bool = false
+}
+
+struct ModelExportRequest {
+    var detailLevel: CodableDetailLevel
+    var photogrammetryRequest: PhotogrammetrySession.Request
+    var targets: [ModelExportTarget]
+    var intermediateDirectory: URL?
+
+    var outputURL: URL? {
+        if case .modelFile(let url, _, _) = photogrammetryRequest {
+            return url
+        }
+        return nil
+    }
+}
+
+struct ModelExportTarget {
+    var format: ModelExportFormat
+    var url: URL
 }

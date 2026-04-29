@@ -51,8 +51,13 @@ struct OutputPreviewView: View {
             if draft.detailLevelOptionsUnderAdvancedMenu.full { levels.insert(.full) }
             if draft.detailLevelOptionsUnderAdvancedMenu.raw { levels.insert(.raw) }
         }
+        let formats = draft.exportFormats.isEmpty ? Set([.usdz]) : draft.exportFormats
         return levels
             .sorted { $0.rawValue < $1.rawValue }
-            .map { "\(name)-\($0.rawValue).usdz" }
+            .flatMap { level in
+                formats
+                    .sorted { $0.rawValue < $1.rawValue }
+                    .map { "\(name)-\(level.rawValue).\($0.fileExtension)" }
+            }
     }
 }

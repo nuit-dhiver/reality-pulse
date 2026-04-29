@@ -231,7 +231,8 @@ class JobScheduler {
         }
 
         let config = jobs[index].sessionConfiguration.toSessionConfiguration()
-        let requests = jobs[index].createReconstructionRequests()
+        let exportRequests = jobs[index].createModelExportRequests()
+        let requests = exportRequests.map(\.photogrammetryRequest)
 
         guard !requests.isEmpty else {
             jobs[index].status = .failed
@@ -242,6 +243,15 @@ class JobScheduler {
         }
 
         do {
+            for exportRequest in exportRequests {
+                if let intermediateDirectory = exportRequest.intermediateDirectory {
+                    try FileManager.default.createDirectory(
+                        at: intermediateDirectory,
+                        withIntermediateDirectories: true
+                    )
+                }
+            }
+
             let session = try await createSession(
                 imageFolder: jobs[index].imageFolder,
                 configuration: config
@@ -268,8 +278,9 @@ class JobScheduler {
                 case .requestProgressInfo(_, let info):
                     estimatedTimeRemaining = info.estimatedRemainingTime
 
-                case .requestComplete(_, _):
+                case .requestComplete(let request, _):
                     logger.log("Request completed for job \(jobId).")
+                    try await finishExport(for: request, in: exportRequests)
 
                 case .requestError(_, let error):
                     logger.warning("Request error for job \(jobId): \(error)")
@@ -327,6 +338,28 @@ class JobScheduler {
         logger.log("Scheduler paused between jobs.")
     }
 
+    private nonisolated func finishExport(
+        for request: PhotogrammetrySession.Request,
+        in exportRequests: [ModelExportRequest]
+    ) async throws {
+        guard let sourceURL = request.modelFileURL,
+              let exportRequest = exportRequests.first(where: { $0.outputURL == sourceURL }),
+              let intermediateDirectory = exportRequest.intermediateDirectory else {
+            return
+        }
+
+        for target in exportRequest.targets where target.format != .usdz {
+            try OBJToGLTFConverter.convertOBJFolder(
+                at: intermediateDirectory,
+                to: target.url,
+                format: target.format
+            )
+            logger.log("Exported \(target.format.displayName) model to \(target.url.lastPathComponent)")
+        }
+
+        try? FileManager.default.removeItem(at: intermediateDirectory)
+    }
+
     // MARK: - Session creation (nonisolated to avoid blocking main actor)
 
     private nonisolated func createSession(
@@ -371,5 +404,14 @@ class JobScheduler {
                 logger.warning("Failed to schedule notification: \(error)")
             }
         }
+    }
+}
+
+private extension PhotogrammetrySession.Request {
+    var modelFileURL: URL? {
+        if case .modelFile(let url, _, _) = self {
+            return url
+        }
+        return nil
     }
 }

@@ -16,6 +16,8 @@ struct ReconstructionOptionsView: View {
 
         MultiModelOutputView()
 
+        ExportFormatView()
+
         OutputPreviewView()
 
         Divider()
