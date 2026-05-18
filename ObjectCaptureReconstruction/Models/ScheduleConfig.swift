@@ -20,6 +20,39 @@ struct ScheduleConfig: Codable, Equatable {
     var allowedWindowStart: Int?
     var allowedWindowEnd: Int?
 
+    /// When enabled, keep the Mac awake while a queue run is active.
+    var preventSleepWhileQueueActive = false
+
+    private enum CodingKeys: String, CodingKey {
+        case delayedStart
+        case allowedWindowStart
+        case allowedWindowEnd
+        case preventSleepWhileQueueActive
+    }
+
+    init(
+        delayedStart: Date? = nil,
+        allowedWindowStart: Int? = nil,
+        allowedWindowEnd: Int? = nil,
+        preventSleepWhileQueueActive: Bool = false
+    ) {
+        self.delayedStart = delayedStart
+        self.allowedWindowStart = allowedWindowStart
+        self.allowedWindowEnd = allowedWindowEnd
+        self.preventSleepWhileQueueActive = preventSleepWhileQueueActive
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        delayedStart = try container.decodeIfPresent(Date.self, forKey: .delayedStart)
+        allowedWindowStart = try container.decodeIfPresent(Int.self, forKey: .allowedWindowStart)
+        allowedWindowEnd = try container.decodeIfPresent(Int.self, forKey: .allowedWindowEnd)
+        preventSleepWhileQueueActive = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .preventSleepWhileQueueActive
+        ) ?? false
+    }
+
     var hasAllowedWindow: Bool {
         allowedWindowStart != nil && allowedWindowEnd != nil
     }
