@@ -20,6 +20,7 @@ struct ScheduleSettingsView: View {
     @State private var useAllowedWindow = false
     @State private var windowStartHour = 22
     @State private var windowEndHour = 6
+    @State private var preventSleepWhileQueueActive = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -65,6 +66,15 @@ struct ScheduleSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+
+                Divider()
+
+                Section {
+                    Toggle(
+                        "Prevent system sleep while queue is active",
+                        isOn: $preventSleepWhileQueueActive
+                    )
+                }
             }
             .padding()
 
@@ -92,6 +102,7 @@ struct ScheduleSettingsView: View {
                         config.allowedWindowStart = windowStartHour
                         config.allowedWindowEnd = windowEndHour
                     }
+                    config.preventSleepWhileQueueActive = preventSleepWhileQueueActive
                     appDataModel.scheduler.scheduleConfig = config
                     appDataModel.scheduler.persist()
                     dismiss()
@@ -108,6 +119,7 @@ struct ScheduleSettingsView: View {
             useAllowedWindow = config.hasAllowedWindow
             windowStartHour = config.allowedWindowStart ?? 22
             windowEndHour = config.allowedWindowEnd ?? 6
+            preventSleepWhileQueueActive = config.preventSleepWhileQueueActive
         }
     }
 

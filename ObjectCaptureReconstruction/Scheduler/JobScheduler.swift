@@ -22,7 +22,11 @@ class JobScheduler {
     // MARK: - Published state
 
     private(set) var jobs: [ReconstructionJob] = []
-    var scheduleConfig: ScheduleConfig = ScheduleConfig()
+    var scheduleConfig: ScheduleConfig = ScheduleConfig() {
+        didSet {
+            updateSleepPreventionActivity()
+        }
+    }
 
     private(set) var isRunning = false
     private(set) var isPaused = false
@@ -35,6 +39,7 @@ class JobScheduler {
 
     private var processingTask: Task<Void, Never>?
     private var currentSession: PhotogrammetrySession?
+    private var sleepPreventionActivity: NSObjectProtocol?
     private let store = JobStore()
 
     // MARK: - Persistence helpers
@@ -100,6 +105,7 @@ class JobScheduler {
         isRunning = true
         isPaused = false
         isPauseRequested = false
+        updateSleepPreventionActivity()
         logger.log("Scheduler started.")
         processingTask = Task { await processQueue() }
     }
@@ -143,6 +149,7 @@ class JobScheduler {
         currentJobId = nil
         currentProgress = 0
         estimatedTimeRemaining = nil
+        updateSleepPreventionActivity()
 
         // Mark the running job as cancelled.
         if let id = cancellingJobId, let idx = jobs.firstIndex(where: { $0.id == id }) {
@@ -159,6 +166,7 @@ class JobScheduler {
             currentJobId = nil
             currentProgress = 0
             estimatedTimeRemaining = nil
+            updateSleepPreventionActivity()
 
             let succeeded = jobs.filter { $0.status == .completed }.count
             let failed = jobs.filter { $0.status == .failed }.count
@@ -204,6 +212,36 @@ class JobScheduler {
 
             await processJob(at: index)
         }
+    }
+
+    // MARK: - Sleep prevention
+
+    private var shouldPreventSleep: Bool {
+        isRunning && scheduleConfig.preventSleepWhileQueueActive
+    }
+
+    private func updateSleepPreventionActivity() {
+        if shouldPreventSleep {
+            beginSleepPreventionActivityIfNeeded()
+        } else {
+            endSleepPreventionActivityIfNeeded()
+        }
+    }
+
+    private func beginSleepPreventionActivityIfNeeded() {
+        guard sleepPreventionActivity == nil else { return }
+        sleepPreventionActivity = ProcessInfo.processInfo.beginActivity(
+            options: [.idleSystemSleepDisabled],
+            reason: "Reality Pulse queue is active"
+        )
+        logger.log("Sleep prevention activity started.")
+    }
+
+    private func endSleepPreventionActivityIfNeeded() {
+        guard let activity = sleepPreventionActivity else { return }
+        ProcessInfo.processInfo.endActivity(activity)
+        sleepPreventionActivity = nil
+        logger.log("Sleep prevention activity ended.")
     }
 
     private func processJob(at index: Int) async {
