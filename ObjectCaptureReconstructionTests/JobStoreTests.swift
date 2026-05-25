@@ -44,6 +44,19 @@ final class JobStoreTests: XCTestCase {
         XCTAssertEqual(JobStore(modelContainer: container).loadSchedule(), schedule)
     }
 
+    func testCompletedOutputsSurviveReload() throws {
+        let container = try JobStore.makeModelContainer(inMemory: true)
+        var job = makeJob(modelName: "CompletedOutput")
+        job.markOutputCompleted(at: job.outputURL(for: .medium))
+
+        JobStore(modelContainer: container).saveJobs([job])
+
+        XCTAssertEqual(
+            JobStore(modelContainer: container).loadJobs().first?.completedOutputFilenames,
+            [job.outputFilename(for: .medium)]
+        )
+    }
+
     func testLaunchRecoveryMarksRunningJobsInterrupted() throws {
         let container = try JobStore.makeModelContainer(inMemory: true)
         let running = makeJob(modelName: "Running", status: .running, progress: 0.42)
@@ -69,6 +82,53 @@ final class JobStoreTests: XCTestCase {
         XCTAssertEqual(scheduler.jobs.first?.status, .pending)
         XCTAssertNil(scheduler.jobs.first?.errorMessage)
         XCTAssertEqual(store.loadJobs().first?.status, .pending)
+    }
+
+    func testRetryingInterruptedJobPreservesCompletedOutputs() throws {
+        let store = try JobStore(inMemory: true)
+        let scheduler = JobScheduler(store: store)
+        var interrupted = makeJob(modelName: "Interrupted", status: .interrupted, errorMessage: "Stopped")
+        interrupted.markOutputCompleted(at: interrupted.outputURL(for: .medium))
+        scheduler.addJob(interrupted)
+
+        scheduler.retryJob(interrupted)
+
+        XCTAssertEqual(
+            scheduler.jobs.first?.completedOutputFilenames,
+            [interrupted.outputFilename(for: .medium)]
+        )
+        XCTAssertEqual(
+            store.loadJobs().first?.completedOutputFilenames,
+            [interrupted.outputFilename(for: .medium)]
+        )
+    }
+
+    func testPrepareRequestsSkipsCompletedOutputsAndDeletesStaleFiles() throws {
+        let store = try JobStore(inMemory: true)
+        let scheduler = JobScheduler(store: store)
+        let outputDirectory = try makeTemporaryDirectory()
+        var additionalDetailLevels = CodableDetailLevelOptions()
+        additionalDetailLevels.isSelected = true
+        additionalDetailLevels.reduced = true
+        var job = makeJob(
+            modelName: "Multi",
+            modelFolder: outputDirectory,
+            primaryDetailLevel: .preview,
+            additionalDetailLevels: additionalDetailLevels
+        )
+
+        let completedURL = job.outputURL(for: .preview)
+        let staleURL = job.outputURL(for: .reduced)
+        try Data("done".utf8).write(to: completedURL)
+        try Data("stale".utf8).write(to: staleURL)
+        job.markOutputCompleted(at: completedURL)
+        scheduler.addJob(job)
+
+        let requests = try scheduler.prepareRequestsForProcessing(at: 0)
+
+        XCTAssertEqual(requests.count, 1)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: completedURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: staleURL.path))
     }
 
     func testLegacyJSONMigrationImportsJobsAndScheduleOnce() throws {
@@ -109,14 +169,19 @@ final class JobStoreTests: XCTestCase {
 
     private func makeJob(
         modelName: String,
+        modelFolder: URL? = nil,
+        primaryDetailLevel: CodableDetailLevel = .medium,
+        additionalDetailLevels: CodableDetailLevelOptions = CodableDetailLevelOptions(),
         status: JobStatus = .pending,
         progress: Double = 0,
         errorMessage: String? = nil
     ) -> ReconstructionJob {
         ReconstructionJob(
             imageFolder: URL(fileURLWithPath: "/tmp/\(modelName)-images"),
-            modelFolder: URL(fileURLWithPath: "/tmp/\(modelName)-models"),
+            modelFolder: modelFolder ?? URL(fileURLWithPath: "/tmp/\(modelName)-models"),
             modelName: modelName,
+            primaryDetailLevel: primaryDetailLevel,
+            additionalDetailLevels: additionalDetailLevels,
             status: status,
             progress: progress,
             errorMessage: errorMessage

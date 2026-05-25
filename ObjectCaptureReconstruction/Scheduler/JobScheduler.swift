@@ -291,13 +291,35 @@ class JobScheduler {
             if modelAccess { modelURL?.stopAccessingSecurityScopedResource() }
         }
 
-        let config = jobs[index].sessionConfiguration.toSessionConfiguration()
-        let requests = jobs[index].createReconstructionRequests()
+        jobs[index].progress = jobs[index].completedOutputFraction()
+        persist()
 
-        guard !requests.isEmpty else {
+        let config = jobs[index].sessionConfiguration.toSessionConfiguration()
+        let totalOutputCount = jobs[index].requestedOutputCount
+        let requests: [PhotogrammetrySession.Request]
+
+        do {
+            requests = try prepareRequestsForProcessing(at: index)
+        } catch {
+            jobs[index].status = .failed
+            jobs[index].errorMessage = "\(error)"
+            sendNotification(title: "Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        guard totalOutputCount > 0 else {
             jobs[index].status = .failed
             jobs[index].errorMessage = "No detail levels selected."
             sendNotification(title: "Job Failed", body: jobName)
+            persist()
+            return
+        }
+
+        guard !requests.isEmpty else {
+            jobs[index].status = .completed
+            jobs[index].progress = 1.0
+            sendNotification(title: "Job Complete", body: jobName)
             persist()
             return
         }
@@ -321,16 +343,26 @@ class JobScheduler {
 
                 switch output {
                 case .requestProgress(_, let fraction):
-                    currentProgress = fraction
                     if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
-                        jobs[idx].progress = fraction
+                        let completedCount = jobs[idx].completedOutputCount()
+                        let overallProgress = (
+                            Double(completedCount) + fraction
+                        ) / Double(totalOutputCount)
+                        currentProgress = overallProgress
+                        jobs[idx].progress = overallProgress
                     }
 
                 case .requestProgressInfo(_, let info):
                     estimatedTimeRemaining = info.estimatedRemainingTime
 
-                case .requestComplete(_, _):
+                case .requestComplete(let request, _):
                     logger.log("Request completed for job \(jobId).")
+                    if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
+                        markCompletedOutput(for: request, on: &jobs[idx])
+                        jobs[idx].progress = jobs[idx].completedOutputFraction()
+                        currentProgress = jobs[idx].progress
+                        store.saveJob(jobs[idx])
+                    }
 
                 case .requestError(_, let error):
                     logger.warning("Request error for job \(jobId): \(error)")
@@ -386,6 +418,30 @@ class JobScheduler {
         isPauseRequested = false
         isPaused = true
         logger.log("Scheduler paused between jobs.")
+    }
+
+    func prepareRequestsForProcessing(at index: Int) throws -> [PhotogrammetrySession.Request] {
+        for level in jobs[index].requestedDetailLevels {
+            if jobs[index].hasCompletedOutputFile(for: level) {
+                continue
+            }
+
+            let url = jobs[index].outputURL(for: level)
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(at: url)
+                logger.log("Removed stale existing output before retry: \(url.lastPathComponent)")
+            }
+        }
+
+        return jobs[index].createReconstructionRequests(skippingCompletedOutputs: true)
+    }
+
+    private func markCompletedOutput(
+        for request: PhotogrammetrySession.Request,
+        on job: inout ReconstructionJob
+    ) {
+        guard case .modelFile(let url, _, _) = request else { return }
+        job.markOutputCompleted(at: url)
     }
 
     // MARK: - Session creation (nonisolated to avoid blocking main actor)

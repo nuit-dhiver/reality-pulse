@@ -24,6 +24,7 @@ final class PersistentJob {
     var boundingBoxAvailable: Bool
     var createdAt: Date
     var updatedAt: Date
+    var completedOutputFilenamesData: Data?
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
 
@@ -42,6 +43,7 @@ final class PersistentJob {
         boundingBoxAvailable = job.boundingBoxAvailable
         createdAt = job.createdAt
         updatedAt = Date()
+        completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -62,6 +64,7 @@ final class PersistentJob {
         boundingBoxAvailable = job.boundingBoxAvailable
         createdAt = job.createdAt
         updatedAt = Date()
+        completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -75,6 +78,9 @@ final class PersistentJob {
             CodableDetailLevelOptions.self,
             from: additionalDetailLevelsData
         )
+        let completedOutputFilenames = try completedOutputFilenamesData.map {
+            try JSONDecoder().decode(Set<String>.self, from: $0)
+        } ?? []
 
         return ReconstructionJob(
             id: id,
@@ -89,6 +95,7 @@ final class PersistentJob {
             errorMessage: errorMessage,
             boundingBoxAvailable: boundingBoxAvailable,
             createdAt: createdAt,
+            completedOutputFilenames: completedOutputFilenames,
             imageFolderBookmark: imageFolderBookmark,
             modelFolderBookmark: modelFolderBookmark
         )

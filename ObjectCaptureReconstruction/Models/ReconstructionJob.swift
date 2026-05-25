@@ -25,6 +25,7 @@ struct ReconstructionJob: Identifiable, Codable {
     var errorMessage: String?
     var boundingBoxAvailable: Bool = false
     var createdAt: Date
+    var completedOutputFilenames: Set<String>?
 
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
@@ -43,6 +44,7 @@ struct ReconstructionJob: Identifiable, Codable {
         errorMessage: String? = nil,
         boundingBoxAvailable: Bool = false,
         createdAt: Date = Date(),
+        completedOutputFilenames: Set<String>? = [],
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
@@ -58,6 +60,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.errorMessage = errorMessage
         self.boundingBoxAvailable = boundingBoxAvailable
         self.createdAt = createdAt
+        self.completedOutputFilenames = completedOutputFilenames
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,
@@ -86,10 +89,61 @@ struct ReconstructionJob: Identifiable, Codable {
         return levels
     }
 
+    var requestedDetailLevels: [CodableDetailLevel] {
+        allRequestedDetailLevels.sorted { $0.rawValue < $1.rawValue }
+    }
+
+    var requestedOutputCount: Int {
+        requestedDetailLevels.count
+    }
+
+    func outputURL(for level: CodableDetailLevel) -> URL {
+        modelFolder.appending(path: outputFilename(for: level))
+    }
+
+    func outputFilename(for level: CodableDetailLevel) -> String {
+        "\(modelName)-\(level.rawValue).usdz"
+    }
+
+    func hasCompletedOutputFile(
+        for level: CodableDetailLevel,
+        fileManager: FileManager = .default
+    ) -> Bool {
+        let filename = outputFilename(for: level)
+        return completedOutputFilenames?.contains(filename) == true &&
+            fileManager.fileExists(atPath: outputURL(for: level).path)
+    }
+
+    func completedOutputCount(fileManager: FileManager = .default) -> Int {
+        requestedDetailLevels.filter {
+            hasCompletedOutputFile(for: $0, fileManager: fileManager)
+        }.count
+    }
+
+    func completedOutputFraction(fileManager: FileManager = .default) -> Double {
+        let total = requestedOutputCount
+        guard total > 0 else { return 0 }
+        return Double(completedOutputCount(fileManager: fileManager)) / Double(total)
+    }
+
+    mutating func markOutputCompleted(at url: URL) {
+        var filenames = completedOutputFilenames ?? []
+        filenames.insert(url.lastPathComponent)
+        completedOutputFilenames = filenames
+    }
+
     /// Build `PhotogrammetrySession.Request` entries for all requested detail levels.
-    func createReconstructionRequests() -> [PhotogrammetrySession.Request] {
-        allRequestedDetailLevels.map { level in
-            let url = modelFolder.appending(path: "\(modelName)-\(level.rawValue).usdz")
+    func createReconstructionRequests(
+        skippingCompletedOutputs: Bool = false,
+        fileManager: FileManager = .default
+    ) -> [PhotogrammetrySession.Request] {
+        requestedDetailLevels.compactMap { level in
+            if skippingCompletedOutputs &&
+                hasCompletedOutputFile(for: level, fileManager: fileManager) {
+                return nil
+            }
+
+            let url = outputURL(for: level)
             return .modelFile(url: url, detail: level.toFrameworkType)
         }
     }
