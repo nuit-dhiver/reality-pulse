@@ -6,10 +6,17 @@ The top-level view routing between the queue dashboard and job setup.
 */
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
-    @State private var appDataModel = AppDataModel()
+    @State private var appDataModel: AppDataModel
     @State private var showErrorAlert = false
+
+    init(modelContainerResult: Result<ModelContainer, Error>) {
+        _appDataModel = State(initialValue: AppDataModel(
+            modelContainerResult: modelContainerResult
+        ))
+    }
 
     var body: some View {
         QueueDashboardView()
@@ -22,6 +29,11 @@ struct ContentView: View {
             .sheet(isPresented: $appDataModel.showingScheduleSettings) {
                 ScheduleSettingsView()
                     .environment(appDataModel)
+            }
+            .onAppear {
+                if appDataModel.state == .error {
+                    showErrorAlert = true
+                }
             }
             .onChange(of: appDataModel.state) {
                 if appDataModel.state == .error {

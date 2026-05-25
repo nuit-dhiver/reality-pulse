@@ -45,13 +45,13 @@ struct JobRowView: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
-            } else if job.status == .failed {
-                Text(job.errorMessage ?? "Failed")
+            } else if job.status == .failed || job.status == .interrupted {
+                Text(job.errorMessage ?? statusText)
                     .font(.caption2)
                     .foregroundStyle(.red)
                     .lineLimit(1)
                     .frame(maxWidth: 120)
-                    .help(job.errorMessage ?? "Failed")
+                    .help(job.errorMessage ?? statusText)
             }
         }
         .padding(.vertical, 4)
@@ -75,6 +75,20 @@ struct JobRowView: View {
         case .cancelled:
             Image(systemName: "xmark.circle")
                 .foregroundStyle(.secondary)
+        case .interrupted:
+            Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
+                .foregroundStyle(.orange)
+        }
+    }
+
+    private var statusText: String {
+        switch job.status {
+        case .failed:
+            return "Failed"
+        case .interrupted:
+            return "Interrupted"
+        default:
+            return job.status.rawValue.capitalized
         }
     }
 

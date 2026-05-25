@@ -67,18 +67,20 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
 
     /// Build a `ReconstructionJob` from the current draft.
     /// Returns `nil` if required fields are missing.
-    func toJob(existingId: UUID? = nil) -> ReconstructionJob? {
+    func toJob(existingId: UUID? = nil, createdAt: Date = Date()) -> ReconstructionJob? {
         guard let imageFolder, let modelFolder, let modelName, !modelName.isEmpty else {
             return nil
         }
 
         var job = ReconstructionJob(
+            id: existingId ?? UUID(),
             imageFolder: imageFolder,
             modelFolder: modelFolder,
             modelName: modelName,
             sessionConfiguration: CodableSessionConfiguration(from: sessionConfiguration),
             primaryDetailLevel: CodableDetailLevel(from: detailLevelOptionUnderQualityMenu),
-            additionalDetailLevels: detailLevelOptionsUnderAdvancedMenu
+            additionalDetailLevels: detailLevelOptionsUnderAdvancedMenu,
+            createdAt: createdAt
         )
         job.boundingBoxAvailable = boundingBoxAvailable
         return job

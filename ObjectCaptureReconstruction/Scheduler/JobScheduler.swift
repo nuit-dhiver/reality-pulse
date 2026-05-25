@@ -25,6 +25,9 @@ class JobScheduler {
     var scheduleConfig: ScheduleConfig = ScheduleConfig() {
         didSet {
             updateSleepPreventionActivity()
+            if !isLoadingPersistedState {
+                store.saveSchedule(scheduleConfig)
+            }
         }
     }
 
@@ -40,7 +43,16 @@ class JobScheduler {
     private var processingTask: Task<Void, Never>?
     private var currentSession: PhotogrammetrySession?
     private var sleepPreventionActivity: NSObjectProtocol?
-    private let store = JobStore()
+    private var isLoadingPersistedState = false
+    private let store: JobStore
+
+    init(store: JobStore) {
+        self.store = store
+    }
+
+    var persistenceErrorMessage: String? {
+        store.lastErrorMessage
+    }
 
     // MARK: - Persistence helpers
 
@@ -49,9 +61,15 @@ class JobScheduler {
         store.saveSchedule(scheduleConfig)
     }
 
+    func performLaunchRecovery() {
+        store.performLaunchRecovery()
+    }
+
     func loadFromDisk() {
         jobs = store.loadJobs()
+        isLoadingPersistedState = true
         scheduleConfig = store.loadSchedule()
+        isLoadingPersistedState = false
     }
 
     // MARK: - Queue management
@@ -63,12 +81,17 @@ class JobScheduler {
 
     func removeJob(_ job: ReconstructionJob) {
         jobs.removeAll { $0.id == job.id }
-        persist()
+        store.deleteJob(id: job.id)
+        store.saveJobs(jobs)
     }
 
     func removeJobs(at offsets: IndexSet) {
+        let removedIds = offsets.map { jobs[$0].id }
         jobs.remove(atOffsets: offsets)
-        persist()
+        for id in removedIds {
+            store.deleteJob(id: id)
+        }
+        store.saveJobs(jobs)
     }
 
     func moveJob(from source: IndexSet, to destination: Int) {
@@ -81,13 +104,13 @@ class JobScheduler {
         jobs[index].status = .pending
         jobs[index].progress = 0
         jobs[index].errorMessage = nil
-        persist()
+        store.saveJob(jobs[index])
     }
 
     func updateJob(_ job: ReconstructionJob) {
         guard let index = jobs.firstIndex(where: { $0.id == job.id }) else { return }
         jobs[index] = job
-        persist()
+        store.saveJob(job)
     }
 
     var pendingJobCount: Int {

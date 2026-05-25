@@ -7,6 +7,7 @@ Data model for maintaining the app state and the job queue.
 
 import Foundation
 import RealityKit
+import SwiftData
 import os
 
 private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
@@ -25,7 +26,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         }
     }
 
-    let scheduler = JobScheduler()
+    let scheduler: JobScheduler
 
     var alertMessage: String = ""
 
@@ -38,8 +39,36 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     /// Draft job being edited in the setup sheet (`nil` when adding a new job).
     var editingJob: ReconstructionJob?
 
-    init() {
+    init(modelContainerResult: Result<ModelContainer, Error>) {
+        var startupPersistenceError: String?
+
+        switch modelContainerResult {
+        case .success(let modelContainer):
+            scheduler = JobScheduler(store: JobStore(modelContainer: modelContainer))
+            scheduler.performLaunchRecovery()
+            startupPersistenceError = scheduler.persistenceErrorMessage
+
+        case .failure(let error):
+            scheduler = JobScheduler(store: Self.makeFallbackStore())
+            startupPersistenceError = "Persistence is unavailable: \(error.localizedDescription)"
+        }
+
         scheduler.loadFromDisk()
+
+        if let persistenceError = startupPersistenceError ?? scheduler.persistenceErrorMessage {
+            alertMessage = persistenceError
+            state = .error
+        }
+    }
+}
+
+private extension AppDataModel {
+    static func makeFallbackStore() -> JobStore {
+        do {
+            return try JobStore(inMemory: true)
+        } catch {
+            fatalError("Unable to create fallback in-memory store: \(error)")
+        }
     }
 }
 

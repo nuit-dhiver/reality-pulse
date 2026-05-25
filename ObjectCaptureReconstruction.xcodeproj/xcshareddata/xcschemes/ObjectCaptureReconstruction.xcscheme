@@ -28,6 +28,17 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3FF53D6DB5C4409ABA48B27A"
+               BuildableName = "ObjectCaptureReconstructionTests.xctest"
+               BlueprintName = "ObjectCaptureReconstructionTests"
+               ReferencedContainer = "container:ObjectCaptureReconstruction.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

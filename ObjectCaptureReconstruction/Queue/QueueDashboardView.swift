@@ -68,13 +68,13 @@ struct QueueDashboardView: View {
                             }
                         }
 
-                        if job.status == .failed {
+                        if job.status == .failed || job.status == .interrupted {
                             Button("Retry") {
                                 appDataModel.scheduler.retryJob(job)
                             }
                         }
 
-                        if job.status == .pending || job.status == .failed || job.status == .cancelled {
+                        if job.status != .running {
                             Button("Remove", role: .destructive) {
                                 appDataModel.scheduler.removeJob(job)
                             }
@@ -148,6 +148,9 @@ private struct QueueHeaderView: View {
         let total = scheduler.jobs.count
         let completed = scheduler.completedJobCount
         let pending = scheduler.pendingJobCount
+        let needsAttention = scheduler.jobs.filter {
+            $0.status == .failed || $0.status == .interrupted
+        }.count
 
         if scheduler.isRunning {
             if scheduler.isPaused {
@@ -161,6 +164,9 @@ private struct QueueHeaderView: View {
 
         if total == 0 { return "Empty" }
         if pending == 0 && completed == total { return "All \(total) jobs complete" }
+        if needsAttention > 0 {
+            return "\(pending) pending, \(completed) complete, \(needsAttention) need attention"
+        }
         return "\(pending) pending, \(completed) complete"
     }
 

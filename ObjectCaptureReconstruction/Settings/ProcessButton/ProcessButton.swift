@@ -28,13 +28,18 @@ struct ProcessButton: View {
 
             Button(isEditing ? "Save Changes" : "Add to Queue") {
                 guard draft.validate() else { return }
-                guard let job = draft.toJob() else { return }
+                let existingJob = isEditing ? appDataModel.editingJob : nil
+                guard var job = draft.toJob(
+                    existingId: existingJob?.id,
+                    createdAt: existingJob?.createdAt ?? Date()
+                ) else { return }
                 logger.log("Adding job to queue: \(job.modelName)")
 
-                if isEditing, let editingJob = appDataModel.editingJob {
-                    var updatedJob = job
-                    updatedJob.status = editingJob.status
-                    appDataModel.scheduler.updateJob(updatedJob)
+                if let editingJob = existingJob {
+                    job.status = editingJob.status
+                    job.progress = editingJob.progress
+                    job.errorMessage = editingJob.errorMessage
+                    appDataModel.scheduler.updateJob(job)
                 } else {
                     appDataModel.scheduler.addJob(job)
                 }

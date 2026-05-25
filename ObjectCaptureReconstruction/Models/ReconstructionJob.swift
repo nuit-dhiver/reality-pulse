@@ -31,32 +31,44 @@ struct ReconstructionJob: Identifiable, Codable {
     var modelFolderBookmark: Data?
 
     init(
+        id: UUID = UUID(),
         imageFolder: URL,
         modelFolder: URL,
         modelName: String,
         sessionConfiguration: CodableSessionConfiguration = CodableSessionConfiguration(),
         primaryDetailLevel: CodableDetailLevel = .medium,
-        additionalDetailLevels: CodableDetailLevelOptions = CodableDetailLevelOptions()
+        additionalDetailLevels: CodableDetailLevelOptions = CodableDetailLevelOptions(),
+        status: JobStatus = .pending,
+        progress: Double = 0,
+        errorMessage: String? = nil,
+        boundingBoxAvailable: Bool = false,
+        createdAt: Date = Date(),
+        imageFolderBookmark: Data? = nil,
+        modelFolderBookmark: Data? = nil
     ) {
-        self.id = UUID()
+        self.id = id
         self.imageFolder = imageFolder
         self.modelFolder = modelFolder
         self.modelName = modelName
         self.sessionConfiguration = sessionConfiguration
         self.primaryDetailLevel = primaryDetailLevel
         self.additionalDetailLevels = additionalDetailLevels
-        self.createdAt = Date()
+        self.status = status
+        self.progress = progress
+        self.errorMessage = errorMessage
+        self.boundingBoxAvailable = boundingBoxAvailable
+        self.createdAt = createdAt
 
-        self.imageFolderBookmark = try? imageFolder.bookmarkData(
+        self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,
             includingResourceValuesForKeys: nil,
             relativeTo: nil
-        )
-        self.modelFolderBookmark = try? modelFolder.bookmarkData(
+        ))
+        self.modelFolderBookmark = modelFolderBookmark ?? (try? modelFolder.bookmarkData(
             options: .withSecurityScope,
             includingResourceValuesForKeys: nil,
             relativeTo: nil
-        )
+        ))
     }
 
     // MARK: - Detail level helpers
@@ -120,6 +132,7 @@ enum JobStatus: String, Codable, CaseIterable {
     case completed
     case failed
     case cancelled
+    case interrupted
 }
 
 enum CodableDetailLevel: String, Codable, CaseIterable, Hashable {
