@@ -4,12 +4,12 @@ Reality Pulse is a macOS SwiftUI app for queued Apple Object Capture / RealityKi
 
 ## Build, test, and lint
 
-- Open the project in Xcode with `open ObjectCaptureReconstruction.xcodeproj`.
+- Open the project in Xcode with `open RealityPulse.xcodeproj`.
 - Build from the CLI with:
 
 ```bash
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   build
@@ -18,14 +18,14 @@ xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
 - Run tests with:
 
 ```bash
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   test
 ```
 
-- The shared scheme is `ObjectCaptureReconstruction`.
+- The shared scheme is `RealityPulse`.
 - There is a focused test target in `ObjectCaptureReconstructionTests`.
 - There is no repository lint configuration (`SwiftLint`, `SwiftFormat`, etc.) checked in.
 - `Configuration/SampleCode.xcconfig` derives `SAMPLE_CODE_DISAMBIGUATOR` from `DEVELOPMENT_TEAM`, so if builds fail on a fresh machine, set a development team in Xcode first.

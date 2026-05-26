@@ -17,7 +17,7 @@
                BlueprintIdentifier = "F974D1152BE0484500EFACBA"
                BuildableName = "Reality Pulse.app"
                BlueprintName = "ObjectCaptureReconstruction"
-               ReferencedContainer = "container:ObjectCaptureReconstruction.xcodeproj">
+               ReferencedContainer = "container:RealityPulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,7 +36,7 @@
                BlueprintIdentifier = "3FF53D6DB5C4409ABA48B27A"
                BuildableName = "ObjectCaptureReconstructionTests.xctest"
                BlueprintName = "ObjectCaptureReconstructionTests"
-               ReferencedContainer = "container:ObjectCaptureReconstruction.xcodeproj">
+               ReferencedContainer = "container:RealityPulse.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -58,7 +58,7 @@
             BlueprintIdentifier = "F974D1152BE0484500EFACBA"
             BuildableName = "Reality Pulse.app"
             BlueprintName = "ObjectCaptureReconstruction"
-            ReferencedContainer = "container:ObjectCaptureReconstruction.xcodeproj">
+            ReferencedContainer = "container:RealityPulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -75,7 +75,7 @@
             BlueprintIdentifier = "F974D1152BE0484500EFACBA"
             BuildableName = "Reality Pulse.app"
             BlueprintName = "ObjectCaptureReconstruction"
-            ReferencedContainer = "container:ObjectCaptureReconstruction.xcodeproj">
+            ReferencedContainer = "container:RealityPulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -53,22 +53,22 @@ Clone the repo and build the macOS app:
 git clone https://github.com/nuit-dhiver/reality-pulse.git
 cd reality-pulse
 
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   build
 ```
 
-You can also open `ObjectCaptureReconstruction.xcodeproj` in Xcode and build the `ObjectCaptureReconstruction` scheme.
+You can also open `RealityPulse.xcodeproj` in Xcode and build the `RealityPulse` scheme.
 
 ## Test
 
 Run the persistence and scheduler-focused test suite with:
 
 ```bash
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   test

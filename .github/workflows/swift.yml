@@ -18,8 +18,8 @@ jobs:
 
       - name: Build
         run: |
-          xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-            -scheme ObjectCaptureReconstruction \
+          xcodebuild -project RealityPulse.xcodeproj \
+            -scheme RealityPulse \
             -configuration Debug \
             -destination 'platform=macOS' \
             build

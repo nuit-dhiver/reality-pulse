@@ -13,14 +13,14 @@ Requirements:
 Open the project in Xcode:
 
 ```bash
-open ObjectCaptureReconstruction.xcodeproj
+open RealityPulse.xcodeproj
 ```
 
 Build from the command line:
 
 ```bash
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   build
@@ -29,8 +29,8 @@ xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
 Run tests:
 
 ```bash
-xcodebuild -project ObjectCaptureReconstruction.xcodeproj \
-  -scheme ObjectCaptureReconstruction \
+xcodebuild -project RealityPulse.xcodeproj \
+  -scheme RealityPulse \
   -configuration Debug \
   -destination 'platform=macOS' \
   test
