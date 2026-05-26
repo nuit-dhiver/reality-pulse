@@ -61,6 +61,12 @@ struct QueueDashboardView: View {
             ForEach(appDataModel.scheduler.jobs) { job in
                 JobRowView(job: job)
                     .contextMenu {
+                        Button("Show in Finder") {
+                            showInFinder(job)
+                        }
+
+                        Divider()
+
                         if job.status == .pending {
                             Button("Edit") {
                                 appDataModel.editingJob = job
@@ -86,6 +92,29 @@ struct QueueDashboardView: View {
             }
         }
         .listStyle(.inset(alternatesRowBackgrounds: true))
+    }
+
+    private func showInFinder(_ job: ReconstructionJob) {
+        var job = job
+        let (_, modelURL) = job.resolveBookmarks()
+        let folderURL = modelURL ?? job.modelFolder
+        let didAccess = folderURL.startAccessingSecurityScopedResource()
+
+        defer {
+            if didAccess {
+                folderURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let outputURLs = job.requestedDetailLevels
+            .map { job.outputURL(for: $0) }
+            .filter { FileManager.default.fileExists(atPath: $0.path) }
+
+        if outputURLs.isEmpty {
+            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)
+        } else {
+            NSWorkspace.shared.activateFileViewerSelecting(outputURLs)
+        }
     }
 }
 
