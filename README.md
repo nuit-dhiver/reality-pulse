@@ -76,6 +76,19 @@ xcodebuild -project RealityPulse.xcodeproj \
 
 The current tests cover SwiftData persistence, schedule reloads, launch recovery, interrupted jobs, retry behavior, and one-time legacy JSON migration.
 
+## Release
+
+Releases are driven by Git tags. To publish a new GitHub Release:
+
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+The release workflow builds `Reality Pulse.app` in Release configuration, runs the test suite, packages the app as a zip, writes a SHA-256 checksum, and attaches both files to the GitHub Release.
+
+The current release artifact is ad-hoc signed for local/open-source distribution, not notarized.
+
 ## Usage Notes
 
 ### Input Images

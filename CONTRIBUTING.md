@@ -36,6 +36,15 @@ xcodebuild -project RealityPulse.xcodeproj \
   test
 ```
 
+Create a release by pushing a version tag:
+
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+The release workflow runs tests, builds the Release app, creates a zip and checksum, and uploads them to the GitHub Release.
+
 `Configuration/SampleCode.xcconfig` derives `SAMPLE_CODE_DISAMBIGUATOR` from `DEVELOPMENT_TEAM`. If signing fails on a fresh machine, set a development team in Xcode.
 
 ## Project Map

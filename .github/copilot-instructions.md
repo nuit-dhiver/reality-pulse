@@ -27,6 +27,7 @@ xcodebuild -project RealityPulse.xcodeproj \
 
 - The shared scheme is `RealityPulse`.
 - There is a focused test target in `ObjectCaptureReconstructionTests`.
+- Releases are tag-driven through `.github/workflows/release.yml`; pushing a `v*` tag builds, tests, packages, and publishes the app zip/checksum.
 - There is no repository lint configuration (`SwiftLint`, `SwiftFormat`, etc.) checked in.
 - `Configuration/SampleCode.xcconfig` derives `SAMPLE_CODE_DISAMBIGUATOR` from `DEVELOPMENT_TEAM`, so if builds fail on a fresh machine, set a development team in Xcode first.
 
