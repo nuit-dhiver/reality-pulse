@@ -95,7 +95,7 @@ enum USDZToGLTFConverter {
 
             let normals = try extractFloat3(from: mesh, attribute: MDLVertexAttributeNormal, transform: transform, isDirection: true)
             let tangents = try extractFloat4(from: mesh, attribute: MDLVertexAttributeTangent)
-            let uvs = try extractFloat2(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
+            let uvs = try extractTexCoords(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
 
             let positionAccessor = builder.appendFloatBuffer(
                 positions.flatMap { [$0.x, $0.y, $0.z] },
@@ -107,8 +107,10 @@ enum USDZToGLTFConverter {
                 normals.flatMap { [$0.x, $0.y, $0.z] },
                 componentsPerElement: 3
             )
+            // The V flip applied to UVs reverses the bitangent direction, so negate
+            // the stored handedness to keep normal maps oriented correctly.
             let tangentAccessor = tangents.isEmpty ? nil : builder.appendFloatBuffer(
-                tangents.flatMap { [$0.x, $0.y, $0.z, $0.w] },
+                tangents.flatMap { [$0.x, $0.y, $0.z, -$0.w] },
                 componentsPerElement: 4
             )
             let texCoordAccessor = uvs.isEmpty ? nil : builder.appendFloatBuffer(
@@ -216,7 +218,10 @@ enum USDZToGLTFConverter {
         transform: matrix_float4x4,
         isDirection: Bool = false
     ) throws -> [SIMD3<Float>] {
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name) else {
+        // Force conversion to a known float3 layout. The native attribute format
+        // (e.g. half-precision) would otherwise be misread when interpreting the
+        // raw bytes as full-width Floats.
+        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float3) else {
             return []
         }
 
@@ -229,11 +234,13 @@ enum USDZToGLTFConverter {
 
         for index in 0..<count {
             let pointer = dataStart.advanced(by: index * stride)
-            let vector = pointer.assumingMemoryBound(to: SIMD3<Float>.self).pointee
+            let components = pointer.assumingMemoryBound(to: Float.self)
+            let vector = SIMD3<Float>(components[0], components[1], components[2])
             if isDirection {
                 let transformed = simd_mul(transform, SIMD4<Float>(vector, 0))
-                let normalized = simd_normalize(SIMD3<Float>(transformed.x, transformed.y, transformed.z))
-                result.append(normalized)
+                let direction = SIMD3<Float>(transformed.x, transformed.y, transformed.z)
+                let length = simd_length(direction)
+                result.append(length > 0 ? direction / length : SIMD3<Float>(0, 0, 1))
             } else {
                 let transformed = simd_mul(transform, SIMD4<Float>(vector, 1))
                 result.append(SIMD3<Float>(transformed.x, transformed.y, transformed.z))
@@ -246,7 +253,7 @@ enum USDZToGLTFConverter {
         from mesh: MDLMesh,
         attribute name: String
     ) throws -> [SIMD4<Float>] {
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name) else {
+        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float4) else {
             return []
         }
 
@@ -259,17 +266,18 @@ enum USDZToGLTFConverter {
 
         for index in 0..<count {
             let pointer = dataStart.advanced(by: index * stride)
-            let vector = pointer.assumingMemoryBound(to: SIMD4<Float>.self).pointee
-            result.append(vector)
+            let components = pointer.assumingMemoryBound(to: Float.self)
+            result.append(SIMD4<Float>(components[0], components[1], components[2], components[3]))
         }
         return result
     }
 
-    private nonisolated static func extractFloat2(
+    /// Extract UV coordinates, flipping the V axis to match glTF's top-left origin.
+    private nonisolated static func extractTexCoords(
         from mesh: MDLMesh,
         attribute name: String
     ) throws -> [SIMD2<Float>] {
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name) else {
+        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float2) else {
             return []
         }
 
@@ -282,8 +290,8 @@ enum USDZToGLTFConverter {
 
         for index in 0..<count {
             let pointer = dataStart.advanced(by: index * stride)
-            let vector = pointer.assumingMemoryBound(to: SIMD2<Float>.self).pointee
-            result.append(vector)
+            let components = pointer.assumingMemoryBound(to: Float.self)
+            result.append(SIMD2<Float>(components[0], 1 - components[1]))
         }
         return result
     }
