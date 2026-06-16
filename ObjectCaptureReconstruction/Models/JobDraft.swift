@@ -40,6 +40,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     var sessionConfiguration: PhotogrammetrySession.Configuration = PhotogrammetrySession.Configuration()
     var detailLevelOptionUnderQualityMenu: PhotogrammetrySession.Request.Detail = .medium
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
+    var exportFormats: Set<ModelExportFormat> = []
 
     // MARK: - Error surface (used by ImageFolderView, ModelFolderView, etc.)
 
@@ -61,6 +62,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         sessionConfiguration = job.sessionConfiguration.toSessionConfiguration()
         detailLevelOptionUnderQualityMenu = job.primaryDetailLevel.toFrameworkType
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
+        exportFormats = job.exportFormats
     }
 
     // MARK: - Conversion
@@ -83,6 +85,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
             createdAt: createdAt
         )
         job.boundingBoxAvailable = boundingBoxAvailable
+        job.exportFormats = exportFormats
         return job
     }
 
