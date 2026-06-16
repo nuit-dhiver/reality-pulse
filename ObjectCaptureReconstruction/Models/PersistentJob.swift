@@ -25,6 +25,7 @@ final class PersistentJob {
     var createdAt: Date
     var updatedAt: Date
     var completedOutputFilenamesData: Data?
+    var exportFormatsData: Data?
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
 
@@ -44,6 +45,7 @@ final class PersistentJob {
         createdAt = job.createdAt
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
+        exportFormatsData = try JSONEncoder().encode(job.exportFormats)
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -65,6 +67,7 @@ final class PersistentJob {
         createdAt = job.createdAt
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
+        exportFormatsData = try JSONEncoder().encode(job.exportFormats)
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -81,6 +84,9 @@ final class PersistentJob {
         let completedOutputFilenames = try completedOutputFilenamesData.map {
             try JSONDecoder().decode(Set<String>.self, from: $0)
         } ?? []
+        let exportFormats = try exportFormatsData.map {
+            try JSONDecoder().decode(Set<ModelExportFormat>.self, from: $0)
+        } ?? []
 
         return ReconstructionJob(
             id: id,
@@ -96,6 +102,7 @@ final class PersistentJob {
             boundingBoxAvailable: boundingBoxAvailable,
             createdAt: createdAt,
             completedOutputFilenames: completedOutputFilenames,
+            exportFormats: exportFormats,
             imageFolderBookmark: imageFolderBookmark,
             modelFolderBookmark: modelFolderBookmark
         )

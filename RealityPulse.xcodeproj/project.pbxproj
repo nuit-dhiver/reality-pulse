@@ -28,6 +28,9 @@
 		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
 		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
 		DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */; };
+		F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */; };
+		E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */; };
+		E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +76,9 @@
 		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
 		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
 		D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStoreTests.swift; sourceTree = "<group>"; };
+		F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelExportTests.swift; sourceTree = "<group>"; };
+		E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLTFSchema.swift; sourceTree = "<group>"; };
+		E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZToGLTFConverter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -97,6 +103,7 @@
 				ReconstructionOptions/MeshTypeView.swift,
 				ReconstructionOptions/MultiModelOutputView.swift,
 				ReconstructionOptions/OutputPreviewView.swift,
+				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
 				SettingsView.swift,
@@ -184,6 +191,7 @@
 				992CB303C65294FA4C0E9608 /* Scheduler */,
 				195BAF6352F89DD77AFC2745 /* Store */,
 				E195DA07BD54DDE970F27E56 /* Queue */,
+				E8F9A0B1C2D3E4F5A6B7C8DD /* Export */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -239,10 +247,20 @@
 			path = Queue;
 			sourceTree = "<group>";
 		};
+		E8F9A0B1C2D3E4F5A6B7C8DD /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */,
+				E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
 		FA6C5F5E612145E7A0847A6A /* ObjectCaptureReconstructionTests */ = {
 			isa = PBXGroup;
 			children = (
 				D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */,
+				F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */,
 			);
 			path = ObjectCaptureReconstructionTests;
 			sourceTree = "<group>";
@@ -366,6 +384,8 @@
 				665189C5915C218406A40D61 /* JobRowView.swift in Sources */,
 				DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */,
 				5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */,
+				E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */,
+				E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +394,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
+				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

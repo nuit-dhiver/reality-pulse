@@ -26,6 +26,7 @@ struct ReconstructionJob: Identifiable, Codable {
     var boundingBoxAvailable: Bool = false
     var createdAt: Date
     var completedOutputFilenames: Set<String>?
+    var exportFormats: Set<ModelExportFormat> = []
 
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
@@ -45,6 +46,7 @@ struct ReconstructionJob: Identifiable, Codable {
         boundingBoxAvailable: Bool = false,
         createdAt: Date = Date(),
         completedOutputFilenames: Set<String>? = [],
+        exportFormats: Set<ModelExportFormat> = [],
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
@@ -61,6 +63,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.boundingBoxAvailable = boundingBoxAvailable
         self.createdAt = createdAt
         self.completedOutputFilenames = completedOutputFilenames
+        self.exportFormats = exportFormats
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,
@@ -103,6 +106,14 @@ struct ReconstructionJob: Identifiable, Codable {
 
     func outputFilename(for level: CodableDetailLevel) -> String {
         "\(modelName)-\(level.rawValue).usdz"
+    }
+
+    func exportFilename(for level: CodableDetailLevel, format: ModelExportFormat) -> String {
+        "\(modelName)-\(level.rawValue).\(format.fileExtension)"
+    }
+
+    func exportURL(for level: CodableDetailLevel, format: ModelExportFormat) -> URL {
+        modelFolder.appending(path: exportFilename(for: level, format: format))
     }
 
     func hasCompletedOutputFile(
@@ -179,6 +190,20 @@ struct ReconstructionJob: Identifiable, Codable {
 }
 
 // MARK: - Supporting types
+
+enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
+    case gltf
+    case glb
+
+    var fileExtension: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .gltf: return "glTF (.gltf)"
+        case .glb: return "glb (.glb)"
+        }
+    }
+}
 
 enum JobStatus: String, Codable, CaseIterable {
     case pending

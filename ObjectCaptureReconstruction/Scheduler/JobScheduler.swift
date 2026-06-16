@@ -397,6 +397,8 @@ class JobScheduler {
             } else if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .completed
                 jobs[idx].progress = 1.0
+                let notificationBody = exportAdditionalFormats(for: jobs[idx]) ?? jobName
+                sendNotification(title: "Job Complete", body: notificationBody)
             }
 
         } catch {
@@ -442,6 +444,22 @@ class JobScheduler {
     ) {
         guard case .modelFile(let url, _, _) = request else { return }
         job.markOutputCompleted(at: url)
+    }
+
+    private func exportAdditionalFormats(for job: ReconstructionJob) -> String? {
+        guard !job.exportFormats.isEmpty else { return nil }
+
+        do {
+            let exportedURLs = try ModelExportService.exportCompletedOutputs(
+                for: job,
+                formats: job.exportFormats
+            )
+            guard !exportedURLs.isEmpty else { return nil }
+            return "\(job.modelName) — exported \(exportedURLs.count) additional file(s)"
+        } catch {
+            logger.warning("Additional format export failed for \(job.modelName): \(error.localizedDescription)")
+            return "\(job.modelName) — reconstruction complete, but additional export failed"
+        }
     }
 
     // MARK: - Session creation (nonisolated to avoid blocking main actor)

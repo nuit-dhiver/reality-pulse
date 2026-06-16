@@ -51,8 +51,16 @@ struct OutputPreviewView: View {
             if draft.detailLevelOptionsUnderAdvancedMenu.full { levels.insert(.full) }
             if draft.detailLevelOptionsUnderAdvancedMenu.raw { levels.insert(.raw) }
         }
-        return levels
-            .sorted { $0.rawValue < $1.rawValue }
-            .map { "\(name)-\($0.rawValue).usdz" }
+
+        let sortedLevels = levels.sorted { $0.rawValue < $1.rawValue }
+        var filenames: [String] = sortedLevels.map { "\(name)-\($0.rawValue).usdz" }
+
+        for level in sortedLevels {
+            for format in draft.exportFormats.sorted(by: { $0.rawValue < $1.rawValue }) {
+                filenames.append("\(name)-\(level.rawValue).\(format.fileExtension)")
+            }
+        }
+
+        return filenames
     }
 }

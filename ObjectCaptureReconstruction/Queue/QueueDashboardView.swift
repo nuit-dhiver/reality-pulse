@@ -13,6 +13,8 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
 
 struct QueueDashboardView: View {
     @Environment(AppDataModel.self) private var appDataModel: AppDataModel
+    @State private var isExporting = false
+    @State private var exportErrorMessage: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,6 +34,14 @@ struct QueueDashboardView: View {
 
             // Footer with add/schedule buttons
             QueueFooterView()
+        }
+        .alert("Export Failed", isPresented: Binding(
+            get: { exportErrorMessage != nil },
+            set: { if !$0 { exportErrorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(exportErrorMessage ?? "")
         }
     }
 
@@ -63,6 +73,20 @@ struct QueueDashboardView: View {
                     .contextMenu {
                         Button("Show in Finder") {
                             showInFinder(job)
+                        }
+
+                        if hasCompletedOutputs(job) {
+                            Menu("Export As") {
+                                Button("glTF (.gltf)") {
+                                    exportJob(job, format: .gltf)
+                                }
+                                .disabled(isExporting)
+
+                                Button("glb (.glb)") {
+                                    exportJob(job, format: .glb)
+                                }
+                                .disabled(isExporting)
+                            }
                         }
 
                         Divider()
@@ -114,6 +138,45 @@ struct QueueDashboardView: View {
             NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)
         } else {
             NSWorkspace.shared.activateFileViewerSelecting(outputURLs)
+        }
+    }
+
+    private func hasCompletedOutputs(_ job: ReconstructionJob) -> Bool {
+        job.requestedDetailLevels.contains {
+            job.hasCompletedOutputFile(for: $0)
+        }
+    }
+
+    private func exportJob(_ job: ReconstructionJob, format: ModelExportFormat) {
+        guard !isExporting else { return }
+        isExporting = true
+
+        Task {
+            var workingJob = job
+            let (_, modelURL) = workingJob.resolveBookmarks()
+            let folderURL = modelURL ?? workingJob.modelFolder
+            let didAccess = folderURL.startAccessingSecurityScopedResource()
+
+            defer {
+                if didAccess {
+                    folderURL.stopAccessingSecurityScopedResource()
+                }
+                isExporting = false
+            }
+
+            do {
+                let exportedURLs = try ModelExportService.exportCompletedOutputs(
+                    for: workingJob,
+                    formats: [format]
+                )
+                guard !exportedURLs.isEmpty else {
+                    exportErrorMessage = "No completed USDZ outputs were available to export."
+                    return
+                }
+                NSWorkspace.shared.activateFileViewerSelecting(exportedURLs)
+            } catch {
+                exportErrorMessage = error.localizedDescription
+            }
         }
     }
 }
