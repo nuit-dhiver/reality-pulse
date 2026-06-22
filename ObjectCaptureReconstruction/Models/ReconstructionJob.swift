@@ -194,13 +194,21 @@ struct ReconstructionJob: Identifiable, Codable {
 enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     case gltf
     case glb
+    case gaussianSplat
 
-    var fileExtension: String { rawValue }
+    var fileExtension: String {
+        switch self {
+        case .gltf: return "gltf"
+        case .glb: return "glb"
+        case .gaussianSplat: return "ply"
+        }
+    }
 
     var displayName: String {
         switch self {
         case .gltf: return "glTF (.gltf)"
         case .glb: return "glb (.glb)"
+        case .gaussianSplat: return "Gaussian Splat (.ply)"
         }
     }
 }
