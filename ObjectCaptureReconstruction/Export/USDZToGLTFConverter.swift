@@ -20,6 +20,7 @@ enum USDZToGLTFConverterError: LocalizedError {
     case failedToLoadAsset(URL)
     case noMeshesFound
     case unsupportedIndexType
+    case unsupportedExportFormat(ModelExportFormat)
     case failedToEncodeTexture(String)
     case failedToWriteOutput(URL)
 
@@ -31,6 +32,8 @@ enum USDZToGLTFConverterError: LocalizedError {
             return "No mesh geometry found in the USDZ file."
         case .unsupportedIndexType:
             return "Unsupported index buffer type in mesh."
+        case .unsupportedExportFormat(let format):
+            return "USDZToGLTFConverter cannot produce \(format.displayName)."
         case .failedToEncodeTexture(let name):
             return "Failed to encode texture \(name)."
         case .failedToWriteOutput(let url):
@@ -56,7 +59,7 @@ enum USDZToGLTFConverter {
         var meshes: [(mesh: MDLMesh, transform: matrix_float4x4)] = []
         for index in 0..<asset.count {
             if let object = asset.object(at: index) as? MDLObject {
-                collectMeshes(from: object, parentTransform: matrix_identity_float4x4, into: &meshes)
+                MeshGeometryReader.collectMeshes(from: object, parentTransform: matrix_identity_float4x4, into: &meshes)
             }
         }
 
@@ -90,12 +93,12 @@ enum USDZToGLTFConverter {
                 )
             }
 
-            let positions = try extractFloat3(from: mesh, attribute: MDLVertexAttributePosition, transform: transform)
+            let positions = extractFloat3(from: mesh, attribute: MDLVertexAttributePosition, transform: transform)
             guard !positions.isEmpty else { continue }
 
-            let normals = try extractFloat3(from: mesh, attribute: MDLVertexAttributeNormal, transform: transform, isDirection: true)
-            let tangents = try extractFloat4(from: mesh, attribute: MDLVertexAttributeTangent)
-            let uvs = try extractTexCoords(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
+            let normals = extractFloat3(from: mesh, attribute: MDLVertexAttributeNormal, transform: transform, isDirection: true)
+            let tangents = extractFloat4(from: mesh, attribute: MDLVertexAttributeTangent)
+            let uvs = extractTexCoords(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
 
             let positionAccessor = builder.appendFloatBuffer(
                 positions.flatMap { [$0.x, $0.y, $0.z] },
@@ -184,116 +187,41 @@ enum USDZToGLTFConverter {
             try GLTFWriter.writeGLB(document: document, binaryData: builder.data, to: outputURL)
         case .gltf:
             try GLTFWriter.writeGLTF(document: document, binaryData: builder.data, to: outputURL)
+        case .gaussianSplat:
+            // Splats are produced by `SplatSampleGenerator`, not this converter.
+            throw USDZToGLTFConverterError.unsupportedExportFormat(format)
         }
 
         logger.log("Exported \(outputURL.lastPathComponent) from \(usdzURL.lastPathComponent)")
     }
 
-    // MARK: - Mesh collection
-
-    private nonisolated static func collectMeshes(
-        from object: MDLObject,
-        parentTransform: matrix_float4x4,
-        into meshes: inout [(mesh: MDLMesh, transform: matrix_float4x4)]
-    ) {
-        let localTransform = object.transform?.matrix ?? matrix_identity_float4x4
-        let worldTransform = simd_mul(parentTransform, localTransform)
-
-        if let mesh = object as? MDLMesh {
-            meshes.append((mesh, worldTransform))
-        }
-
-        for child in object.children.objects {
-            if let childObject = child as? MDLObject {
-                collectMeshes(from: childObject, parentTransform: worldTransform, into: &meshes)
-            }
-        }
-    }
-
     // MARK: - Vertex extraction
+
+    // The raw byte-reading lives in `MeshGeometryReader`; these thin wrappers
+    // apply the glTF-specific conventions (world transform, V flip) on top.
 
     private nonisolated static func extractFloat3(
         from mesh: MDLMesh,
         attribute name: String,
         transform: matrix_float4x4,
         isDirection: Bool = false
-    ) throws -> [SIMD3<Float>] {
-        // Force conversion to a known float3 layout. The native attribute format
-        // (e.g. half-precision) would otherwise be misread when interpreting the
-        // raw bytes as full-width Floats.
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float3) else {
-            return []
-        }
-
-        let count = mesh.vertexCount
-        var result = [SIMD3<Float>]()
-        result.reserveCapacity(count)
-
-        let stride = attrData.stride
-        let dataStart = attrData.dataStart
-
-        for index in 0..<count {
-            let pointer = dataStart.advanced(by: index * stride)
-            let components = pointer.assumingMemoryBound(to: Float.self)
-            let vector = SIMD3<Float>(components[0], components[1], components[2])
-            if isDirection {
-                let transformed = simd_mul(transform, SIMD4<Float>(vector, 0))
-                let direction = SIMD3<Float>(transformed.x, transformed.y, transformed.z)
-                let length = simd_length(direction)
-                result.append(length > 0 ? direction / length : SIMD3<Float>(0, 0, 1))
-            } else {
-                let transformed = simd_mul(transform, SIMD4<Float>(vector, 1))
-                result.append(SIMD3<Float>(transformed.x, transformed.y, transformed.z))
-            }
-        }
-        return result
+    ) -> [SIMD3<Float>] {
+        MeshGeometryReader.readFloat3(mesh, attribute: name, transform: transform, isDirection: isDirection)
     }
 
     private nonisolated static func extractFloat4(
         from mesh: MDLMesh,
         attribute name: String
-    ) throws -> [SIMD4<Float>] {
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float4) else {
-            return []
-        }
-
-        let count = mesh.vertexCount
-        var result = [SIMD4<Float>]()
-        result.reserveCapacity(count)
-
-        let stride = attrData.stride
-        let dataStart = attrData.dataStart
-
-        for index in 0..<count {
-            let pointer = dataStart.advanced(by: index * stride)
-            let components = pointer.assumingMemoryBound(to: Float.self)
-            result.append(SIMD4<Float>(components[0], components[1], components[2], components[3]))
-        }
-        return result
+    ) -> [SIMD4<Float>] {
+        MeshGeometryReader.readFloat4(mesh, attribute: name)
     }
 
     /// Extract UV coordinates, flipping the V axis to match glTF's top-left origin.
     private nonisolated static func extractTexCoords(
         from mesh: MDLMesh,
         attribute name: String
-    ) throws -> [SIMD2<Float>] {
-        guard let attrData = mesh.vertexAttributeData(forAttributeNamed: name, as: .float2) else {
-            return []
-        }
-
-        let count = mesh.vertexCount
-        var result = [SIMD2<Float>]()
-        result.reserveCapacity(count)
-
-        let stride = attrData.stride
-        let dataStart = attrData.dataStart
-
-        for index in 0..<count {
-            let pointer = dataStart.advanced(by: index * stride)
-            let components = pointer.assumingMemoryBound(to: Float.self)
-            result.append(SIMD2<Float>(components[0], 1 - components[1]))
-        }
-        return result
+    ) -> [SIMD2<Float>] {
+        MeshGeometryReader.readFloat2(mesh, attribute: name).map { SIMD2<Float>($0.x, 1 - $0.y) }
     }
 
     private nonisolated static func appendIndices(
@@ -640,11 +568,16 @@ enum ModelExportService {
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
                 do {
-                    try USDZToGLTFConverter.convert(
-                        usdzURL: usdzURL,
-                        format: format,
-                        outputURL: outputURL
-                    )
+                    switch format {
+                    case .gaussianSplat:
+                        try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+                    case .gltf, .glb:
+                        try USDZToGLTFConverter.convert(
+                            usdzURL: usdzURL,
+                            format: format,
+                            outputURL: outputURL
+                        )
+                    }
                     exportedURLs.append(outputURL)
                 } catch {
                     exportErrors.append(error)

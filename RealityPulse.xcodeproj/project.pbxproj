@@ -31,6 +31,13 @@
 		F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */; };
 		E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */; };
 		E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */; };
+		BBBB0001BBBB0001BBBB0001 /* MeshGeometryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */; };
+		BBBB0002BBBB0002BBBB0002 /* SurfaceSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */; };
+		BBBB0003BBBB0003BBBB0003 /* TextureColorSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */; };
+		BBBB0004BBBB0004BBBB0004 /* GaussianSplat.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */; };
+		BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */; };
+		BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */; };
+		BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +86,13 @@
 		F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelExportTests.swift; sourceTree = "<group>"; };
 		E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLTFSchema.swift; sourceTree = "<group>"; };
 		E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZToGLTFConverter.swift; sourceTree = "<group>"; };
+		AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGeometryReader.swift; sourceTree = "<group>"; };
+		AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceSampler.swift; sourceTree = "<group>"; };
+		AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureColorSampler.swift; sourceTree = "<group>"; };
+		AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplat.swift; sourceTree = "<group>"; };
+		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
+		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
+		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -192,6 +206,7 @@
 				195BAF6352F89DD77AFC2745 /* Store */,
 				E195DA07BD54DDE970F27E56 /* Queue */,
 				E8F9A0B1C2D3E4F5A6B7C8DD /* Export */,
+				CCCC0001CCCC0001CCCC0001 /* GaussianSplat */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -252,6 +267,7 @@
 			children = (
 				E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */,
 				E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */,
+				AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -261,8 +277,21 @@
 			children = (
 				D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */,
 				F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */,
+				AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */,
 			);
 			path = ObjectCaptureReconstructionTests;
+			sourceTree = "<group>";
+		};
+		CCCC0001CCCC0001CCCC0001 /* GaussianSplat */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */,
+				AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */,
+				AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */,
+				AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */,
+				AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */,
+			);
+			path = GaussianSplat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -386,6 +415,12 @@
 				5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */,
 				E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */,
 				E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */,
+				BBBB0001BBBB0001BBBB0001 /* MeshGeometryReader.swift in Sources */,
+				BBBB0002BBBB0002BBBB0002 /* SurfaceSampler.swift in Sources */,
+				BBBB0003BBBB0003BBBB0003 /* TextureColorSampler.swift in Sources */,
+				BBBB0004BBBB0004BBBB0004 /* GaussianSplat.swift in Sources */,
+				BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */,
+				BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +430,7 @@
 			files = (
 				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
 				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
+				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
