@@ -29,8 +29,14 @@ enum SplatSampleGenerator {
     }
 
     // Fixed sampling/appearance defaults (no UI). Tunable here.
-    static let defaultPointCount = 250_000
+    //
+    // `defaultPointCount` drives density: more points are both more numerous and
+    // smaller, since each splat's radius is derived from the average surface
+    // spacing `sqrt(area / N)`. `splatSizeFactor` shrinks the disks below that
+    // spacing for a finer look (keep it near 1.0 — too small leaves visible gaps).
+    static let defaultPointCount = 1_000_000
     static let minimumPointCount = 1_000
+    static let splatSizeFactor: Float = 0.85
     static let flatten: Float = 0.1
     static let opacity: Float = 0.9
 
@@ -60,8 +66,9 @@ enum SplatSampleGenerator {
             }
         }
 
-        // Tangential splat radius from the average surface spacing: sqrt(area / N).
-        let tangentScale = sqrt(result.totalArea / Float(result.points.count))
+        // Tangential splat radius from the average surface spacing: sqrt(area / N),
+        // shrunk by `splatSizeFactor` for finer, less blurry coverage.
+        let tangentScale = sqrt(result.totalArea / Float(result.points.count)) * splatSizeFactor
 
         var splats = [GaussianSplat]()
         splats.reserveCapacity(result.points.count)
