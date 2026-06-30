@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/paths';
+---
+
+<BaseLayout title="Reality Pulse">
+	<section class="hero container">
+		<p class="hero-eyebrow">macOS · SwiftUI · Object Capture</p>
+		<h1>Batch photogrammetry for Apple Object Capture</h1>
+		<p class="hero-lead">
+			Reality Pulse turns folders of photos into USDZ 3D models with a persistent queue, scheduled
+			processing windows, SwiftData persistence, and crash-aware retry recovery.
+		</p>
+		<div class="hero-actions">
+			<a class="button button-primary" href={withBase('docs/getting-started/')}>Get started</a>
+			<a class="button button-secondary" href="https://github.com/nuit-dhiver/reality-pulse">View on GitHub</a>
+		</div>
+	</section>
+
+	<section class="section container">
+		<h2 class="section-title">Why Reality Pulse?</h2>
+		<p>
+			Apple Object Capture is powerful, but running one folder at a time is tedious when you are
+			scanning products, props, archive objects, or environment assets. Reality Pulse wraps
+			<code>PhotogrammetrySession</code> in a persistent queue so you can prepare a batch, choose
+			output quality, and let the Mac process the work in order.
+		</p>
+	</section>
+
+	<section class="section container">
+		<h2 class="section-title">Features</h2>
+		<div class="card-grid">
+			<article class="card">
+				<h3>Batch queue</h3>
+				<p>Add multiple image folders and process them sequentially with full queue control.</p>
+			</article>
+			<article class="card">
+				<h3>Multiple detail levels</h3>
+				<p>Generate preview, reduced, medium, full, raw, or custom USDZ outputs from one capture.</p>
+			</article>
+			<article class="card">
+				<h3>Scheduled processing</h3>
+				<p>Delay a queue run or restrict processing to allowed hours, including overnight windows.</p>
+			</article>
+			<article class="card">
+				<h3>SwiftData persistence</h3>
+				<p>Queue jobs, history, schedule settings, and recovery metadata survive app quits and crashes.</p>
+			</article>
+			<article class="card">
+				<h3>Retry-safe exports</h3>
+				<p>Completed outputs are skipped on retry while stale partial files are replaced before resuming.</p>
+			</article>
+			<article class="card">
+				<h3>Progress and notifications</h3>
+				<p>Track job progress, estimated time remaining, failures, and queue completion.</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="section container">
+		<h2 class="section-title">Documentation</h2>
+		<p>
+			Guides for building, testing, and understanding the app live in the
+			<a href={withBase('docs/')}>docs section</a>. More pages will be added here as
+			the project grows.
+		</p>
+	</section>
+</BaseLayout>

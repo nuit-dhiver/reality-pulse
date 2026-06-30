@@ -1,0 +1,30 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../utils/paths';
+---
+
+<DocLayout title="Documentation" description="Guides and reference for Reality Pulse.">
+	<h1>Documentation</h1>
+	<p>Guides for building, running, and contributing to Reality Pulse.</p>
+
+	<ul class="doc-list">
+		{
+			(await getCollection('docs'))
+				.sort((a, b) => a.data.order - b.data.order)
+				.map((doc) => (
+					<li>
+						<a href={withBase(`docs/${doc.id}/`)}>{doc.data.title}</a>
+						<p>{doc.data.description}</p>
+					</li>
+				))
+		}
+	</ul>
+
+	<h2>Repository docs</h2>
+	<ul>
+		<li><a href="https://github.com/nuit-dhiver/reality-pulse/blob/main/README.md">README</a></li>
+		<li><a href="https://github.com/nuit-dhiver/reality-pulse/blob/main/CONTRIBUTING.md">Contributing guide</a></li>
+		<li><a href="https://github.com/nuit-dhiver/reality-pulse/blob/main/docs/ARCHITECTURE.md">Architecture (source)</a></li>
+	</ul>
+</DocLayout>

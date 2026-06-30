@@ -9,6 +9,8 @@
 
 Use it when you have many capture sets to reconstruct and want a local Apple Object Capture workflow that can run overnight, survive relaunches, keep completed history, and export multiple quality levels from one job.
 
+Project site: [nuit-dhiver.github.io/reality-pulse](https://nuit-dhiver.github.io/reality-pulse/)
+
 ## Why Reality Pulse?
 
 Apple Object Capture is powerful, but running one folder at a time is tedious when you are scanning products, props, archive objects, handmade pieces, or environment assets. Reality Pulse wraps `PhotogrammetrySession` in a persistent queue so you can prepare a batch, choose output quality, and let the Mac process the work in order.

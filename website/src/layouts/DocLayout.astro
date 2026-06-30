@@ -1,0 +1,37 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../utils/paths';
+
+interface Props {
+	title: string;
+	description?: string;
+	currentSlug?: string;
+}
+
+const { title, description, currentSlug } = Astro.props;
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title={title} description={description}>
+	<div class="container doc-layout">
+		<aside class="doc-sidebar">
+			<nav aria-label="Documentation">
+				<a href={withBase('docs/')} aria-current={!currentSlug ? 'page' : undefined}>Overview</a>
+				{
+					docs.map((doc) => (
+						<a
+							href={withBase(`docs/${doc.id}/`)}
+							aria-current={currentSlug === doc.id ? 'page' : undefined}
+						>
+							{doc.data.title}
+						</a>
+					))
+				}
+			</nav>
+		</aside>
+		<article class="doc-content">
+			<slot />
+		</article>
+	</div>
+</BaseLayout>
