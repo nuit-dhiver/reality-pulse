@@ -26,6 +26,7 @@ final class PersistentJob {
     var updatedAt: Date
     var completedOutputFilenamesData: Data?
     var exportFormatsData: Data?
+    var watermarkEnabled: Bool?
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
 
@@ -46,6 +47,7 @@ final class PersistentJob {
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
+        watermarkEnabled = job.watermarkEnabled
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -68,6 +70,7 @@ final class PersistentJob {
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
+        watermarkEnabled = job.watermarkEnabled
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -103,6 +106,7 @@ final class PersistentJob {
             createdAt: createdAt,
             completedOutputFilenames: completedOutputFilenames,
             exportFormats: exportFormats,
+            watermarkEnabled: watermarkEnabled,
             imageFolderBookmark: imageFolderBookmark,
             modelFolderBookmark: modelFolderBookmark
         )

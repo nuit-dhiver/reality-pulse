@@ -1,10 +1,10 @@
 ---
 title: Architecture
-description: How Reality Pulse is structured around a persistent Object Capture queue.
+description: How Reality Pulse automates Object Capture reconstruction and multi-format export.
 order: 2
 ---
 
-Reality Pulse is a native macOS SwiftUI app built around Apple Object Capture's `PhotogrammetrySession`. The app's main responsibility is to turn single-session reconstruction into a persistent, scheduled, retryable queue.
+Reality Pulse is a native macOS SwiftUI app built around Apple Object Capture's `PhotogrammetrySession`. Its main responsibility is to turn single-session reconstruction into a persistent, scheduled, retryable automation pipeline—from photo folders to USDZ meshes and optional glTF, glB, or Gaussian splat exports.
 
 ## Runtime Flow
 
@@ -23,7 +23,8 @@ ObjectCaptureReconstructionApp
 3. The queue UI edits `ReconstructionJob` values through `JobScheduler`.
 4. `JobScheduler` selects the next pending job, resolves folder bookmarks, and creates a `PhotogrammetrySession`.
 5. Session outputs update progress, completion metadata, job status, and user notifications.
-6. `JobStore` persists every meaningful queue and schedule mutation through SwiftData.
+6. Optional post-processing converts completed USDZ files to glTF, glB, or Gaussian splat `.ply`.
+7. `JobStore` persists every meaningful queue and schedule mutation through SwiftData.
 
 ## Main Components
 
@@ -49,8 +50,9 @@ ObjectCaptureReconstructionApp
 
 ### UI Areas
 
-- `Settings/`: SwiftUI controls for folder selection and `PhotogrammetrySession.Configuration`.
+- `Settings/`: SwiftUI controls for folder selection, `PhotogrammetrySession.Configuration`, and export format selection.
 - `Processing/`: progress display and USDZ preview with RealityKit.
 - `Queue/`: dashboard and job setup views.
+- `Export/`: USDZ to glTF/glB conversion and Gaussian splat generation.
 
 For deeper implementation notes, see the [architecture guide in the repository](https://github.com/nuit-dhiver/reality-pulse/blob/main/docs/ARCHITECTURE.md).

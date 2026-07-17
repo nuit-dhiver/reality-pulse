@@ -7,6 +7,7 @@ SwiftData persistence layer for saving and loading the job queue and schedule.
 
 import Foundation
 import SwiftData
+import WatermarkCore
 import os
 
 private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
@@ -51,7 +52,8 @@ class JobStore {
         let schema = Schema([
             PersistentJob.self,
             PersistentScheduleSettings.self,
-            PersistentMigrationState.self
+            PersistentMigrationState.self,
+            PersistentExportRecord.self
         ])
         let configuration = ModelConfiguration(
             schema: schema,
@@ -133,6 +135,59 @@ class JobStore {
         } catch {
             recordError("Failed to load jobs: \(error.localizedDescription)", error: error)
             return []
+        }
+    }
+
+    // MARK: - Provenance export records
+
+    /// Export records are append-only provenance history: they are never
+    /// updated in place and intentionally survive job deletion.
+    func saveExportRecords(_ records: [WatermarkRecord]) {
+        guard !records.isEmpty else { return }
+        do {
+            for record in records {
+                modelContext.insert(try PersistentExportRecord(record: record))
+            }
+            try saveIfNeeded()
+            logger.log("Saved \(records.count) provenance export record(s).")
+            lastErrorMessage = nil
+        } catch {
+            recordError("Failed to save export records: \(error.localizedDescription)", error: error)
+        }
+    }
+
+    func exportRecords(jobId: UUID) -> [WatermarkRecord] {
+        do {
+            var descriptor = FetchDescriptor<PersistentExportRecord>(
+                predicate: #Predicate { $0.jobId == jobId },
+                sortBy: [SortDescriptor(\.createdAt)]
+            )
+            descriptor.includePendingChanges = true
+            return try modelContext.fetch(descriptor).compactMap { try? $0.toRecord() }
+        } catch {
+            recordError("Failed to load export records: \(error.localizedDescription)", error: error)
+            return []
+        }
+    }
+
+    /// Most recent record for one exported file, used to make USDZ stamping
+    /// idempotent across job retries.
+    func latestExportRecord(jobId: UUID, detailLevel: String, format: String) -> WatermarkRecord? {
+        do {
+            var descriptor = FetchDescriptor<PersistentExportRecord>(
+                predicate: #Predicate {
+                    $0.jobId == jobId
+                        && $0.detailLevelRawValue == detailLevel
+                        && $0.formatRawValue == format
+                },
+                sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+            )
+            descriptor.fetchLimit = 1
+            descriptor.includePendingChanges = true
+            return try modelContext.fetch(descriptor).first.flatMap { try? $0.toRecord() }
+        } catch {
+            recordError("Failed to load export record: \(error.localizedDescription)", error: error)
+            return nil
         }
     }
 

@@ -1,10 +1,10 @@
 ---
 title: Getting Started
-description: Build, test, and run Reality Pulse on macOS.
+description: Build, test, and run the Reality Pulse 3D automation suite on macOS.
 order: 1
 ---
 
-Reality Pulse is a native macOS app. Clone the repository, open the Xcode project, and build the `RealityPulse` scheme.
+Reality Pulse is a native macOS app for automating 3D model creation with Apple Object Capture. Clone the repository, open the Xcode project, and build the `RealityPulse` scheme.
 
 ## Requirements
 
@@ -44,12 +44,12 @@ The test suite covers SwiftData persistence, schedule reloads, launch recovery, 
 
 1. Add a job from the queue dashboard.
 2. Pick an image folder and an output folder.
-3. Name the model and choose Object Capture settings.
-4. Optionally enable additional detail-level exports.
+3. Name the model and choose Object Capture reconstruction settings.
+4. Select detail levels for USDZ output and, optionally, additional export formats (glTF, glB, or Gaussian splat `.ply`).
 5. Add more jobs, reorder them, and configure a schedule.
 6. Press **Start** when you want the queue to run.
 
-Reality Pulse restores the queue on launch, but it does not automatically start processing after a relaunch.
+Reality Pulse reconstructs each job with `PhotogrammetrySession`, writes USDZ meshes, then generates any selected secondary formats from the completed reconstruction. The queue restores on launch, but it does not automatically start processing after a relaunch.
 
 ## Releases
 

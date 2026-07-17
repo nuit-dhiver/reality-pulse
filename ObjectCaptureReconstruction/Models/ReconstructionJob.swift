@@ -28,6 +28,11 @@ struct ReconstructionJob: Identifiable, Codable {
     var completedOutputFilenames: Set<String>?
     var exportFormats: Set<ModelExportFormat> = []
 
+    /// Optional so jobs persisted before this field existed still decode.
+    var watermarkEnabled: Bool?
+
+    var isWatermarkEnabled: Bool { watermarkEnabled ?? false }
+
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
@@ -47,6 +52,7 @@ struct ReconstructionJob: Identifiable, Codable {
         createdAt: Date = Date(),
         completedOutputFilenames: Set<String>? = [],
         exportFormats: Set<ModelExportFormat> = [],
+        watermarkEnabled: Bool? = nil,
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
@@ -64,6 +70,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.createdAt = createdAt
         self.completedOutputFilenames = completedOutputFilenames
         self.exportFormats = exportFormats
+        self.watermarkEnabled = watermarkEnabled
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,

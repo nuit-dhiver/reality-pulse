@@ -87,6 +87,15 @@ struct QueueDashboardView: View {
                                 }
                                 .disabled(isExporting)
                             }
+
+                            // Internal tooling, hidden unless enabled via
+                            // `defaults write <bundle-id> RPWatermarkRecordExport -bool YES`.
+                            // Record JSONs contain the per-copy secret keys.
+                            if UserDefaults.standard.bool(forKey: "RPWatermarkRecordExport") {
+                                Button("Export Provenance Records…") {
+                                    exportProvenanceRecords(for: job)
+                                }
+                            }
                         }
 
                         Divider()
@@ -165,18 +174,48 @@ struct QueueDashboardView: View {
             }
 
             do {
-                let exportedURLs = try ModelExportService.exportCompletedOutputs(
+                let exportedFiles = try ModelExportService.exportCompletedOutputs(
                     for: workingJob,
-                    formats: [format]
+                    formats: [format],
+                    embedWatermark: workingJob.isWatermarkEnabled
                 )
-                guard !exportedURLs.isEmpty else {
+                guard !exportedFiles.isEmpty else {
                     exportErrorMessage = "No completed USDZ outputs were available to export."
                     return
                 }
-                NSWorkspace.shared.activateFileViewerSelecting(exportedURLs)
+                appDataModel.scheduler.saveExportRecords(exportedFiles.compactMap(\.record))
+                NSWorkspace.shared.activateFileViewerSelecting(exportedFiles.map(\.url))
             } catch {
                 exportErrorMessage = error.localizedDescription
             }
+        }
+    }
+
+    /// Internal: dump this job's provenance records as JSON for the offline
+    /// `watermark-verify` tool. Each file contains a per-copy secret key.
+    private func exportProvenanceRecords(for job: ReconstructionJob) {
+        let records = appDataModel.scheduler.exportRecords(jobId: job.id)
+        guard !records.isEmpty else {
+            exportErrorMessage = "No provenance records exist for this job."
+            return
+        }
+
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        panel.prompt = "Export Records"
+        panel.message = "Choose a folder for the record files. They contain secret watermark keys — keep them private."
+        guard panel.runModal() == .OK, let directory = panel.url else { return }
+
+        do {
+            for record in records {
+                let url = directory.appending(path: "\(record.filename).wmrecord.json")
+                try record.jsonData().write(to: url, options: [.atomic])
+            }
+            NSWorkspace.shared.activateFileViewerSelecting([directory])
+        } catch {
+            exportErrorMessage = "Failed to write records: \(error.localizedDescription)"
         }
     }
 }

@@ -18,6 +18,8 @@ struct ReconstructionOptionsView: View {
 
         ExportFormatView()
 
+        WatermarkOptionView()
+
         OutputPreviewView()
 
         Divider()

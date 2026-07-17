@@ -38,6 +38,16 @@
 		BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */; };
 		BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */; };
 		BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */; };
+		DDDD0011DDDD0011DDDD0011 /* PersistentExportRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0010DDDD0010DDDD0010 /* PersistentExportRecord.swift */; };
+		DDDD0013DDDD0013DDDD0013 /* WatermarkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0012DDDD0012DDDD0012 /* WatermarkingService.swift */; };
+		DDDD0017DDDD0017DDDD0017 /* WatermarkExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0015DDDD0015DDDD0015 /* WatermarkExportTests.swift */; };
+		DDDD0018DDDD0018DDDD0018 /* ExportRecordStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0016DDDD0016DDDD0016 /* ExportRecordStoreTests.swift */; };
+		DDDD0020DDDD0020DDDD0020 /* USDZStamper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0019DDDD0019DDDD0019 /* USDZStamper.swift */; };
+		DDDD0022DDDD0022DDDD0022 /* USDZStamperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0021DDDD0021DDDD0021 /* USDZStamperTests.swift */; };
+		DDDD0004DDDD0004DDDD0004 /* WatermarkCore in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0002DDDD0002DDDD0002 /* WatermarkCore */; };
+		DDDD0005DDDD0005DDDD0005 /* ModelFileIO in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0003DDDD0003DDDD0003 /* ModelFileIO */; };
+		DDDD0008DDDD0008DDDD0008 /* WatermarkCore in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0006DDDD0006DDDD0006 /* WatermarkCore */; };
+		DDDD0009DDDD0009DDDD0009 /* ModelFileIO in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0007DDDD0007DDDD0007 /* ModelFileIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +103,12 @@
 		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
 		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
 		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
+		DDDD0010DDDD0010DDDD0010 /* PersistentExportRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentExportRecord.swift; sourceTree = "<group>"; };
+		DDDD0012DDDD0012DDDD0012 /* WatermarkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatermarkingService.swift; sourceTree = "<group>"; };
+		DDDD0015DDDD0015DDDD0015 /* WatermarkExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatermarkExportTests.swift; sourceTree = "<group>"; };
+		DDDD0016DDDD0016DDDD0016 /* ExportRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportRecordStoreTests.swift; sourceTree = "<group>"; };
+		DDDD0019DDDD0019DDDD0019 /* USDZStamper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZStamper.swift; sourceTree = "<group>"; };
+		DDDD0021DDDD0021DDDD0021 /* USDZStamperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZStamperTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -120,6 +136,7 @@
 				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
+				ReconstructionOptions/WatermarkOptionView.swift,
 				SettingsView.swift,
 			);
 			target = F974D1152BE0484500EFACBA /* ObjectCaptureReconstruction */;
@@ -135,6 +152,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DDDD0004DDDD0004DDDD0004 /* WatermarkCore in Frameworks */,
+				DDDD0005DDDD0005DDDD0005 /* ModelFileIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +161,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DDDD0008DDDD0008DDDD0008 /* WatermarkCore in Frameworks */,
+				DDDD0009DDDD0009DDDD0009 /* ModelFileIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +180,14 @@
 				26B095482C091BEA0097324A /* BottomBarView.swift */,
 			);
 			path = Processing;
+			sourceTree = "<group>";
+		};
+		DDDD0014DDDD0014DDDD0014 /* Watermark */ = {
+			isa = PBXGroup;
+			children = (
+				DDDD0012DDDD0012DDDD0012 /* WatermarkingService.swift */,
+			);
+			path = Watermark;
 			sourceTree = "<group>";
 		};
 		BD87F13DD4B2159CCB69FFA2 /* Configuration */ = {
@@ -201,6 +230,7 @@
 				26B0954A2C091C770097324A /* ThumbnailView.swift */,
 				26B095232C091B810097324A /* Processing */,
 				26B095212C091B740097324A /* Settings */,
+				DDDD0014DDDD0014DDDD0014 /* Watermark */,
 				AAC7DC5DCD23638D271D3093 /* Models */,
 				992CB303C65294FA4C0E9608 /* Scheduler */,
 				195BAF6352F89DD77AFC2745 /* Store */,
@@ -231,6 +261,7 @@
 				A88318DE6F7346A38820D6CA /* */,
 				C98675D558934377A48B11EB /* */,
 				E3A4F851B39B9C4EA08E7C13 /* */,
+				DDDD0010DDDD0010DDDD0010 /* PersistentExportRecord.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -268,6 +299,7 @@
 				E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */,
 				E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */,
 				AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */,
+				DDDD0019DDDD0019DDDD0019 /* USDZStamper.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -278,6 +310,9 @@
 				D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */,
 				F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */,
 				AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */,
+				DDDD0015DDDD0015DDDD0015 /* WatermarkExportTests.swift */,
+				DDDD0016DDDD0016DDDD0016 /* ExportRecordStoreTests.swift */,
+				DDDD0021DDDD0021DDDD0021 /* USDZStamperTests.swift */,
 			);
 			path = ObjectCaptureReconstructionTests;
 			sourceTree = "<group>";
@@ -310,6 +345,10 @@
 			dependencies = (
 			);
 			name = ObjectCaptureReconstruction;
+			packageProductDependencies = (
+				DDDD0002DDDD0002DDDD0002 /* WatermarkCore */,
+				DDDD0003DDDD0003DDDD0003 /* ModelFileIO */,
+			);
 			productName = ObjectCaptureReconstruction;
 			productReference = F974D1162BE0484500EFACBA /* Reality Pulse.app */;
 			productType = "com.apple.product-type.application";
@@ -328,6 +367,10 @@
 				10FB862EFFF74E3D88EE52D4 /* PBXTargetDependency */,
 			);
 			name = ObjectCaptureReconstructionTests;
+			packageProductDependencies = (
+				DDDD0006DDDD0006DDDD0006 /* WatermarkCore */,
+				DDDD0007DDDD0007DDDD0007 /* ModelFileIO */,
+			);
 			productName = ObjectCaptureReconstructionTests;
 			productReference = F5A38ACB50CF47AE95A5E30A /* ObjectCaptureReconstructionTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -361,6 +404,9 @@
 				Base,
 			);
 			mainGroup = F974D10D2BE0484500EFACBA;
+			packageReferences = (
+				DDDD0001DDDD0001DDDD0001 /* XCLocalSwiftPackageReference "RealityMarkKit" */,
+			);
 			productRefGroup = F974D1172BE0484500EFACBA /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -406,6 +452,9 @@
 				4BC3F99B1E9F4DFF83756389 /* PersistentJob.swift in Sources */,
 				6E179F522E3A43939DF5BF80 /* PersistentScheduleSettings.swift in Sources */,
 				5EF33318F00E443A81683739 /* PersistentMigrationState.swift in Sources */,
+				DDDD0011DDDD0011DDDD0011 /* PersistentExportRecord.swift in Sources */,
+				DDDD0013DDDD0013DDDD0013 /* WatermarkingService.swift in Sources */,
+				DDDD0020DDDD0020DDDD0020 /* USDZStamper.swift in Sources */,
 				0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */,
 				4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */,
 				8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */,
@@ -431,6 +480,9 @@
 				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
 				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
 				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
+				DDDD0017DDDD0017DDDD0017 /* WatermarkExportTests.swift in Sources */,
+				DDDD0018DDDD0018DDDD0018 /* ExportRecordStoreTests.swift in Sources */,
+				DDDD0022DDDD0022DDDD0022 /* USDZStamperTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -733,6 +785,32 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DDDD0001DDDD0001DDDD0001 /* XCLocalSwiftPackageReference "RealityMarkKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RealityMarkKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DDDD0002DDDD0002DDDD0002 /* WatermarkCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WatermarkCore;
+		};
+		DDDD0003DDDD0003DDDD0003 /* ModelFileIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ModelFileIO;
+		};
+		DDDD0006DDDD0006DDDD0006 /* WatermarkCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WatermarkCore;
+		};
+		DDDD0007DDDD0007DDDD0007 /* ModelFileIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ModelFileIO;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F974D10E2BE0484500EFACBA /* Project object */;
 }

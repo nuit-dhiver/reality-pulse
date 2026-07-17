@@ -9,6 +9,7 @@ conversion (training-free), not a photometrically optimized 3DGS.
 */
 
 import Foundation
+import WatermarkCore
 import simd
 import os
 
@@ -43,11 +44,15 @@ enum SplatSampleGenerator {
     /// Sample `usdzURL`'s surface and write a Gaussian-splat `.ply` to `outputURL`.
     /// - Parameter targetCount: number of splats to generate (clamped to a floor).
     ///   Exposed for testing; production callers use the fixed default.
+    /// - Parameter watermark: when set, the splat positions are stamped with
+    ///   the per-copy key (geometry channel only — splat color carries no mark).
+    @discardableResult
     nonisolated static func generate(
         usdzURL: URL,
         outputURL: URL,
-        targetCount: Int = defaultPointCount
-    ) throws {
+        targetCount: Int = defaultPointCount,
+        watermark: WatermarkStamp? = nil
+    ) throws -> WatermarkStampOutcome {
         let meshes = MeshGeometryReader.loadMeshes(from: usdzURL)
         guard !meshes.isEmpty else { throw GeneratorError.noGeometry(usdzURL) }
 
@@ -55,6 +60,25 @@ enum SplatSampleGenerator {
         let result = SurfaceSampler.sample(meshes: meshes, targetCount: count)
         guard !result.points.isEmpty, result.totalArea > 0 else {
             throw GeneratorError.noGeometry(usdzURL)
+        }
+
+        var positions = result.points.map(\.position)
+        var geometryInfo: WatermarkRecord.GeometryChannelInfo?
+        if let watermark {
+            let embedResult = GeometryWatermarker.embed(
+                positions: &positions,
+                key: watermark.key,
+                parameters: watermark.geometryParameters
+            )
+            if embedResult.isEmbedded {
+                geometryInfo = WatermarkRecord.GeometryChannelInfo(
+                    parameters: watermark.geometryParameters,
+                    effectiveBinCount: embedResult.effectiveBinCount,
+                    embeddedBits: embedResult.embeddedBits
+                )
+            } else {
+                logger.log("Geometry watermark skipped for \(outputURL.lastPathComponent, privacy: .public): too few points.")
+            }
         }
 
         // One color sampler per flattened material, in the same mesh-major/submesh
@@ -72,7 +96,7 @@ enum SplatSampleGenerator {
 
         var splats = [GaussianSplat]()
         splats.reserveCapacity(result.points.count)
-        for point in result.points {
+        for (index, point) in result.points.enumerated() {
             let color: SIMD3<Float>
             if point.materialIndex >= 0, point.materialIndex < colorSamplers.count {
                 color = colorSamplers[point.materialIndex].color(at: point.uv)
@@ -81,7 +105,7 @@ enum SplatSampleGenerator {
             }
 
             splats.append(GaussianSplat.surfaceSplat(
-                position: point.position,
+                position: positions[index],
                 normal: point.normal,
                 color: color,
                 tangentScale: tangentScale,
@@ -92,5 +116,6 @@ enum SplatSampleGenerator {
 
         try SplatPLYWriter.write(splats, to: outputURL)
         logger.log("Generated splat \(outputURL.lastPathComponent, privacy: .public) with \(splats.count) points from \(usdzURL.lastPathComponent, privacy: .public)")
+        return WatermarkStampOutcome(geometry: geometryInfo, texture: nil)
     }
 }

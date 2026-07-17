@@ -10,6 +10,7 @@ import Foundation
 import ModelIO
 import ImageIO
 import UniformTypeIdentifiers
+import WatermarkCore
 import simd
 import os
 
@@ -45,11 +46,16 @@ enum USDZToGLTFConverterError: LocalizedError {
 enum USDZToGLTFConverter {
 
     /// Convert a `.usdz` file to the requested glTF container format.
+    /// When `watermark` is set, the vertex positions (all meshes as one point
+    /// set) and base-color textures are stamped with the per-copy key before
+    /// serialization; the returned outcome says which channels were embedded.
+    @discardableResult
     nonisolated static func convert(
         usdzURL: URL,
         format: ModelExportFormat,
-        outputURL: URL
-    ) throws {
+        outputURL: URL,
+        watermark: WatermarkStamp? = nil
+    ) throws -> WatermarkStampOutcome {
         let asset = MDLAsset(url: usdzURL)
         guard asset.count > 0 else {
             throw USDZToGLTFConverterError.failedToLoadAsset(usdzURL)
@@ -83,6 +89,9 @@ enum USDZToGLTFConverter {
             wrapT: GLTFConstants.wrapRepeat
         )]
 
+        // Pass 1: extract all vertex data so the geometry watermark can treat
+        // every mesh as one point set (global centroid and bins).
+        var preparedMeshes: [PreparedMesh] = []
         for (mesh, transform) in meshes {
             mesh.addNormals(withAttributeNamed: MDLVertexAttributeNormal, creaseThreshold: 0.5)
             if mesh.vertexAttributeData(forAttributeNamed: MDLVertexAttributeTextureCoordinate) != nil {
@@ -96,9 +105,44 @@ enum USDZToGLTFConverter {
             let positions = extractFloat3(from: mesh, attribute: MDLVertexAttributePosition, transform: transform)
             guard !positions.isEmpty else { continue }
 
-            let normals = extractFloat3(from: mesh, attribute: MDLVertexAttributeNormal, transform: transform, isDirection: true)
-            let tangents = extractFloat4(from: mesh, attribute: MDLVertexAttributeTangent)
-            let uvs = extractTexCoords(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
+            preparedMeshes.append(PreparedMesh(
+                mesh: mesh,
+                positions: positions,
+                normals: extractFloat3(from: mesh, attribute: MDLVertexAttributeNormal, transform: transform, isDirection: true),
+                tangents: extractFloat4(from: mesh, attribute: MDLVertexAttributeTangent),
+                uvs: extractTexCoords(from: mesh, attribute: MDLVertexAttributeTextureCoordinate)
+            ))
+        }
+
+        var geometryInfo: WatermarkRecord.GeometryChannelInfo?
+        if let watermark {
+            var allPositions = preparedMeshes.flatMap(\.positions)
+            let embedResult = GeometryWatermarker.embed(
+                positions: &allPositions,
+                key: watermark.key,
+                parameters: watermark.geometryParameters
+            )
+            if embedResult.isEmbedded {
+                var cursor = 0
+                for index in preparedMeshes.indices {
+                    let count = preparedMeshes[index].positions.count
+                    preparedMeshes[index].positions = Array(allPositions[cursor..<(cursor + count)])
+                    cursor += count
+                }
+                geometryInfo = WatermarkRecord.GeometryChannelInfo(
+                    parameters: watermark.geometryParameters,
+                    effectiveBinCount: embedResult.effectiveBinCount,
+                    embeddedBits: embedResult.embeddedBits
+                )
+            } else {
+                logger.log("Geometry watermark skipped for \(outputURL.lastPathComponent): too few vertices or degenerate shape.")
+            }
+        }
+
+        // Pass 2: serialize.
+        var stampedImages: [WatermarkRecord.TextureChannelInfo.Image] = []
+        for prepared in preparedMeshes {
+            let positions = prepared.positions
 
             let positionAccessor = builder.appendFloatBuffer(
                 positions.flatMap { [$0.x, $0.y, $0.z] },
@@ -106,24 +150,24 @@ enum USDZToGLTFConverter {
                 min: vectorMin(positions),
                 max: vectorMax(positions)
             )
-            let normalAccessor = normals.isEmpty ? nil : builder.appendFloatBuffer(
-                normals.flatMap { [$0.x, $0.y, $0.z] },
+            let normalAccessor = prepared.normals.isEmpty ? nil : builder.appendFloatBuffer(
+                prepared.normals.flatMap { [$0.x, $0.y, $0.z] },
                 componentsPerElement: 3
             )
             // The V flip applied to UVs reverses the bitangent direction, so negate
             // the stored handedness to keep normal maps oriented correctly.
-            let tangentAccessor = tangents.isEmpty ? nil : builder.appendFloatBuffer(
-                tangents.flatMap { [$0.x, $0.y, $0.z, -$0.w] },
+            let tangentAccessor = prepared.tangents.isEmpty ? nil : builder.appendFloatBuffer(
+                prepared.tangents.flatMap { [$0.x, $0.y, $0.z, -$0.w] },
                 componentsPerElement: 4
             )
-            let texCoordAccessor = uvs.isEmpty ? nil : builder.appendFloatBuffer(
-                uvs.flatMap { [$0.x, $0.y] },
+            let texCoordAccessor = prepared.uvs.isEmpty ? nil : builder.appendFloatBuffer(
+                prepared.uvs.flatMap { [$0.x, $0.y] },
                 componentsPerElement: 2
             )
 
             var primitives: [GLTFPrimitive] = []
 
-            for submesh in mesh.submeshes ?? [] {
+            for submesh in prepared.mesh.submeshes ?? [] {
                 guard let submesh = submesh as? MDLSubmesh else { continue }
 
                 let indexAccessor = try appendIndices(from: submesh, builder: builder)
@@ -137,7 +181,9 @@ enum USDZToGLTFConverter {
                     builder: builder,
                     outputDirectory: outputURL.deletingLastPathComponent(),
                     embedImages: format == .glb,
-                    defaultSamplerIndex: defaultSamplerIndex
+                    defaultSamplerIndex: defaultSamplerIndex,
+                    watermark: watermark,
+                    stampedImages: &stampedImages
                 )
 
                 var attributes: [String: Int] = [
@@ -182,6 +228,14 @@ enum USDZToGLTFConverter {
             samplers: samplers
         )
 
+        var textureInfo: WatermarkRecord.TextureChannelInfo?
+        if let watermark, !stampedImages.isEmpty {
+            textureInfo = WatermarkRecord.TextureChannelInfo(
+                parameters: watermark.textureParameters,
+                images: stampedImages
+            )
+        }
+
         switch format {
         case .glb:
             try GLTFWriter.writeGLB(document: document, binaryData: builder.data, to: outputURL)
@@ -193,6 +247,17 @@ enum USDZToGLTFConverter {
         }
 
         logger.log("Exported \(outputURL.lastPathComponent) from \(usdzURL.lastPathComponent)")
+        return WatermarkStampOutcome(geometry: geometryInfo, texture: textureInfo)
+    }
+
+    /// Vertex data extracted in pass 1, serialized in pass 2 (with the
+    /// geometry watermark applied to `positions` in between).
+    private struct PreparedMesh {
+        let mesh: MDLMesh
+        var positions: [SIMD3<Float>]
+        let normals: [SIMD3<Float>]
+        let tangents: [SIMD4<Float>]
+        let uvs: [SIMD2<Float>]
     }
 
     // MARK: - Vertex extraction
@@ -287,7 +352,9 @@ enum USDZToGLTFConverter {
         builder: GLTFBinaryBuilder,
         outputDirectory: URL,
         embedImages: Bool,
-        defaultSamplerIndex: Int
+        defaultSamplerIndex: Int,
+        watermark: WatermarkStamp? = nil,
+        stampedImages: inout [WatermarkRecord.TextureChannelInfo.Image]
     ) -> Int? {
         let cacheKey = material?.name ?? "default"
         if let existing = materialCache[cacheKey] {
@@ -319,7 +386,9 @@ enum USDZToGLTFConverter {
                 outputDirectory: outputDirectory,
                 embedImages: embedImages,
                 defaultSamplerIndex: defaultSamplerIndex,
-                repackAsMetallicRoughness: false
+                repackAsMetallicRoughness: false,
+                watermark: watermark,
+                stampedImages: &stampedImages
             ) {
                 pbr.baseColorTexture = GLTFTextureInfo(index: textureIndex)
             }
@@ -334,7 +403,8 @@ enum USDZToGLTFConverter {
                 outputDirectory: outputDirectory,
                 embedImages: embedImages,
                 defaultSamplerIndex: defaultSamplerIndex,
-                repackAsMetallicRoughness: true
+                repackAsMetallicRoughness: true,
+                stampedImages: &stampedImages
             ) {
                 pbr.metallicRoughnessTexture = GLTFTextureInfo(index: textureIndex)
             }
@@ -349,7 +419,8 @@ enum USDZToGLTFConverter {
                 outputDirectory: outputDirectory,
                 embedImages: embedImages,
                 defaultSamplerIndex: defaultSamplerIndex,
-                repackAsMetallicRoughness: false
+                repackAsMetallicRoughness: false,
+                stampedImages: &stampedImages
             ) {
                 normalTexture = GLTFNormalTextureInfo(index: textureIndex)
             }
@@ -364,7 +435,8 @@ enum USDZToGLTFConverter {
                 outputDirectory: outputDirectory,
                 embedImages: embedImages,
                 defaultSamplerIndex: defaultSamplerIndex,
-                repackAsMetallicRoughness: false
+                repackAsMetallicRoughness: false,
+                stampedImages: &stampedImages
             ) {
                 occlusionTexture = GLTFOcclusionTextureInfo(index: textureIndex, strength: 1)
             }
@@ -404,7 +476,9 @@ enum USDZToGLTFConverter {
         outputDirectory: URL,
         embedImages: Bool,
         defaultSamplerIndex: Int,
-        repackAsMetallicRoughness: Bool
+        repackAsMetallicRoughness: Bool,
+        watermark: WatermarkStamp? = nil,
+        stampedImages: inout [WatermarkRecord.TextureChannelInfo.Image]
     ) -> Int? {
         guard let property = material.property(with: semantic),
               property.type == .texture,
@@ -415,9 +489,23 @@ enum USDZToGLTFConverter {
             return existing
         }
 
-        guard let imageData = encodeTexture(texture, repackAsMetallicRoughness: repackAsMetallicRoughness) else {
+        guard var imageData = encodeTexture(texture, repackAsMetallicRoughness: repackAsMetallicRoughness) else {
             logger.warning("Skipping texture \(texture.name, privacy: .public)")
             return nil
+        }
+
+        // Only the base color carries the texture watermark; stamping normal,
+        // AO, or roughness maps harms shading for little forensic value.
+        if let watermark, semantic == .baseColor {
+            let name = sanitizedTextureFilename(texture.name, semantic: semantic)
+            if let stamped = WatermarkingService.stampedTexture(
+                pngData: imageData, name: name, stamp: watermark
+            ) {
+                imageData = stamped.data
+                stampedImages.append(stamped.image)
+            } else {
+                logger.warning("Texture watermark skipped for \(name, privacy: .public): payload not decodable.")
+            }
         }
 
         let mimeType = "image/png"
@@ -550,15 +638,27 @@ enum USDZToGLTFConverter {
 
 enum ModelExportService {
 
+    /// One derived-format export, with its provenance record when the file
+    /// was watermarked.
+    struct ExportedFile {
+        let url: URL
+        let format: ModelExportFormat
+        let detailLevel: CodableDetailLevel
+        let record: WatermarkRecord?
+    }
+
     /// Export all completed USDZ outputs for a job into the requested formats.
-  nonisolated static func exportCompletedOutputs(
+    /// With `embedWatermark`, each exported file is stamped with its own fresh
+    /// per-copy key and returns a record for the caller to persist.
+    nonisolated static func exportCompletedOutputs(
         for job: ReconstructionJob,
         formats: Set<ModelExportFormat>,
-        fileManager: FileManager = .default
-    ) throws -> [URL] {
+        fileManager: FileManager = .default,
+        embedWatermark: Bool = false
+    ) throws -> [ExportedFile] {
         guard !formats.isEmpty else { return [] }
 
-        var exportedURLs: [URL] = []
+        var exportedFiles: [ExportedFile] = []
         var exportErrors: [Error] = []
 
         for level in job.requestedDetailLevels {
@@ -567,18 +667,39 @@ enum ModelExportService {
 
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
+                let stamp = embedWatermark ? WatermarkStamp.fresh() : nil
                 do {
+                    let outcome: WatermarkStampOutcome
                     switch format {
                     case .gaussianSplat:
-                        try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+                        outcome = try SplatSampleGenerator.generate(
+                            usdzURL: usdzURL,
+                            outputURL: outputURL,
+                            watermark: stamp
+                        )
                     case .gltf, .glb:
-                        try USDZToGLTFConverter.convert(
+                        outcome = try USDZToGLTFConverter.convert(
                             usdzURL: usdzURL,
                             format: format,
-                            outputURL: outputURL
+                            outputURL: outputURL,
+                            watermark: stamp
                         )
                     }
-                    exportedURLs.append(outputURL)
+
+                    var record: WatermarkRecord?
+                    if let stamp {
+                        record = try? WatermarkingService.record(
+                            for: stamp,
+                            outcome: outcome,
+                            jobId: job.id,
+                            detailLevel: level,
+                            format: format.fileExtension,
+                            fileURL: outputURL
+                        )
+                    }
+                    exportedFiles.append(ExportedFile(
+                        url: outputURL, format: format, detailLevel: level, record: record
+                    ))
                 } catch {
                     exportErrors.append(error)
                     logger.warning("Export failed for \(outputURL.lastPathComponent): \(error.localizedDescription)")
@@ -586,10 +707,10 @@ enum ModelExportService {
             }
         }
 
-        if exportedURLs.isEmpty, let firstError = exportErrors.first {
+        if exportedFiles.isEmpty, let firstError = exportErrors.first {
             throw firstError
         }
 
-        return exportedURLs
+        return exportedFiles
     }
 }

@@ -9,6 +9,7 @@ respecting optional time-window constraints.
 import Foundation
 import RealityKit
 import UserNotifications
+import WatermarkCore
 import os
 
 private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
@@ -397,7 +398,7 @@ class JobScheduler {
             } else if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .completed
                 jobs[idx].progress = 1.0
-                let notificationBody = exportAdditionalFormats(for: jobs[idx]) ?? jobName
+                let notificationBody = finalizeCompletedJob(for: jobs[idx]) ?? jobName
                 sendNotification(title: "Job Complete", body: notificationBody)
             }
 
@@ -446,20 +447,82 @@ class JobScheduler {
         job.markOutputCompleted(at: url)
     }
 
+    /// Post-reconstruction finalize, in a deliberate order: derived formats
+    /// are converted first (from the still-pristine USDZ, so they never
+    /// inherit its marks), then the USDZ itself is texture-stamped last.
+    private func finalizeCompletedJob(for job: ReconstructionJob) -> String? {
+        let exportSummary = exportAdditionalFormats(for: job)
+        stampCompletedUSDZOutputs(for: job)
+        return exportSummary
+    }
+
+    private func stampCompletedUSDZOutputs(for job: ReconstructionJob) {
+        guard job.isWatermarkEnabled else { return }
+
+        for level in job.requestedDetailLevels where job.hasCompletedOutputFile(for: level) {
+            let usdzURL = job.outputURL(for: level)
+
+            // Idempotence across retries: skip when the newest usdz record
+            // still matches the file bytes (already stamped, unchanged).
+            if let existing = store.latestExportRecord(
+                jobId: job.id, detailLevel: level.rawValue, format: "usdz"
+               ),
+               let currentSHA = try? WatermarkingService.sha256Hex(of: usdzURL),
+               currentSHA == existing.fileSHA256 {
+                continue
+            }
+
+            let stamp = WatermarkStamp.fresh()
+            do {
+                let result = try USDZStamper.stampTextures(usdzURL: usdzURL, stamp: stamp)
+                let record = WatermarkRecord(
+                    jobId: job.id,
+                    format: "usdz",
+                    detailLevel: level.rawValue,
+                    filename: usdzURL.lastPathComponent,
+                    filePath: usdzURL.path,
+                    key: stamp.key,
+                    channels: [WatermarkRecord.Channel.texture],
+                    geometry: nil,
+                    texture: WatermarkRecord.TextureChannelInfo(
+                        parameters: stamp.textureParameters,
+                        images: result.stampedImages
+                    ),
+                    fileSHA256: result.fileSHA256
+                )
+                store.saveExportRecords([record])
+            } catch {
+                logger.warning("USDZ provenance stamp failed for \(usdzURL.lastPathComponent, privacy: .public): \(error.localizedDescription)")
+            }
+        }
+    }
+
     private func exportAdditionalFormats(for job: ReconstructionJob) -> String? {
         guard !job.exportFormats.isEmpty else { return nil }
 
         do {
-            let exportedURLs = try ModelExportService.exportCompletedOutputs(
+            let exportedFiles = try ModelExportService.exportCompletedOutputs(
                 for: job,
-                formats: job.exportFormats
+                formats: job.exportFormats,
+                embedWatermark: job.isWatermarkEnabled
             )
-            guard !exportedURLs.isEmpty else { return nil }
-            return "\(job.modelName) — exported \(exportedURLs.count) additional file(s)"
+            guard !exportedFiles.isEmpty else { return nil }
+            store.saveExportRecords(exportedFiles.compactMap(\.record))
+            return "\(job.modelName) — exported \(exportedFiles.count) additional file(s)"
         } catch {
             logger.warning("Additional format export failed for \(job.modelName): \(error.localizedDescription)")
             return "\(job.modelName) — reconstruction complete, but additional export failed"
         }
+    }
+
+    /// Persist provenance records produced by an export outside the scheduler
+    /// path (the dashboard's manual "Export As" flow).
+    func saveExportRecords(_ records: [WatermarkRecord]) {
+        store.saveExportRecords(records)
+    }
+
+    func exportRecords(jobId: UUID) -> [WatermarkRecord] {
+        store.exportRecords(jobId: jobId)
     }
 
     // MARK: - Session creation (nonisolated to avoid blocking main actor)

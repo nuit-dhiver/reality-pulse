@@ -5,11 +5,12 @@ import { withBase } from '../utils/paths';
 
 <BaseLayout title="Reality Pulse">
 	<section class="hero container">
-		<p class="hero-eyebrow">macOS · SwiftUI · Object Capture</p>
-		<h1>Batch photogrammetry for Apple Object Capture</h1>
+		<p class="hero-eyebrow">macOS · 3D automation · Object Capture</p>
+		<h1>Automate 3D model creation on macOS</h1>
 		<p class="hero-lead">
-			Reality Pulse turns folders of photos into USDZ 3D models with a persistent queue, scheduled
-			processing windows, SwiftData persistence, and crash-aware retry recovery.
+			Reality Pulse is an automation suite for turning photo captures into production-ready 3D assets.
+			Queue folders through Apple Object Capture, export USDZ meshes, convert to glTF or glB for the web,
+			generate Gaussian splats as <code>.ply</code>, and let your Mac run the pipeline on a schedule.
 		</p>
 		<div class="hero-actions">
 			<a class="button button-primary" href={withBase('docs/getting-started/')}>Get started</a>
@@ -18,41 +19,77 @@ import { withBase } from '../utils/paths';
 	</section>
 
 	<section class="section container">
-		<h2 class="section-title">Why Reality Pulse?</h2>
+		<h2 class="section-title">More than a batch queue</h2>
 		<p>
-			Apple Object Capture is powerful, but running one folder at a time is tedious when you are
-			scanning products, props, archive objects, or environment assets. Reality Pulse wraps
-			<code>PhotogrammetrySession</code> in a persistent queue so you can prepare a batch, choose
-			output quality, and let the Mac process the work in order.
+			Apple Object Capture is powerful, but running one folder at a time does not scale when you are
+			scanning products, props, archive objects, or environment assets. Reality Pulse wraps the full
+			workflow in a persistent automation layer: prepare jobs, pick reconstruction settings, choose
+			export formats, and walk away while the Mac processes everything in order.
+		</p>
+		<p>
+			The goal is simple—make 3D model creation on macOS easy. Less clicking through repeated
+			reconstructions, fewer manual format conversions, and a queue that survives overnight runs,
+			app restarts, and interrupted jobs.
 		</p>
 	</section>
 
 	<section class="section container">
-		<h2 class="section-title">Features</h2>
+		<h2 class="section-title">Output formats</h2>
+		<p>
+			Every job starts with Apple Object Capture and produces USDZ photogrammetry meshes. From there,
+			you can optionally generate additional formats from the same reconstruction:
+		</p>
 		<div class="card-grid">
 			<article class="card">
-				<h3>Batch queue</h3>
-				<p>Add multiple image folders and process them sequentially with full queue control.</p>
+				<h3>USDZ</h3>
+				<p>
+					Native Object Capture output in preview, reduced, medium, full, raw, or custom detail
+					levels—one or more meshes per job.
+				</p>
 			</article>
 			<article class="card">
-				<h3>Multiple detail levels</h3>
-				<p>Generate preview, reduced, medium, full, raw, or custom USDZ outputs from one capture.</p>
+				<h3>glTF &amp; glB</h3>
+				<p>
+					Convert completed USDZ models to glTF or binary glB for web viewers, game engines, and
+					pipelines that do not use USDZ.
+				</p>
+			</article>
+			<article class="card">
+				<h3>Gaussian splats (.ply)</h3>
+				<p>
+					Export photogrammetry results as Gaussian splat point clouds in standard <code>.ply</code>
+					format for splat viewers and research workflows.
+				</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="section container">
+		<h2 class="section-title">Automation features</h2>
+		<div class="card-grid">
+			<article class="card">
+				<h3>Persistent job queue</h3>
+				<p>Add, reorder, edit, and retry multiple capture folders—process them sequentially without babysitting each run.</p>
 			</article>
 			<article class="card">
 				<h3>Scheduled processing</h3>
-				<p>Delay a queue run or restrict processing to allowed hours, including overnight windows.</p>
+				<p>Delay a queue start or restrict runs to allowed hours, including overnight windows.</p>
 			</article>
 			<article class="card">
 				<h3>SwiftData persistence</h3>
-				<p>Queue jobs, history, schedule settings, and recovery metadata survive app quits and crashes.</p>
+				<p>Jobs, history, schedule settings, and recovery metadata survive app quits and crashes.</p>
 			</article>
 			<article class="card">
 				<h3>Retry-safe exports</h3>
 				<p>Completed outputs are skipped on retry while stale partial files are replaced before resuming.</p>
 			</article>
 			<article class="card">
-				<h3>Progress and notifications</h3>
-				<p>Track job progress, estimated time remaining, failures, and queue completion.</p>
+				<h3>Reconstruction controls</h3>
+				<p>Configure mesh type, masking, polygon limits, texture maps, format, and resolution per job.</p>
+			</article>
+			<article class="card">
+				<h3>Progress &amp; notifications</h3>
+				<p>Track reconstruction progress, estimated time remaining, failures, and queue completion.</p>
 			</article>
 		</div>
 	</section>
@@ -61,8 +98,7 @@ import { withBase } from '../utils/paths';
 		<h2 class="section-title">Documentation</h2>
 		<p>
 			Guides for building, testing, and understanding the app live in the
-			<a href={withBase('docs/')}>docs section</a>. More pages will be added here as
-			the project grows.
+			<a href={withBase('docs/')}>docs section</a>. More pages will be added as the automation suite grows.
 		</p>
 	</section>
 </BaseLayout>

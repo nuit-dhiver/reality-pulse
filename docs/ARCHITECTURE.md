@@ -112,6 +112,83 @@ The `Processing/` views display progress, estimated time remaining, completion s
 
 The app is sandboxed. User-selected input and output folders are stored with security-scoped bookmarks so the queue can access them after relaunch.
 
+## Provenance Watermarking
+
+Jobs can opt in (per-job toggle, default off) to embedding an imperceptible,
+per-copy provenance watermark in every exported file, so a copy found in the
+wild can be traced back to the export that produced it. The implementation
+lives in the local Swift package `RealityMarkKit/` (`WatermarkCore` +
+`ModelFileIO`), shared by the app and the internal `watermark-verify` CLI so
+embedding and detection can never drift apart.
+
+### Open design
+
+This repository is public, so the scheme follows Kerckhoffs's principle: the
+algorithm hides nothing, and all security rests on a per-copy 256-bit secret
+key. Every keyed decision (bit sequence, bin permutation, chip signs) is
+derived from that key via HMAC-SHA256; without the key the mark can be
+neither read, forged, nor selectively targeted. Wrong keys detect at exactly
+chance level.
+
+### Channels
+
+- **Geometry** — a blind keyed statistical watermark on the distribution of
+  vertex radial norms (Cho–Prost–Jung, IEEE TSP 2007, hardened with
+  trimmed-quantile range normalization). Norms are computed against the
+  centroid and normalized over a trimmed range, so detection is invariant to
+  vertex reordering, translation, rotation, and uniform scale, and needs only
+  the position multiset — no topology. One bit per norm bin; vertices move at
+  most one bin width (≲0.5% of the bounding-box diagonal). Applied to
+  glTF/GLB vertices and Gaussian-splat PLY points.
+- **Texture** — a blind additive spread-spectrum mark in the mid-band 8×8 DCT
+  coefficients of the base-color luma plane (PSNR ≥ 45 dB). Survives PNG/JPEG
+  re-encoding and mild rescaling (the detector resamples suspects back to the
+  recorded size). Applied to glTF/GLB base-color images and, via a
+  stored-zip repack that never touches the `.usdc` geometry bytes, to the
+  USDZ itself.
+
+Coverage per format: USDZ = texture only (v1), PLY = geometry only,
+glTF/GLB = both. The scheduler finalizes a job by exporting derived formats
+first (from the still-pristine USDZ) and stamping the USDZ last, so every
+distributed file maps to exactly one record and one fresh key.
+
+### Records and verification
+
+Each stamped file gets a `PersistentExportRecord` row (SwiftData): per-copy
+key, channels, embedding parameters, and the file's SHA-256. Records are
+append-only provenance history and survive job deletion. An internal record
+export ("Export Provenance Records…" in the job context menu, hidden behind
+`defaults write <bundle-id> RPWatermarkRecordExport -bool YES`) writes them as
+`*.wmrecord.json` for the offline verifier:
+
+```
+swift build --package-path RealityMarkKit -c release
+RealityMarkKit/.build/release/watermark-verify --record <record.json> <suspect-file>
+```
+
+The CLI loads geometry/images from usdz, glb, gltf, ply, png, or jpg
+suspects, reports per-channel match statistics with binomial/normal-tail
+p-values, and prints a MATCH / LIKELY / NO MATCH verdict (exit codes 0/1/2).
+Record JSONs contain the secret keys — treat them as credentials.
+
+### Known limitations
+
+- Aggressive remeshing plus full texture replacement strips both channels;
+  heavy decimation (≫50%), non-uniform scaling, or shearing breaks the
+  geometry statistic; large crops/warps or AI re-texturing break the texture
+  channel.
+- The algorithm being public means an attacker can run targeted
+  distribution-flattening or mid-band-scrubbing attacks — at a measurable
+  quality cost. The mark traces and deters; it is not DRM.
+- Cropping or part-extraction shifts the centroid, degrading partial-mesh
+  geometry detection; texture detection assumes approximate origin alignment.
+- Keys live only in the app's SwiftData store and exported record JSONs;
+  losing the store means losing verifiability, and anyone with the Mac
+  account (or a record file) can remove or transplant marks.
+- Manual re-exports from an already-stamped USDZ get texture-double-marked
+  (benign: independent-key patterns are quasi-orthogonal and each record
+  still verifies independently).
+
 ## Test Coverage
 
 The focused test target verifies:
@@ -125,3 +202,11 @@ The focused test target verifies:
 - completed-output preservation on retry
 - stale output deletion before retry
 - one-time legacy JSON migration
+- watermark embed → export → read-back → detect round trips (GLB, PLY, USDZ)
+- provenance-record persistence, idempotence lookups, and job-deletion survival
+
+`RealityMarkKit/` has its own test suite (`swift test --package-path
+RealityMarkKit`) covering keyed-PRF determinism, geometry roundtrip and
+robustness (noise, similarity transforms, reordering, subsampling), false
+positives at chance level, imperceptibility bounds, texture PSNR and
+JPEG/rescale robustness, and usdz archive alignment.
