@@ -185,9 +185,10 @@ Record JSONs contain the secret keys — treat them as credentials.
 - Keys live only in the app's SwiftData store and exported record JSONs;
   losing the store means losing verifiability, and anyone with the Mac
   account (or a record file) can remove or transplant marks.
-- Manual re-exports from an already-stamped USDZ get texture-double-marked
-  (benign: independent-key patterns are quasi-orthogonal and each record
-  still verifies independently).
+- Manual re-exports (and derived exports re-run when a job completes again
+  from already-stamped outputs) come from an already-stamped USDZ and get
+  texture-double-marked. Benign: independent-key patterns are
+  quasi-orthogonal and each record still verifies independently.
 
 ## Test Coverage
 

@@ -142,8 +142,13 @@ class JobStore {
 
     /// Export records are append-only provenance history: they are never
     /// updated in place and intentionally survive job deletion.
-    func saveExportRecords(_ records: [WatermarkRecord]) {
-        guard !records.isEmpty else { return }
+    ///
+    /// Returns false when persistence failed — callers must treat the
+    /// affected files as unmarked, because a marked file whose key was never
+    /// recorded is untraceable.
+    @discardableResult
+    func saveExportRecords(_ records: [WatermarkRecord]) -> Bool {
+        guard !records.isEmpty else { return true }
         do {
             for record in records {
                 modelContext.insert(try PersistentExportRecord(record: record))
@@ -151,8 +156,11 @@ class JobStore {
             try saveIfNeeded()
             logger.log("Saved \(records.count) provenance export record(s).")
             lastErrorMessage = nil
+            return true
         } catch {
+            modelContext.rollback()
             recordError("Failed to save export records: \(error.localizedDescription)", error: error)
+            return false
         }
     }
 

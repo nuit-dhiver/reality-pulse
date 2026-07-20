@@ -318,9 +318,13 @@ class JobScheduler {
         }
 
         guard !requests.isEmpty else {
+            // All detail levels are already on disk (e.g. a retry after every
+            // USDZ was written) — finalize must still run, or derived exports
+            // and provenance stamping silently never happen for this job.
             jobs[index].status = .completed
             jobs[index].progress = 1.0
-            sendNotification(title: "Job Complete", body: jobName)
+            let notificationBody = finalizeCompletedJob(for: jobs[index]) ?? jobName
+            sendNotification(title: "Job Complete", body: notificationBody)
             persist()
             return
         }
@@ -450,15 +454,31 @@ class JobScheduler {
     /// Post-reconstruction finalize, in a deliberate order: derived formats
     /// are converted first (from the still-pristine USDZ, so they never
     /// inherit its marks), then the USDZ itself is texture-stamped last.
+    /// Returns the notification body; stamping problems are surfaced there
+    /// because the queue row only shows errors for failed jobs.
     private func finalizeCompletedJob(for job: ReconstructionJob) -> String? {
         let exportSummary = exportAdditionalFormats(for: job)
-        stampCompletedUSDZOutputs(for: job)
-        return exportSummary
+        let stampWarning = stampCompletedUSDZOutputs(for: job)
+
+        switch (exportSummary, stampWarning) {
+        case (nil, nil):
+            return nil
+        case (let summary?, nil):
+            return summary
+        case (nil, let warning?):
+            return "\(job.modelName) — \(warning)"
+        case (let summary?, let warning?):
+            return "\(summary); \(warning)"
+        }
     }
 
-    private func stampCompletedUSDZOutputs(for job: ReconstructionJob) {
-        guard job.isWatermarkEnabled else { return }
+    /// Returns a user-facing warning when any stamp failed, nil when all
+    /// stamps succeeded or watermarking is off.
+    private func stampCompletedUSDZOutputs(for job: ReconstructionJob) -> String? {
+        guard job.isWatermarkEnabled else { return nil }
 
+        var attempted = 0
+        var failed = 0
         for level in job.requestedDetailLevels where job.hasCompletedOutputFile(for: level) {
             let usdzURL = job.outputURL(for: level)
 
@@ -472,9 +492,14 @@ class JobScheduler {
                 continue
             }
 
+            attempted += 1
             let stamp = WatermarkStamp.fresh()
             do {
-                let result = try USDZStamper.stampTextures(usdzURL: usdzURL, stamp: stamp)
+                // Stage, persist the record, then swap the file in — never
+                // the other way around: a marked file without a persisted
+                // key would be untraceable, and a later retry would stamp a
+                // second layer over it.
+                let staged = try USDZStamper.stage(usdzURL: usdzURL, stamp: stamp)
                 let record = WatermarkRecord(
                     jobId: job.id,
                     format: "usdz",
@@ -486,15 +511,24 @@ class JobScheduler {
                     geometry: nil,
                     texture: WatermarkRecord.TextureChannelInfo(
                         parameters: stamp.textureParameters,
-                        images: result.stampedImages
+                        images: staged.stampedImages
                     ),
-                    fileSHA256: result.fileSHA256
+                    fileSHA256: staged.fileSHA256
                 )
-                store.saveExportRecords([record])
+                guard store.saveExportRecords([record]) else {
+                    USDZStamper.discard(staged)
+                    failed += 1
+                    continue
+                }
+                try USDZStamper.commit(staged, to: usdzURL)
             } catch {
+                failed += 1
                 logger.warning("USDZ provenance stamp failed for \(usdzURL.lastPathComponent, privacy: .public): \(error.localizedDescription)")
             }
         }
+
+        guard failed > 0 else { return nil }
+        return "provenance stamping failed for \(failed) of \(attempted) USDZ file(s)"
     }
 
     private func exportAdditionalFormats(for job: ReconstructionJob) -> String? {
@@ -507,7 +541,16 @@ class JobScheduler {
                 embedWatermark: job.isWatermarkEnabled
             )
             guard !exportedFiles.isEmpty else { return nil }
-            store.saveExportRecords(exportedFiles.compactMap(\.record))
+
+            let markedFiles = exportedFiles.filter { $0.record != nil }
+            guard store.saveExportRecords(markedFiles.compactMap(\.record)) else {
+                // Marked files whose keys were never persisted are
+                // untraceable — remove them rather than ship them silently.
+                for file in markedFiles {
+                    try? FileManager.default.removeItem(at: file.url)
+                }
+                return "\(job.modelName) — additional export failed: provenance records could not be saved"
+            }
             return "\(job.modelName) — exported \(exportedFiles.count) additional file(s)"
         } catch {
             logger.warning("Additional format export failed for \(job.modelName): \(error.localizedDescription)")
@@ -516,8 +559,11 @@ class JobScheduler {
     }
 
     /// Persist provenance records produced by an export outside the scheduler
-    /// path (the dashboard's manual "Export As" flow).
-    func saveExportRecords(_ records: [WatermarkRecord]) {
+    /// path (the dashboard's manual "Export As" flow). Returns false when the
+    /// records could not be saved — the caller must treat the marked files as
+    /// untraceable.
+    @discardableResult
+    func saveExportRecords(_ records: [WatermarkRecord]) -> Bool {
         store.saveExportRecords(records)
     }
 

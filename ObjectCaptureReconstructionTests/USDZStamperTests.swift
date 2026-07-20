@@ -89,6 +89,35 @@ final class USDZStamperTests: XCTestCase {
         XCTAssertGreaterThan(wrongDetection.pValue, 1e-3)
     }
 
+    func testStageLeavesOriginalUntouchedUntilCommit() throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let (usdzURL, _, _) = try makeFixtureUSDZ(in: directory)
+        let originalBytes = try Data(contentsOf: usdzURL)
+
+        let stamp = WatermarkStamp(
+            key: try WatermarkKey(data: Data(repeating: 0x2C, count: WatermarkKey.byteCount)),
+            geometryParameters: GeometryWatermarkParameters(),
+            textureParameters: TextureWatermarkParameters()
+        )
+
+        // Stage: original untouched, staged copy has the promised hash.
+        let staged = try USDZStamper.stage(usdzURL: usdzURL, stamp: stamp)
+        XCTAssertEqual(try Data(contentsOf: usdzURL), originalBytes)
+        XCTAssertEqual(try WatermarkingService.sha256Hex(of: staged.temporaryURL), staged.fileSHA256)
+
+        // Discard: original still untouched, temp gone.
+        USDZStamper.discard(staged)
+        XCTAssertEqual(try Data(contentsOf: usdzURL), originalBytes)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: staged.temporaryURL.path))
+
+        // Stage + commit: destination now carries the staged bytes.
+        let secondStaged = try USDZStamper.stage(usdzURL: usdzURL, stamp: stamp)
+        try USDZStamper.commit(secondStaged, to: usdzURL)
+        XCTAssertEqual(try WatermarkingService.sha256Hex(of: usdzURL), secondStaged.fileSHA256)
+        XCTAssertNotEqual(try Data(contentsOf: usdzURL), originalBytes)
+    }
+
     func testStampFailureLeavesOriginalUntouched() throws {
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

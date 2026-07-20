@@ -688,14 +688,26 @@ enum ModelExportService {
 
                     var record: WatermarkRecord?
                     if let stamp {
-                        record = try? WatermarkingService.record(
-                            for: stamp,
-                            outcome: outcome,
-                            jobId: job.id,
-                            detailLevel: level,
-                            format: format.fileExtension,
-                            fileURL: outputURL
-                        )
+                        // A watermarked export without a record is untraceable:
+                        // remove the file and fail this export rather than
+                        // silently breaking the provenance guarantee.
+                        do {
+                            record = try WatermarkingService.record(
+                                for: stamp,
+                                outcome: outcome,
+                                jobId: job.id,
+                                detailLevel: level,
+                                format: format.fileExtension,
+                                fileURL: outputURL
+                            )
+                        } catch {
+                            try? fileManager.removeItem(at: outputURL)
+                            throw error
+                        }
+                        guard record != nil else {
+                            try? fileManager.removeItem(at: outputURL)
+                            throw WatermarkingError.nothingEmbedded(outputURL.lastPathComponent)
+                        }
                     }
                     exportedFiles.append(ExportedFile(
                         url: outputURL, format: format, detailLevel: level, record: record

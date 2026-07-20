@@ -46,6 +46,19 @@ struct WatermarkStampOutcome {
     }
 }
 
+enum WatermarkingError: LocalizedError {
+    /// Watermarking was requested but no channel could be embedded — the file
+    /// would be untraceable, so the export must not silently succeed.
+    case nothingEmbedded(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .nothingEmbedded(let filename):
+            return "Provenance watermark could not be embedded in \(filename) (model too small or textures not encodable)."
+        }
+    }
+}
+
 enum WatermarkingService {
     /// Assemble the persistent record for a stamped export file. Returns nil
     /// when nothing was embedded (no record should exist for unmarked files).

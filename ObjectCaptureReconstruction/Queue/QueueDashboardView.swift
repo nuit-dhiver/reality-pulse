@@ -183,7 +183,16 @@ struct QueueDashboardView: View {
                     exportErrorMessage = "No completed USDZ outputs were available to export."
                     return
                 }
-                appDataModel.scheduler.saveExportRecords(exportedFiles.compactMap(\.record))
+                let markedFiles = exportedFiles.filter { $0.record != nil }
+                guard appDataModel.scheduler.saveExportRecords(markedFiles.compactMap(\.record)) else {
+                    // Without persisted keys the marked exports are
+                    // untraceable — remove them and tell the user.
+                    for file in markedFiles {
+                        try? FileManager.default.removeItem(at: file.url)
+                    }
+                    exportErrorMessage = "Export succeeded, but the provenance records could not be saved. The exported files were removed — try again."
+                    return
+                }
                 NSWorkspace.shared.activateFileViewerSelecting(exportedFiles.map(\.url))
             } catch {
                 exportErrorMessage = error.localizedDescription

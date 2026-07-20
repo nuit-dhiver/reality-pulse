@@ -35,9 +35,33 @@ enum USDZStamper {
         var fileSHA256: String
     }
 
+    /// A stamped copy written to a temporary location, not yet swapped in.
+    /// Lets the caller persist the provenance record between staging and
+    /// committing, so a marked file can never exist without its record.
+    struct StagedStamp {
+        var temporaryURL: URL
+        var stampedImages: [WatermarkRecord.TextureChannelInfo.Image]
+        /// SHA-256 of the staged bytes — identical to the destination file's
+        /// hash after `commit`.
+        var fileSHA256: String
+    }
+
     /// Stamp the base-color textures of a finished USDZ in place, atomically.
     /// Any failure throws before the original file is replaced.
     nonisolated static func stampTextures(usdzURL: URL, stamp: WatermarkStamp) throws -> StampResult {
+        let staged = try stage(usdzURL: usdzURL, stamp: stamp)
+        do {
+            try commit(staged, to: usdzURL)
+        } catch {
+            discard(staged)
+            throw error
+        }
+        return StampResult(stampedImages: staged.stampedImages, fileSHA256: staged.fileSHA256)
+    }
+
+    /// Produce a stamped copy in a temporary location; the original stays
+    /// untouched until `commit`.
+    nonisolated static func stage(usdzURL: URL, stamp: WatermarkStamp) throws -> StagedStamp {
         var archive = try UsdzArchive.read(url: usdzURL)
         let baseColorNames = baseColorTextureNames(usdzURL: usdzURL)
 
@@ -74,13 +98,22 @@ enum USDZStamper {
         let temporaryURL = FileManager.default.temporaryDirectory
             .appending(path: UUID().uuidString + ".usdz")
         try archive.write(to: temporaryURL)
-        _ = try FileManager.default.replaceItemAt(usdzURL, withItemAt: temporaryURL)
 
-        logger.log("Stamped \(stampedImages.count) texture(s) in \(usdzURL.lastPathComponent, privacy: .public)")
-        return StampResult(
+        return StagedStamp(
+            temporaryURL: temporaryURL,
             stampedImages: stampedImages,
-            fileSHA256: try WatermarkingService.sha256Hex(of: usdzURL)
+            fileSHA256: try WatermarkingService.sha256Hex(of: temporaryURL)
         )
+    }
+
+    /// Atomically replace the destination with the staged copy.
+    nonisolated static func commit(_ staged: StagedStamp, to usdzURL: URL) throws {
+        _ = try FileManager.default.replaceItemAt(usdzURL, withItemAt: staged.temporaryURL)
+        logger.log("Stamped \(staged.stampedImages.count) texture(s) in \(usdzURL.lastPathComponent, privacy: .public)")
+    }
+
+    nonisolated static func discard(_ staged: StagedStamp) {
+        try? FileManager.default.removeItem(at: staged.temporaryURL)
     }
 
     /// Base-color texture filenames according to ModelIO's material graph.
