@@ -71,8 +71,12 @@ public struct WatermarkRecord: Codable, Sendable, Equatable {
     public var filePath: String?
     public var createdAt: Date
     public var algorithmVersion: Int
-    /// The 32-byte per-copy secret key (base64 in JSON).
+    /// The 32-byte secret key (base64 in JSON).
     public var key: Data
+    /// Label of the saved key library entry when a reused key was used; nil
+    /// for the default of a fresh per-copy key. A shared key means this file
+    /// is traceable to the label, not to an individual copy.
+    public var keyLabel: String?
     /// Channels actually embedded in this file.
     public var channels: [String]
     public var geometry: GeometryChannelInfo?
@@ -90,6 +94,7 @@ public struct WatermarkRecord: Codable, Sendable, Equatable {
         filePath: String?,
         createdAt: Date = Date(),
         key: WatermarkKey,
+        keyLabel: String? = nil,
         channels: [String],
         geometry: GeometryChannelInfo?,
         texture: TextureChannelInfo?,
@@ -105,6 +110,7 @@ public struct WatermarkRecord: Codable, Sendable, Equatable {
         self.createdAt = createdAt
         self.algorithmVersion = Self.currentAlgorithmVersion
         self.key = key.data
+        self.keyLabel = keyLabel
         self.channels = channels
         self.geometry = geometry
         self.texture = texture

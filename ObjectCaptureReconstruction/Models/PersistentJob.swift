@@ -27,6 +27,7 @@ final class PersistentJob {
     var completedOutputFilenamesData: Data?
     var exportFormatsData: Data?
     var watermarkEnabled: Bool?
+    var watermarkKeyId: UUID?
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
 
@@ -48,6 +49,7 @@ final class PersistentJob {
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
         watermarkEnabled = job.watermarkEnabled
+        watermarkKeyId = job.watermarkKeyId
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -71,6 +73,7 @@ final class PersistentJob {
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
         watermarkEnabled = job.watermarkEnabled
+        watermarkKeyId = job.watermarkKeyId
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -107,6 +110,7 @@ final class PersistentJob {
             completedOutputFilenames: completedOutputFilenames,
             exportFormats: exportFormats,
             watermarkEnabled: watermarkEnabled,
+            watermarkKeyId: watermarkKeyId,
             imageFolderBookmark: imageFolderBookmark,
             modelFolderBookmark: modelFolderBookmark
         )

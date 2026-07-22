@@ -638,6 +638,12 @@ enum USDZToGLTFConverter {
 
 enum ModelExportService {
 
+    /// Identifies one derived output slot of a job.
+    struct ExportSlot: Hashable, Sendable {
+        let detailLevel: CodableDetailLevel
+        let format: ModelExportFormat
+    }
+
     /// One derived-format export, with its provenance record when the file
     /// was watermarked.
     struct ExportedFile {
@@ -645,16 +651,28 @@ enum ModelExportService {
         let format: ModelExportFormat
         let detailLevel: CodableDetailLevel
         let record: WatermarkRecord?
+        /// True when an already-current watermarked file was left in place
+        /// instead of being re-exported under a new key.
+        var isUpToDate: Bool = false
     }
 
     /// Export all completed USDZ outputs for a job into the requested formats.
     /// With `embedWatermark`, each exported file is stamped with its own fresh
     /// per-copy key and returns a record for the caller to persist.
+    ///
+    /// `recordedHashes` makes re-finalizing idempotent: a slot whose file on
+    /// disk still matches the hash of its newest provenance record is left
+    /// untouched, so a retry cannot silently re-key files that are already
+    /// marked and recorded.
+    /// `sharedKey` reuses one saved library key for every file instead of the
+    /// default fresh per-copy key.
     nonisolated static func exportCompletedOutputs(
         for job: ReconstructionJob,
         formats: Set<ModelExportFormat>,
         fileManager: FileManager = .default,
-        embedWatermark: Bool = false
+        embedWatermark: Bool = false,
+        sharedKey: SharedWatermarkKey? = nil,
+        recordedHashes: [ExportSlot: String] = [:]
     ) throws -> [ExportedFile] {
         guard !formats.isEmpty else { return [] }
 
@@ -667,7 +685,20 @@ enum ModelExportService {
 
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
-                let stamp = embedWatermark ? WatermarkStamp.fresh() : nil
+
+                if let recordedHash = recordedHashes[ExportSlot(detailLevel: level, format: format)],
+                   fileManager.fileExists(atPath: outputURL.path),
+                   let currentHash = try? WatermarkingService.sha256Hex(of: outputURL),
+                   currentHash == recordedHash {
+                    exportedFiles.append(ExportedFile(
+                        url: outputURL, format: format, detailLevel: level,
+                        record: nil, isUpToDate: true
+                    ))
+                    logger.log("Skipped \(outputURL.lastPathComponent): already exported and recorded.")
+                    continue
+                }
+
+                let stamp = embedWatermark ? WatermarkStamp.next(sharedKey: sharedKey) : nil
                 do {
                     let outcome: WatermarkStampOutcome
                     switch format {

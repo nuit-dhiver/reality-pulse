@@ -77,6 +77,11 @@ do {
 
 print("watermark-verify — provenance check")
 print("record:   \(record.recordId) (\(record.format), \(record.detailLevel), \(record.filename))")
+if let keyLabel = record.keyLabel {
+    print("key:      shared key '\(keyLabel)' — identifies the key, not an individual copy")
+} else {
+    print("key:      per-copy key — identifies this exact exported file")
+}
 print("suspect:  \(suspectPath)")
 
 // Exact-copy short-circuit.

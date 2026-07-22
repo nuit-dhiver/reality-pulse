@@ -21,6 +21,9 @@ final class PersistentExportRecord {
     var filename: String
     var filePath: String
     var keyData: Data
+    /// Label when a reused library key produced this file; nil for a fresh
+    /// per-copy key.
+    var keyLabel: String?
     var createdAt: Date
     var schemaVersion: Int
     var algorithmVersion: Int
@@ -37,6 +40,7 @@ final class PersistentExportRecord {
         filename = record.filename
         filePath = record.filePath ?? ""
         keyData = record.key
+        keyLabel = record.keyLabel
         createdAt = record.createdAt
         schemaVersion = record.schemaVersion
         algorithmVersion = record.algorithmVersion
@@ -56,6 +60,7 @@ final class PersistentExportRecord {
             filePath: filePath.isEmpty ? nil : filePath,
             createdAt: createdAt,
             key: try WatermarkKey(data: keyData),
+            keyLabel: keyLabel,
             channels: try JSONDecoder().decode([String].self, from: channelsData),
             geometry: try geometryInfoData.map {
                 try JSONDecoder().decode(WatermarkRecord.GeometryChannelInfo.self, from: $0)

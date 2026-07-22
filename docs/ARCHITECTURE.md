@@ -150,12 +150,41 @@ chance level.
 Coverage per format: USDZ = texture only (v1), PLY = geometry only,
 glTF/GLB = both. The scheduler finalizes a job by exporting derived formats
 first (from the still-pristine USDZ) and stamping the USDZ last, so every
-distributed file maps to exactly one record and one fresh key.
+distributed file maps to exactly one record.
+
+### Key granularity
+
+The job setup sheet offers two key sources whenever watermarking is on:
+
+- **New key per file** (default) — every exported file gets a freshly
+  generated 256-bit key. This is full *traitor tracing*: a leaked copy
+  identifies the exact file, so different recipients are distinguishable.
+- **A saved key** — a labeled key from the key library
+  (`PersistentWatermarkKey`: unique id, unique label, key material,
+  created/last-used timestamps) is reused for every file of the job, and can
+  be reused across jobs. Labels are created in the sheet ("New Saved Key…")
+  and are trimmed, non-empty, and unique.
+
+Reusing a key deliberately trades tracing for a different property. Every
+copy carries the same mark, so a leak proves *ownership* ("this is my
+export") but not *which* copy leaked. In exchange it resists collusion: two
+recipients comparing byte-identical copies find no differences to average
+away, whereas per-copy keys give colluders exactly that signal. Neither is
+strictly better — per-copy is the default because losing tracing should be a
+deliberate act, not an accident.
+
+Records store the label alongside the key (`keyLabel`, nil for per-copy
+keys), and the verifier prints which regime applies so a result is never
+misread as identifying a single copy when it cannot. A saved key that was
+deleted since the job was created falls back to per-copy keys, with a warning
+in the completion notification — strictly more traceable, but not what was
+asked for.
 
 ### Records and verification
 
-Each stamped file gets a `PersistentExportRecord` row (SwiftData): per-copy
-key, channels, embedding parameters, and the file's SHA-256. Records are
+Each stamped file gets a `PersistentExportRecord` row (SwiftData): the
+key (and its label when reused), channels, embedding parameters, and the
+file's SHA-256. Records are
 append-only provenance history and survive job deletion. An internal record
 export ("Export Provenance Records…" in the job context menu, hidden behind
 `defaults write <bundle-id> RPWatermarkRecordExport -bool YES`) writes them as
@@ -185,6 +214,10 @@ Record JSONs contain the secret keys — treat them as credentials.
 - Keys live only in the app's SwiftData store and exported record JSONs;
   losing the store means losing verifiability, and anyone with the Mac
   account (or a record file) can remove or transplant marks.
+- A reused saved key identifies the key, not an individual copy: every file
+  marked with it is indistinguishable, so it cannot answer "which recipient
+  leaked this". It also widens blast radius — one leaked record JSON exposes
+  the key for every file ever marked with it, not just one export.
 - Manual re-exports (and derived exports re-run when a job completes again
   from already-stamped outputs) come from an already-stamped USDZ and get
   texture-double-marked. Benign: independent-key patterns are

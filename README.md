@@ -27,7 +27,7 @@ Apple Object Capture is powerful, but running one folder at a time is tedious wh
 - **Interrupted-job recovery**: running jobs are restored as interrupted on launch and can be retried.
 - **Retry-safe exports**: completed outputs are skipped on retry, while stale partial files are replaced before reconstruction resumes.
 - **Sandbox-friendly folder access**: user-selected input and output folders are restored with security-scoped bookmarks.
-- **Provenance watermarking (opt-in)**: imperceptibly stamp every exported file with a per-copy secret key so leaked copies can be traced to the export that produced them — public algorithm, private keys (see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#provenance-watermarking)).
+- **Provenance watermarking (opt-in)**: imperceptibly stamp every exported file with a secret key so leaked copies can be traced back — a fresh per-copy key by default, or a saved labeled key reused across jobs as an ownership stamp. Public algorithm, private keys (see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#provenance-watermarking)).
 - **Progress and notifications**: track job progress, estimated time remaining, failures, and queue completion.
 
 ## Screens And Workflow

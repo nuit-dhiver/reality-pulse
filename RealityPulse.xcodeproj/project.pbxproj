@@ -44,6 +44,7 @@
 		DDDD0018DDDD0018DDDD0018 /* ExportRecordStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0016DDDD0016DDDD0016 /* ExportRecordStoreTests.swift */; };
 		DDDD0020DDDD0020DDDD0020 /* USDZStamper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0019DDDD0019DDDD0019 /* USDZStamper.swift */; };
 		DDDD0022DDDD0022DDDD0022 /* USDZStamperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0021DDDD0021DDDD0021 /* USDZStamperTests.swift */; };
+		DDDD0024DDDD0024DDDD0024 /* PersistentWatermarkKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0023DDDD0023DDDD0023 /* PersistentWatermarkKey.swift */; };
 		DDDD0004DDDD0004DDDD0004 /* WatermarkCore in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0002DDDD0002DDDD0002 /* WatermarkCore */; };
 		DDDD0005DDDD0005DDDD0005 /* ModelFileIO in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0003DDDD0003DDDD0003 /* ModelFileIO */; };
 		DDDD0008DDDD0008DDDD0008 /* WatermarkCore in Frameworks */ = {isa = PBXBuildFile; productRef = DDDD0006DDDD0006DDDD0006 /* WatermarkCore */; };
@@ -109,6 +110,7 @@
 		DDDD0016DDDD0016DDDD0016 /* ExportRecordStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportRecordStoreTests.swift; sourceTree = "<group>"; };
 		DDDD0019DDDD0019DDDD0019 /* USDZStamper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZStamper.swift; sourceTree = "<group>"; };
 		DDDD0021DDDD0021DDDD0021 /* USDZStamperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZStamperTests.swift; sourceTree = "<group>"; };
+		DDDD0023DDDD0023DDDD0023 /* PersistentWatermarkKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentWatermarkKey.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -262,6 +264,7 @@
 				C98675D558934377A48B11EB /* */,
 				E3A4F851B39B9C4EA08E7C13 /* */,
 				DDDD0010DDDD0010DDDD0010 /* PersistentExportRecord.swift */,
+				DDDD0023DDDD0023DDDD0023 /* PersistentWatermarkKey.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 				6E179F522E3A43939DF5BF80 /* PersistentScheduleSettings.swift in Sources */,
 				5EF33318F00E443A81683739 /* PersistentMigrationState.swift in Sources */,
 				DDDD0011DDDD0011DDDD0011 /* PersistentExportRecord.swift in Sources */,
+				DDDD0024DDDD0024DDDD0024 /* PersistentWatermarkKey.swift in Sources */,
 				DDDD0013DDDD0013DDDD0013 /* WatermarkingService.swift in Sources */,
 				DDDD0020DDDD0020DDDD0020 /* USDZStamper.swift in Sources */,
 				0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */,

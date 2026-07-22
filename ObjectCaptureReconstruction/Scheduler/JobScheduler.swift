@@ -323,7 +323,7 @@ class JobScheduler {
             // and provenance stamping silently never happen for this job.
             jobs[index].status = .completed
             jobs[index].progress = 1.0
-            let notificationBody = finalizeCompletedJob(for: jobs[index]) ?? jobName
+            let notificationBody = await finalizeCompletedJob(for: jobs[index]) ?? jobName
             sendNotification(title: "Job Complete", body: notificationBody)
             persist()
             return
@@ -402,7 +402,7 @@ class JobScheduler {
             } else if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .completed
                 jobs[idx].progress = 1.0
-                let notificationBody = finalizeCompletedJob(for: jobs[idx]) ?? jobName
+                let notificationBody = await finalizeCompletedJob(for: jobs[idx]) ?? jobName
                 sendNotification(title: "Job Complete", body: notificationBody)
             }
 
@@ -456,50 +456,65 @@ class JobScheduler {
     /// inherit its marks), then the USDZ itself is texture-stamped last.
     /// Returns the notification body; stamping problems are surfaced there
     /// because the queue row only shows errors for failed jobs.
-    private func finalizeCompletedJob(for job: ReconstructionJob) -> String? {
-        let exportSummary = exportAdditionalFormats(for: job)
-        let stampWarning = stampCompletedUSDZOutputs(for: job)
+    private func finalizeCompletedJob(for job: ReconstructionJob) async -> String? {
+        let (sharedKey, keyWarning) = resolveSharedKey(for: job)
+        let exportSummary = await exportAdditionalFormats(for: job, sharedKey: sharedKey)
+        let stampWarning = await stampCompletedUSDZOutputs(for: job, sharedKey: sharedKey)
 
-        switch (exportSummary, stampWarning) {
-        case (nil, nil):
+        let warnings = [keyWarning, stampWarning].compactMap { $0 }
+        switch (exportSummary, warnings.isEmpty) {
+        case (nil, true):
             return nil
-        case (let summary?, nil):
+        case (let summary?, true):
             return summary
-        case (nil, let warning?):
-            return "\(job.modelName) — \(warning)"
-        case (let summary?, let warning?):
-            return "\(summary); \(warning)"
+        case (nil, false):
+            return "\(job.modelName) — \(warnings.joined(separator: "; "))"
+        case (let summary?, false):
+            return "\(summary); \(warnings.joined(separator: "; "))"
         }
+    }
+
+    /// Resolve the job's selected library key. A missing key (deleted since
+    /// the job was created) falls back to fresh per-copy keys — strictly more
+    /// traceable, but the user asked for the label, so it is surfaced.
+    private func resolveSharedKey(
+        for job: ReconstructionJob
+    ) -> (shared: SharedWatermarkKey?, warning: String?) {
+        guard job.isWatermarkEnabled, let keyId = job.watermarkKeyId else { return (nil, nil) }
+        guard let resolved = store.watermarkKey(id: keyId) else {
+            logger.warning("Saved watermark key \(keyId) is missing; falling back to per-copy keys.")
+            return (nil, "saved watermark key is missing, used fresh per-copy keys instead")
+        }
+        return (SharedWatermarkKey(key: resolved.key, label: resolved.label), nil)
     }
 
     /// Returns a user-facing warning when any stamp failed, nil when all
     /// stamps succeeded or watermarking is off.
-    private func stampCompletedUSDZOutputs(for job: ReconstructionJob) -> String? {
+    private func stampCompletedUSDZOutputs(
+        for job: ReconstructionJob,
+        sharedKey: SharedWatermarkKey?
+    ) async -> String? {
         guard job.isWatermarkEnabled else { return nil }
 
         var attempted = 0
         var failed = 0
         for level in job.requestedDetailLevels where job.hasCompletedOutputFile(for: level) {
             let usdzURL = job.outputURL(for: level)
-
-            // Idempotence across retries: skip when the newest usdz record
-            // still matches the file bytes (already stamped, unchanged).
-            if let existing = store.latestExportRecord(
+            let recordedSHA = store.latestExportRecord(
                 jobId: job.id, detailLevel: level.rawValue, format: "usdz"
-               ),
-               let currentSHA = try? WatermarkingService.sha256Hex(of: usdzURL),
-               currentSHA == existing.fileSHA256 {
-                continue
-            }
+            )?.fileSHA256
+            let stamp = WatermarkStamp.next(sharedKey: sharedKey)
 
-            attempted += 1
-            let stamp = WatermarkStamp.fresh()
             do {
-                // Stage, persist the record, then swap the file in — never
-                // the other way around: a marked file without a persisted
-                // key would be untraceable, and a later retry would stamp a
-                // second layer over it.
-                let staged = try USDZStamper.stage(usdzURL: usdzURL, stamp: stamp)
+                // Stage off the main actor, persist the record, then swap the
+                // file in — never the other way around: a marked file without
+                // a persisted key would be untraceable, and a later retry
+                // would stamp a second layer over it.
+                guard let staged = try await stageStampIfNeeded(
+                    usdzURL: usdzURL, recordedSHA: recordedSHA, stamp: stamp
+                ) else { continue }
+
+                attempted += 1
                 let record = WatermarkRecord(
                     jobId: job.id,
                     format: "usdz",
@@ -507,6 +522,7 @@ class JobScheduler {
                     filename: usdzURL.lastPathComponent,
                     filePath: usdzURL.path,
                     key: stamp.key,
+                    keyLabel: stamp.keyLabel,
                     channels: [WatermarkRecord.Channel.texture],
                     geometry: nil,
                     texture: WatermarkRecord.TextureChannelInfo(
@@ -520,8 +536,21 @@ class JobScheduler {
                     failed += 1
                     continue
                 }
-                try USDZStamper.commit(staged, to: usdzURL)
+
+                do {
+                    try USDZStamper.commit(staged, to: usdzURL)
+                } catch {
+                    // The record is saved but the file was never replaced.
+                    // Roll the record back, otherwise it would describe bytes
+                    // that do not exist and defeat the idempotence check on
+                    // the next retry.
+                    USDZStamper.discard(staged)
+                    store.deleteExportRecords(recordIds: [record.recordId])
+                    failed += 1
+                    logger.warning("USDZ provenance commit failed for \(usdzURL.lastPathComponent, privacy: .public): \(error.localizedDescription)")
+                }
             } catch {
+                attempted += 1
                 failed += 1
                 logger.warning("USDZ provenance stamp failed for \(usdzURL.lastPathComponent, privacy: .public): \(error.localizedDescription)")
             }
@@ -531,14 +560,34 @@ class JobScheduler {
         return "provenance stamping failed for \(failed) of \(attempted) USDZ file(s)"
     }
 
-    private func exportAdditionalFormats(for job: ReconstructionJob) -> String? {
+    private func exportAdditionalFormats(
+        for job: ReconstructionJob,
+        sharedKey: SharedWatermarkKey?
+    ) async -> String? {
         guard !job.exportFormats.isEmpty else { return nil }
 
+        // Idempotence: a slot whose file still matches its newest record is
+        // left alone, so re-finalizing (e.g. a retry where every USDZ already
+        // existed) cannot silently re-key files that are already traceable.
+        var recordedHashes: [ModelExportService.ExportSlot: String] = [:]
+        if job.isWatermarkEnabled {
+            for level in job.requestedDetailLevels {
+                for format in job.exportFormats {
+                    guard let record = store.latestExportRecord(
+                        jobId: job.id, detailLevel: level.rawValue, format: format.fileExtension
+                    ) else { continue }
+                    recordedHashes[.init(detailLevel: level, format: format)] = record.fileSHA256
+                }
+            }
+        }
+
         do {
-            let exportedFiles = try ModelExportService.exportCompletedOutputs(
-                for: job,
+            let exportedFiles = try await runExports(
+                job: job,
                 formats: job.exportFormats,
-                embedWatermark: job.isWatermarkEnabled
+                embedWatermark: job.isWatermarkEnabled,
+                sharedKey: sharedKey,
+                recordedHashes: recordedHashes
             )
             guard !exportedFiles.isEmpty else { return nil }
 
@@ -551,11 +600,50 @@ class JobScheduler {
                 }
                 return "\(job.modelName) — additional export failed: provenance records could not be saved"
             }
-            return "\(job.modelName) — exported \(exportedFiles.count) additional file(s)"
+
+            let freshCount = exportedFiles.filter { !$0.isUpToDate }.count
+            guard freshCount > 0 else { return nil }
+            return "\(job.modelName) — exported \(freshCount) additional file(s)"
         } catch {
             logger.warning("Additional format export failed for \(job.modelName): \(error.localizedDescription)")
             return "\(job.modelName) — reconstruction complete, but additional export failed"
         }
+    }
+
+    // MARK: - Finalize work (nonisolated to avoid blocking main actor)
+
+    /// Format conversion, watermark embedding, and hashing are all CPU- and
+    /// I/O-heavy (splat generation alone samples a million points), so they
+    /// run off the main actor like `createSession` does.
+    private nonisolated func runExports(
+        job: ReconstructionJob,
+        formats: Set<ModelExportFormat>,
+        embedWatermark: Bool,
+        sharedKey: SharedWatermarkKey?,
+        recordedHashes: [ModelExportService.ExportSlot: String]
+    ) async throws -> [ModelExportService.ExportedFile] {
+        try ModelExportService.exportCompletedOutputs(
+            for: job,
+            formats: formats,
+            embedWatermark: embedWatermark,
+            sharedKey: sharedKey,
+            recordedHashes: recordedHashes
+        )
+    }
+
+    /// Returns nil when the file already matches its recorded hash (nothing to
+    /// do), otherwise a staged copy awaiting record persistence and commit.
+    private nonisolated func stageStampIfNeeded(
+        usdzURL: URL,
+        recordedSHA: String?,
+        stamp: WatermarkStamp
+    ) async throws -> USDZStamper.StagedStamp? {
+        if let recordedSHA,
+           let currentSHA = try? WatermarkingService.sha256Hex(of: usdzURL),
+           currentSHA == recordedSHA {
+            return nil
+        }
+        return try USDZStamper.stage(usdzURL: usdzURL, stamp: stamp)
     }
 
     /// Persist provenance records produced by an export outside the scheduler
@@ -569,6 +657,23 @@ class JobScheduler {
 
     func exportRecords(jobId: UUID) -> [WatermarkRecord] {
         store.exportRecords(jobId: jobId)
+    }
+
+    // MARK: - Watermark key library
+
+    func watermarkKeys() -> [WatermarkKeyInfo] {
+        store.watermarkKeys()
+    }
+
+    /// Returns nil when the label is blank or already in use.
+    func createWatermarkKey(label: String) -> WatermarkKeyInfo? {
+        store.createWatermarkKey(label: label)
+    }
+
+    /// Resolve a job's selected library key for an export outside the
+    /// scheduler path (the dashboard's manual "Export As" flow).
+    func sharedWatermarkKey(for job: ReconstructionJob) -> SharedWatermarkKey? {
+        resolveSharedKey(for: job).shared
     }
 
     // MARK: - Session creation (nonisolated to avoid blocking main actor)

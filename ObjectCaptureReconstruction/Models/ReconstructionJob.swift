@@ -31,6 +31,10 @@ struct ReconstructionJob: Identifiable, Codable {
     /// Optional so jobs persisted before this field existed still decode.
     var watermarkEnabled: Bool?
 
+    /// Saved library key to reuse for this job's exports. Nil means the
+    /// default: a fresh per-copy key for every exported file.
+    var watermarkKeyId: UUID?
+
     var isWatermarkEnabled: Bool { watermarkEnabled ?? false }
 
     /// Security-scoped bookmark data for persisting sandbox access across launches.
@@ -53,6 +57,7 @@ struct ReconstructionJob: Identifiable, Codable {
         completedOutputFilenames: Set<String>? = [],
         exportFormats: Set<ModelExportFormat> = [],
         watermarkEnabled: Bool? = nil,
+        watermarkKeyId: UUID? = nil,
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
@@ -71,6 +76,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.completedOutputFilenames = completedOutputFilenames
         self.exportFormats = exportFormats
         self.watermarkEnabled = watermarkEnabled
+        self.watermarkKeyId = watermarkKeyId
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,

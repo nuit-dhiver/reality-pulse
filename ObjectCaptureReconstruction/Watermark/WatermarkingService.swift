@@ -16,18 +16,48 @@ import WatermarkCore
 /// Per-file stamping instruction handed to an export converter. Every exported
 /// file gets its own fresh key, so every distributed file maps to exactly one
 /// export record.
-struct WatermarkStamp {
+struct WatermarkStamp: Sendable {
     let key: WatermarkKey
+    /// Label when this stamp reuses a saved library key; nil for a fresh
+    /// per-copy key.
+    var keyLabel: String?
     let geometryParameters: GeometryWatermarkParameters
     let textureParameters: TextureWatermarkParameters
 
-    static func fresh() -> WatermarkStamp {
-        WatermarkStamp(
-            key: .random(),
-            geometryParameters: GeometryWatermarkParameters(),
-            textureParameters: TextureWatermarkParameters()
-        )
+    init(
+        key: WatermarkKey,
+        keyLabel: String? = nil,
+        geometryParameters: GeometryWatermarkParameters = GeometryWatermarkParameters(),
+        textureParameters: TextureWatermarkParameters = TextureWatermarkParameters()
+    ) {
+        self.key = key
+        self.keyLabel = keyLabel
+        self.geometryParameters = geometryParameters
+        self.textureParameters = textureParameters
     }
+
+    /// A brand-new key, unique to this one file — full per-copy traceability.
+    static func fresh() -> WatermarkStamp {
+        WatermarkStamp(key: .random())
+    }
+
+    /// Reuse a saved library key. Every file stamped with it carries the same
+    /// mark, so a leak traces to the label rather than to one copy.
+    static func reusing(_ shared: SharedWatermarkKey) -> WatermarkStamp {
+        WatermarkStamp(key: shared.key, keyLabel: shared.label)
+    }
+
+    /// One file's stamp: the shared key when the job selected one, otherwise
+    /// a fresh key.
+    static func next(sharedKey: SharedWatermarkKey?) -> WatermarkStamp {
+        sharedKey.map(reusing) ?? .fresh()
+    }
+}
+
+/// A saved library key resolved for use by an export run.
+struct SharedWatermarkKey: Sendable {
+    let key: WatermarkKey
+    let label: String
 }
 
 /// What a converter actually embedded (channels can be skipped, e.g. geometry
@@ -79,6 +109,7 @@ enum WatermarkingService {
             filename: fileURL.lastPathComponent,
             filePath: fileURL.path,
             key: stamp.key,
+            keyLabel: stamp.keyLabel,
             channels: channels,
             geometry: outcome.geometry,
             texture: outcome.texture,

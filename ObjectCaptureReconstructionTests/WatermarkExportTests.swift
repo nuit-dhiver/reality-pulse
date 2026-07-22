@@ -94,6 +94,61 @@ final class WatermarkExportTests: XCTestCase {
         XCTAssertGreaterThan(wrongDetection.pValue, 1e-3)
     }
 
+    // MARK: - Key reuse
+
+    func testSharedKeyMarksEveryFileWithTheSameKey() {
+        let shared = SharedWatermarkKey(key: .random(), label: "Client A")
+
+        let first = WatermarkStamp.next(sharedKey: shared)
+        let second = WatermarkStamp.next(sharedKey: shared)
+        XCTAssertEqual(first.key, second.key)
+        XCTAssertEqual(first.key, shared.key)
+        XCTAssertEqual(first.keyLabel, "Client A")
+
+        // The default stays per-copy: every file gets unique, unlabeled keys.
+        let fresh = WatermarkStamp.next(sharedKey: nil)
+        let anotherFresh = WatermarkStamp.next(sharedKey: nil)
+        XCTAssertNotEqual(fresh.key, anotherFresh.key)
+        XCTAssertNil(fresh.keyLabel)
+    }
+
+    func testOneSharedKeyVerifiesAcrossDifferentExportedFormats() throws {
+        let directory = try makeTemporaryDirectory()
+        let sourceURL = directory.appending(path: "box.usdc")
+        let glbURL = directory.appending(path: "box.glb")
+        let plyURL = directory.appending(path: "box.ply")
+        try writeSampleUSD(to: sourceURL)
+
+        // The same saved key stamps two different exports of the same model.
+        let shared = SharedWatermarkKey(
+            key: try WatermarkKey(data: Data(repeating: 0x3A, count: WatermarkKey.byteCount)),
+            label: "Client A"
+        )
+        let glbOutcome = try USDZToGLTFConverter.convert(
+            usdzURL: sourceURL, format: .glb, outputURL: glbURL,
+            watermark: .next(sharedKey: shared)
+        )
+        let plyOutcome = try SplatSampleGenerator.generate(
+            usdzURL: sourceURL, outputURL: plyURL, targetCount: 30_000,
+            watermark: .next(sharedKey: shared)
+        )
+
+        // Both files verify under that one key.
+        let glbDetection = GeometryWatermarker.detect(
+            positions: try MiniGLTFReader.read(url: glbURL).positions,
+            key: shared.key,
+            parameters: try XCTUnwrap(glbOutcome.geometry).detectionParameters
+        )
+        XCTAssertLessThan(glbDetection.pValue, 1e-6)
+
+        let plyDetection = GeometryWatermarker.detect(
+            positions: try PLYReader.readPositions(url: plyURL),
+            key: shared.key,
+            parameters: try XCTUnwrap(plyOutcome.geometry).detectionParameters
+        )
+        XCTAssertLessThan(plyDetection.pValue, 1e-6)
+    }
+
     func testUnwatermarkedConvertLeavesNoOutcome() throws {
         let directory = try makeTemporaryDirectory()
         let sourceURL = directory.appending(path: "box.usdc")

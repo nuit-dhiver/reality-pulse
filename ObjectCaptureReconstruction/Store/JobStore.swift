@@ -53,7 +53,8 @@ class JobStore {
             PersistentJob.self,
             PersistentScheduleSettings.self,
             PersistentMigrationState.self,
-            PersistentExportRecord.self
+            PersistentExportRecord.self,
+            PersistentWatermarkKey.self
         ])
         let configuration = ModelConfiguration(
             schema: schema,
@@ -164,6 +165,25 @@ class JobStore {
         }
     }
 
+    /// Remove records again — used to roll back when the file a record
+    /// describes could not be put in place after the record was saved.
+    func deleteExportRecords(recordIds: [UUID]) {
+        guard !recordIds.isEmpty else { return }
+        do {
+            let ids = Set(recordIds)
+            var descriptor = FetchDescriptor<PersistentExportRecord>(
+                predicate: #Predicate { ids.contains($0.recordId) }
+            )
+            descriptor.includePendingChanges = true
+            for record in try modelContext.fetch(descriptor) {
+                modelContext.delete(record)
+            }
+            try saveIfNeeded()
+        } catch {
+            recordError("Failed to roll back export records: \(error.localizedDescription)", error: error)
+        }
+    }
+
     func exportRecords(jobId: UUID) -> [WatermarkRecord] {
         do {
             var descriptor = FetchDescriptor<PersistentExportRecord>(
@@ -196,6 +216,86 @@ class JobStore {
         } catch {
             recordError("Failed to load export record: \(error.localizedDescription)", error: error)
             return nil
+        }
+    }
+
+    // MARK: - Watermark key library
+
+    /// Saved keys, most recently used first. Returns metadata only — key
+    /// material never leaves the store except through `watermarkKey(id:)`.
+    func watermarkKeys() -> [WatermarkKeyInfo] {
+        do {
+            var descriptor = FetchDescriptor<PersistentWatermarkKey>(
+                sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+            )
+            descriptor.includePendingChanges = true
+            return try modelContext.fetch(descriptor).map(\.info)
+        } catch {
+            recordError("Failed to load watermark keys: \(error.localizedDescription)", error: error)
+            return []
+        }
+    }
+
+    /// Create and save a new labeled key. Returns nil when the label is blank
+    /// or already taken.
+    func createWatermarkKey(label: String) -> WatermarkKeyInfo? {
+        let trimmed = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        do {
+            var descriptor = FetchDescriptor<PersistentWatermarkKey>(
+                predicate: #Predicate { $0.label == trimmed }
+            )
+            descriptor.fetchLimit = 1
+            descriptor.includePendingChanges = true
+            guard try modelContext.fetch(descriptor).isEmpty else { return nil }
+
+            let saved = PersistentWatermarkKey(label: trimmed, key: .random())
+            modelContext.insert(saved)
+            try saveIfNeeded()
+            logger.log("Created watermark key '\(trimmed, privacy: .public)'.")
+            lastErrorMessage = nil
+            return saved.info
+        } catch {
+            modelContext.rollback()
+            recordError("Failed to create watermark key: \(error.localizedDescription)", error: error)
+            return nil
+        }
+    }
+
+    /// Resolve a saved key for embedding, marking it as used.
+    func watermarkKey(id: UUID) -> (key: WatermarkKey, label: String)? {
+        do {
+            var descriptor = FetchDescriptor<PersistentWatermarkKey>(
+                predicate: #Predicate { $0.id == id }
+            )
+            descriptor.fetchLimit = 1
+            descriptor.includePendingChanges = true
+            guard let saved = try modelContext.fetch(descriptor).first,
+                  let key = saved.watermarkKey else { return nil }
+            saved.lastUsedAt = Date()
+            try saveIfNeeded()
+            return (key, saved.label)
+        } catch {
+            recordError("Failed to load watermark key: \(error.localizedDescription)", error: error)
+            return nil
+        }
+    }
+
+    /// Saved keys are provenance history: deleting one makes every file marked
+    /// with it unverifiable, so this is only for keys created by mistake.
+    func deleteWatermarkKey(id: UUID) {
+        do {
+            var descriptor = FetchDescriptor<PersistentWatermarkKey>(
+                predicate: #Predicate { $0.id == id }
+            )
+            descriptor.fetchLimit = 1
+            if let saved = try modelContext.fetch(descriptor).first {
+                modelContext.delete(saved)
+                try saveIfNeeded()
+            }
+        } catch {
+            recordError("Failed to delete watermark key: \(error.localizedDescription)", error: error)
         }
     }
 

@@ -177,7 +177,8 @@ struct QueueDashboardView: View {
                 let exportedFiles = try ModelExportService.exportCompletedOutputs(
                     for: workingJob,
                     formats: [format],
-                    embedWatermark: workingJob.isWatermarkEnabled
+                    embedWatermark: workingJob.isWatermarkEnabled,
+                    sharedKey: appDataModel.scheduler.sharedWatermarkKey(for: workingJob)
                 )
                 guard !exportedFiles.isEmpty else {
                     exportErrorMessage = "No completed USDZ outputs were available to export."

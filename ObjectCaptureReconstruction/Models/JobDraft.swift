@@ -42,6 +42,8 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
     var exportFormats: Set<ModelExportFormat> = []
     var embedWatermark = false
+    /// Selected saved key; nil means a fresh per-copy key per exported file.
+    var watermarkKeyId: UUID?
 
     // MARK: - Error surface (used by ImageFolderView, ModelFolderView, etc.)
 
@@ -65,6 +67,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
         exportFormats = job.exportFormats
         embedWatermark = job.isWatermarkEnabled
+        watermarkKeyId = job.watermarkKeyId
     }
 
     // MARK: - Conversion
@@ -89,6 +92,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         job.boundingBoxAvailable = boundingBoxAvailable
         job.exportFormats = exportFormats
         job.watermarkEnabled = embedWatermark
+        job.watermarkKeyId = embedWatermark ? watermarkKeyId : nil
         return job
     }
 

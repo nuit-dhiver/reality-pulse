@@ -75,6 +75,80 @@ final class ExportRecordStoreTests: XCTestCase {
                        "provenance records must outlive the job")
     }
 
+    // MARK: - Key library
+
+    func testCreatedKeysAreListedAndResolvable() throws {
+        let store = try JobStore(inMemory: true)
+
+        let created = try XCTUnwrap(store.createWatermarkKey(label: "Client A"))
+        XCTAssertEqual(created.label, "Client A")
+
+        XCTAssertEqual(store.watermarkKeys().map(\.label), ["Client A"])
+
+        let resolved = try XCTUnwrap(store.watermarkKey(id: created.id))
+        XCTAssertEqual(resolved.label, "Client A")
+        XCTAssertEqual(resolved.key.data.count, WatermarkKey.byteCount)
+
+        // Resolving marks the key as used.
+        XCTAssertNotNil(store.watermarkKeys().first?.lastUsedAt)
+    }
+
+    func testKeyLabelsAreUniqueAndTrimmedAndNonEmpty() throws {
+        let store = try JobStore(inMemory: true)
+
+        XCTAssertNotNil(store.createWatermarkKey(label: "Portfolio"))
+        XCTAssertNil(store.createWatermarkKey(label: "Portfolio"), "duplicate labels must be rejected")
+        XCTAssertNil(store.createWatermarkKey(label: "  Portfolio  "), "labels are compared trimmed")
+        XCTAssertNil(store.createWatermarkKey(label: "   "), "blank labels must be rejected")
+        XCTAssertEqual(store.watermarkKeys().count, 1)
+    }
+
+    func testDistinctKeysHaveDistinctMaterial() throws {
+        let store = try JobStore(inMemory: true)
+        let first = try XCTUnwrap(store.createWatermarkKey(label: "One"))
+        let second = try XCTUnwrap(store.createWatermarkKey(label: "Two"))
+
+        let firstKey = try XCTUnwrap(store.watermarkKey(id: first.id)).key
+        let secondKey = try XCTUnwrap(store.watermarkKey(id: second.id)).key
+        XCTAssertNotEqual(firstKey, secondKey)
+    }
+
+    func testMissingKeyResolvesToNil() throws {
+        let store = try JobStore(inMemory: true)
+        XCTAssertNil(store.watermarkKey(id: UUID()))
+    }
+
+    func testSelectedKeyPersistsWithJob() throws {
+        let store = try JobStore(inMemory: true)
+        let created = try XCTUnwrap(store.createWatermarkKey(label: "Client B"))
+
+        var job = ReconstructionJob(
+            imageFolder: URL(fileURLWithPath: "/tmp/images"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Statue"
+        )
+        job.watermarkEnabled = true
+        job.watermarkKeyId = created.id
+        store.saveJob(job)
+
+        XCTAssertEqual(store.loadJobs().first?.watermarkKeyId, created.id)
+    }
+
+    func testKeyLabelRoundTripsThroughRecord() throws {
+        let store = try JobStore(inMemory: true)
+        let jobId = UUID()
+        var record = makeRecord(jobId: jobId)
+        record.keyLabel = "Client A"
+
+        store.saveExportRecords([record])
+        XCTAssertEqual(store.exportRecords(jobId: jobId).first?.keyLabel, "Client A")
+
+        // Per-copy keys stay unlabeled.
+        let otherJobId = UUID()
+        store.saveExportRecords([makeRecord(jobId: otherJobId)])
+        XCTAssertNil(store.exportRecords(jobId: otherJobId).first?.keyLabel)
+    }
+
     func testWatermarkFlagPersistsThroughStore() throws {
         let store = try JobStore(inMemory: true)
         var job = ReconstructionJob(
