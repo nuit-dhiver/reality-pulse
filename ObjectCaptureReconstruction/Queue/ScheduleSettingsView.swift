@@ -70,10 +70,13 @@ struct ScheduleSettingsView: View {
                 Divider()
 
                 Section {
-                    Toggle(
-                        "Prevent system sleep while queue is active",
-                        isOn: $preventSleepWhileQueueActive
-                    )
+                    Toggle(sleepPreventionTitle, isOn: $preventSleepWhileQueueActive)
+
+                    if let sleepPreventionNote {
+                        Text(sleepPreventionNote)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .padding()
@@ -111,7 +114,7 @@ struct ScheduleSettingsView: View {
             }
             .padding()
         }
-        .frame(minWidth: 456, minHeight: 360)
+        .platformSheetFrame(minWidth: 456, minHeight: 360)
         .onAppear {
             let config = appDataModel.scheduler.scheduleConfig
             useDelayedStart = config.delayedStart != nil
@@ -121,6 +124,22 @@ struct ScheduleSettingsView: View {
             windowEndHour = config.allowedWindowEnd ?? 6
             preventSleepWhileQueueActive = config.preventSleepWhileQueueActive
         }
+    }
+
+    private var sleepPreventionTitle: String {
+        #if os(macOS)
+        return "Prevent system sleep while queue is active"
+        #else
+        return "Keep the device awake while queue is active"
+        #endif
+    }
+
+    private var sleepPreventionNote: String? {
+        #if os(macOS)
+        return nil
+        #else
+        return "Reconstruction only makes progress while Reality Pulse is in the foreground, so keep the app open while the queue runs."
+        #endif
     }
 
     private func formattedHour(_ hour: Int) -> String {

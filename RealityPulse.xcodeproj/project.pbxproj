@@ -38,6 +38,11 @@
 		BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */; };
 		BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */; };
 		BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */; };
+		EEEE0001EEEE0001EEEE0001 /* ReconstructionCapability.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0001DDDD0001DDDD0001 /* ReconstructionCapability.swift */; };
+		EEEE0002EEEE0002EEEE0002 /* PlatformUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0002DDDD0002DDDD0002 /* PlatformUI.swift */; };
+		EEEE0003EEEE0003EEEE0003 /* FolderAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0003DDDD0003DDDD0003 /* FolderAccess.swift */; };
+		EEEE0004EEEE0004EEEE0004 /* QueueAwakeAssertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0004DDDD0004DDDD0004 /* QueueAwakeAssertion.swift */; };
+		EEEE0005EEEE0005EEEE0005 /* ReconstructionCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD0005DDDD0005DDDD0005 /* ReconstructionCapabilityTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +98,11 @@
 		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
 		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
 		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
+		DDDD0001DDDD0001DDDD0001 /* ReconstructionCapability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionCapability.swift; sourceTree = "<group>"; };
+		DDDD0002DDDD0002DDDD0002 /* PlatformUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformUI.swift; sourceTree = "<group>"; };
+		DDDD0003DDDD0003DDDD0003 /* FolderAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderAccess.swift; sourceTree = "<group>"; };
+		DDDD0004DDDD0004DDDD0004 /* QueueAwakeAssertion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueAwakeAssertion.swift; sourceTree = "<group>"; };
+		DDDD0005DDDD0005DDDD0005 /* ReconstructionCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionCapabilityTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -201,6 +211,7 @@
 				26B0954A2C091C770097324A /* ThumbnailView.swift */,
 				26B095232C091B810097324A /* Processing */,
 				26B095212C091B740097324A /* Settings */,
+				DDDD0100DDDD0100DDDD0100 /* Platform */,
 				AAC7DC5DCD23638D271D3093 /* Models */,
 				992CB303C65294FA4C0E9608 /* Scheduler */,
 				195BAF6352F89DD77AFC2745 /* Store */,
@@ -231,6 +242,7 @@
 				A88318DE6F7346A38820D6CA /* */,
 				C98675D558934377A48B11EB /* */,
 				E3A4F851B39B9C4EA08E7C13 /* */,
+				DDDD0001DDDD0001DDDD0001 /* ReconstructionCapability.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -278,8 +290,19 @@
 				D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */,
 				F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */,
 				AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */,
+				DDDD0005DDDD0005DDDD0005 /* ReconstructionCapabilityTests.swift */,
 			);
 			path = ObjectCaptureReconstructionTests;
+			sourceTree = "<group>";
+		};
+		DDDD0100DDDD0100DDDD0100 /* Platform */ = {
+			isa = PBXGroup;
+			children = (
+				DDDD0002DDDD0002DDDD0002 /* PlatformUI.swift */,
+				DDDD0003DDDD0003DDDD0003 /* FolderAccess.swift */,
+				DDDD0004DDDD0004DDDD0004 /* QueueAwakeAssertion.swift */,
+			);
+			path = Platform;
 			sourceTree = "<group>";
 		};
 		CCCC0001CCCC0001CCCC0001 /* GaussianSplat */ = {
@@ -421,6 +444,10 @@
 				BBBB0004BBBB0004BBBB0004 /* GaussianSplat.swift in Sources */,
 				BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */,
 				BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */,
+				EEEE0001EEEE0001EEEE0001 /* ReconstructionCapability.swift in Sources */,
+				EEEE0002EEEE0002EEEE0002 /* PlatformUI.swift in Sources */,
+				EEEE0003EEEE0003EEEE0003 /* FolderAccess.swift in Sources */,
+				EEEE0004EEEE0004EEEE0004 /* QueueAwakeAssertion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +458,7 @@
 				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
 				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
 				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
+				EEEE0005EEEE0005EEEE0005 /* ReconstructionCapabilityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,10 +528,12 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx15.0;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -558,9 +588,11 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx15.0;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -580,8 +612,10 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -596,13 +630,13 @@
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
 				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
@@ -620,8 +654,10 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -636,13 +672,13 @@
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
 				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};
@@ -665,11 +701,11 @@
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
 			};
 			name = Debug;
@@ -693,11 +729,11 @@
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
 			};
 			name = Release;

@@ -25,9 +25,7 @@ struct ImageFolderSelectionView: View {
             HStack {
                 if let selectedFolder = selectedFolder {
                     HStack {
-                        Image(nsImage: NSWorkspace.shared.icon(for: .folder))
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
+                        PlatformFolderIcon()
 
                         Text("\(selectedFolder.lastPathComponent)")
                     }

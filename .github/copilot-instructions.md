@@ -1,6 +1,6 @@
 # Copilot instructions for `reality-pulse`
 
-Reality Pulse is a macOS SwiftUI app for queued Apple Object Capture / RealityKit photogrammetry. It processes folders of images into USDZ files with scheduling, SwiftData persistence, history, and interrupted-job recovery.
+Reality Pulse is a SwiftUI app for queued Apple Object Capture / RealityKit photogrammetry on Mac, iPhone, and iPad. It processes folders of images into USDZ files with scheduling, SwiftData persistence, history, and interrupted-job recovery. One target and one scheme build every platform.
 
 ## Build, test, and lint
 
@@ -15,6 +15,7 @@ xcodebuild -project RealityPulse.xcodeproj \
   build
 ```
 
+- Swap the destination to build the same target for mobile, for example `-destination 'platform=iOS Simulator,name=iPhone 16'` or `-destination 'platform=iOS Simulator,name=iPad (10th generation)'`.
 - Run tests with:
 
 ```bash
@@ -25,6 +26,7 @@ xcodebuild -project RealityPulse.xcodeproj \
   test
 ```
 
+- The test target builds for macOS and iOS too, so the suite also runs on an iOS simulator destination.
 - The shared scheme is `RealityPulse`.
 - There is a focused test target in `ObjectCaptureReconstructionTests`.
 - Releases are tag-driven through `.github/workflows/release.yml`; pushing a `v*` tag builds, tests, packages, and publishes the app zip/checksum.
@@ -33,7 +35,7 @@ xcodebuild -project RealityPulse.xcodeproj \
 
 ## High-level architecture
 
-- `ObjectCaptureReconstruction/ObjectCaptureReconstructionApp.swift` creates the SwiftData `ModelContainer` and the main `Reality Pulse` window.
+- `ObjectCaptureReconstruction/ObjectCaptureReconstructionApp.swift` creates the SwiftData `ModelContainer` and the app scene: a `Reality Pulse` window on macOS, a window group on iPhone and iPad.
 - `ObjectCaptureReconstruction/ContentView.swift` owns the `AppDataModel`, performs launch recovery, loads persisted state, and routes the UI.
 - `ObjectCaptureReconstruction/AppDataModel.swift` is the central application state object. It owns `JobScheduler` plus sheet/editing state for queue workflows.
 - `ObjectCaptureReconstruction/Scheduler/JobScheduler.swift` owns queue operations, sequential processing, schedule-window enforcement, pause/cancel semantics, sleep prevention, notifications, and retry preparation.
@@ -43,6 +45,8 @@ xcodebuild -project RealityPulse.xcodeproj \
 - `ObjectCaptureReconstruction/Queue/` contains the queue dashboard, job rows, job setup sheet, and schedule settings sheet.
 - `ObjectCaptureReconstruction/Settings/` contains folder selection and Object Capture configuration controls.
 - `ObjectCaptureReconstruction/Processing/` renders reconstruction progress and previews completed USDZ output.
+- `ObjectCaptureReconstruction/Models/ReconstructionCapability.swift` reports what Object Capture supports on the current platform, including which detail levels a build can request.
+- `ObjectCaptureReconstruction/Platform/` holds the macOS and iOS differences: bookmark options, security-scoped access, revealing versus sharing finished models, keeping the system awake, and SwiftUI shims.
 
 ## Core behavior to preserve
 
@@ -55,6 +59,14 @@ xcodebuild -project RealityPulse.xcodeproj \
 - Pause takes effect between jobs unless no job is active.
 - Retry of failed, cancelled, or interrupted jobs resets status to `pending` and clears the error.
 - Retry of an interrupted multi-output job should skip an output only when completion was recorded and the USDZ file still exists. Existing unrecorded destination files should be deleted before retry to avoid `file already exists` failures.
+
+## Platform rules
+
+- Object Capture on iOS and iPadOS only offers `PhotogrammetrySession.Request.Detail.reduced`, and has no `meshPrimitive` or `customDetailSpecification`. Those members are absent from the iOS SDK, so using them outside `#if os(macOS)` breaks the mobile build.
+- Ask `ReconstructionCapability` what the platform supports instead of branching on the platform in feature code.
+- Keep stored types complete on every platform. `CodableSessionConfiguration` and `CodableDetailLevel` keep all fields and cases so a saved job decodes the same way everywhere; only the framework conversions are conditional.
+- Route AppKit and UIKit differences through `Platform/`, and guard a macOS-only view's whole file with `#if os(macOS)` plus a guarded call site.
+- A job that requests a detail level this platform cannot produce fails with a clear message instead of silently producing nothing.
 
 ## Key conventions
 
@@ -86,5 +98,6 @@ Add or update tests for changes to:
 - schedule persistence
 - retry, cancel, failed, completed, or interrupted status behavior
 - output request generation and multi-detail retry handling
+- platform capability differences, such as which detail levels a build can request
 
 The test suite uses in-memory SwiftData containers and temporary directories where possible.

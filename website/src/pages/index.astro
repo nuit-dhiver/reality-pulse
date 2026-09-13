@@ -5,11 +5,12 @@ import { withBase } from '../utils/paths';
 
 <BaseLayout title="Reality Pulse">
 	<section class="hero container">
-		<p class="hero-eyebrow">macOS · SwiftUI · Object Capture</p>
+		<p class="hero-eyebrow">macOS · iOS · iPadOS · SwiftUI · Object Capture</p>
 		<h1>Batch photogrammetry for Apple Object Capture</h1>
 		<p class="hero-lead">
 			Reality Pulse turns folders of photos into USDZ 3D models with a persistent queue, scheduled
-			processing windows, SwiftData persistence, and crash-aware retry recovery.
+			processing windows, SwiftData persistence, and crash-aware retry recovery — on a Mac, an
+			iPhone, or an iPad.
 		</p>
 		<div class="hero-actions">
 			<a class="button button-primary" href={withBase('docs/getting-started/')}>Get started</a>
@@ -23,7 +24,8 @@ import { withBase } from '../utils/paths';
 			Apple Object Capture is powerful, but running one folder at a time is tedious when you are
 			scanning products, props, archive objects, or environment assets. Reality Pulse wraps
 			<code>PhotogrammetrySession</code> in a persistent queue so you can prepare a batch, choose
-			output quality, and let the Mac process the work in order.
+			output quality, and let the device process the work in order, on the Mac or on device after
+			a capture session.
 		</p>
 	</section>
 
@@ -35,8 +37,12 @@ import { withBase } from '../utils/paths';
 				<p>Add multiple image folders and process them sequentially with full queue control.</p>
 			</article>
 			<article class="card">
+				<h3>Mac, iPhone, and iPad</h3>
+				<p>One app and one scheme, reconstructing on device on every supported platform.</p>
+			</article>
+			<article class="card">
 				<h3>Multiple detail levels</h3>
-				<p>Generate preview, reduced, medium, full, raw, or custom USDZ outputs from one capture.</p>
+				<p>Generate preview, reduced, medium, full, raw, or custom USDZ outputs from one capture on macOS, and reduced-detail models on iPhone and iPad.</p>
 			</article>
 			<article class="card">
 				<h3>Scheduled processing</h3>

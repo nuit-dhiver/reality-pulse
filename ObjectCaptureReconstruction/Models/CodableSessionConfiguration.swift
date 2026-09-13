@@ -11,6 +11,11 @@ import RealityKit
 /// A fully `Codable` representation of `PhotogrammetrySession.Configuration`
 /// and its nested types. Convert to/from the real framework type with
 /// `toSessionConfiguration()` and `init(from:)`.
+///
+/// Every stored field exists on all platforms so a saved job decodes the same
+/// way everywhere. Only the framework conversions are platform specific: Object
+/// Capture on iPhone and iPad has no mesh primitive selection and no custom
+/// detail specification, so those settings are stored but not applied there.
 struct CodableSessionConfiguration: Codable, Equatable {
 
     // MARK: - Top-level fields
@@ -26,6 +31,7 @@ struct CodableSessionConfiguration: Codable, Equatable {
         case triangle
         case quad
 
+        #if os(macOS)
         init(from primitive: PhotogrammetrySession.Configuration.MeshPrimitive) {
             switch primitive {
             case .triangle: self = .triangle
@@ -40,6 +46,7 @@ struct CodableSessionConfiguration: Codable, Equatable {
             case .quad: return .quad
             }
         }
+        #endif
     }
 
     struct CodableCustomDetailSpecification: Codable, Equatable {
@@ -49,11 +56,14 @@ struct CodableSessionConfiguration: Codable, Equatable {
         var maximumTextureDimension: CodableTextureDimension = .fourK
 
         init() {
+            #if os(macOS)
             let defaults = PhotogrammetrySession.Configuration.CustomDetailSpecification()
             outputTextureMapsRawValue = defaults.outputTextureMaps.rawValue
             maximumPolygonCount = defaults.maximumPolygonCount
+            #endif
         }
 
+        #if os(macOS)
         init(from spec: PhotogrammetrySession.Configuration.CustomDetailSpecification) {
             maximumPolygonCount = spec.maximumPolygonCount
             outputTextureMapsRawValue = spec.outputTextureMaps.rawValue
@@ -69,12 +79,14 @@ struct CodableSessionConfiguration: Codable, Equatable {
             spec.maximumTextureDimension = maximumTextureDimension.toFrameworkType
             return spec
         }
+        #endif
     }
 
     enum CodableTextureFormat: Codable, Equatable {
         case png
         case jpeg(compressionQuality: Float)
 
+        #if os(macOS)
         init(from format: PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureFormat) {
             switch format {
             case .png:
@@ -92,11 +104,13 @@ struct CodableSessionConfiguration: Codable, Equatable {
             case .jpeg(let quality): return .jpeg(compressionQuality: quality)
             }
         }
+        #endif
     }
 
     enum CodableTextureDimension: String, Codable, CaseIterable {
         case oneK, twoK, fourK, eightK, sixteenK
 
+        #if os(macOS)
         init(from dimension: PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureDimension) {
             switch dimension {
             case .oneK: self = .oneK
@@ -117,6 +131,7 @@ struct CodableSessionConfiguration: Codable, Equatable {
             case .sixteenK: return .sixteenK
             }
         }
+        #endif
     }
 
     // MARK: - Conversion
@@ -124,18 +139,22 @@ struct CodableSessionConfiguration: Codable, Equatable {
     init() {}
 
     init(from config: PhotogrammetrySession.Configuration) {
-        meshPrimitive = CodableMeshPrimitive(from: config.meshPrimitive)
         isObjectMaskingEnabled = config.isObjectMaskingEnabled
         ignoreBoundingBox = config.ignoreBoundingBox
+        #if os(macOS)
+        meshPrimitive = CodableMeshPrimitive(from: config.meshPrimitive)
         customDetailSpecification = CodableCustomDetailSpecification(from: config.customDetailSpecification)
+        #endif
     }
 
     func toSessionConfiguration() -> PhotogrammetrySession.Configuration {
         var config = PhotogrammetrySession.Configuration()
-        config.meshPrimitive = meshPrimitive.toFrameworkType
         config.isObjectMaskingEnabled = isObjectMaskingEnabled
         config.ignoreBoundingBox = ignoreBoundingBox
+        #if os(macOS)
+        config.meshPrimitive = meshPrimitive.toFrameworkType
         config.customDetailSpecification = customDetailSpecification.toFrameworkType()
+        #endif
         return config
     }
 }

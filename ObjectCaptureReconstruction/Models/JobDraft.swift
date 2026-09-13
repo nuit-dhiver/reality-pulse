@@ -38,7 +38,10 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     // MARK: - Session configuration (live framework type for picker bindings)
 
     var sessionConfiguration: PhotogrammetrySession.Configuration = PhotogrammetrySession.Configuration()
-    var detailLevelOptionUnderQualityMenu: PhotogrammetrySession.Request.Detail = .medium
+
+    /// The primary detail level. It is a `CodableDetailLevel` rather than the
+    /// framework type because iPhone and iPad only declare `.reduced`.
+    var detailLevelOptionUnderQualityMenu: CodableDetailLevel = ReconstructionCapability.defaultDetailLevel
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
     var exportFormats: Set<ModelExportFormat> = []
 
@@ -60,7 +63,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         boundingBoxAvailable = job.boundingBoxAvailable
 
         sessionConfiguration = job.sessionConfiguration.toSessionConfiguration()
-        detailLevelOptionUnderQualityMenu = job.primaryDetailLevel.toFrameworkType
+        detailLevelOptionUnderQualityMenu = job.primaryDetailLevel
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
         exportFormats = job.exportFormats
     }
@@ -80,7 +83,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
             modelFolder: modelFolder,
             modelName: modelName,
             sessionConfiguration: CodableSessionConfiguration(from: sessionConfiguration),
-            primaryDetailLevel: CodableDetailLevel(from: detailLevelOptionUnderQualityMenu),
+            primaryDetailLevel: detailLevelOptionUnderQualityMenu,
             additionalDetailLevels: detailLevelOptionsUnderAdvancedMenu,
             createdAt: createdAt
         )

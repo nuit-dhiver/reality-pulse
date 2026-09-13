@@ -41,9 +41,7 @@ struct OutputPreviewView: View {
 
     private var outputFilenames: [String] {
         let name = draft.modelName ?? "Model"
-        var levels: Set<CodableDetailLevel> = [
-            CodableDetailLevel(from: draft.detailLevelOptionUnderQualityMenu)
-        ]
+        var levels: Set<CodableDetailLevel> = [draft.detailLevelOptionUnderQualityMenu]
         if draft.detailLevelOptionsUnderAdvancedMenu.isSelected {
             if draft.detailLevelOptionsUnderAdvancedMenu.preview { levels.insert(.preview) }
             if draft.detailLevelOptionsUnderAdvancedMenu.reduced { levels.insert(.reduced) }

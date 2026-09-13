@@ -17,7 +17,7 @@ struct MultiModelOutputView: View {
     var body: some View {
         @Bindable var draft = draft
 
-        let primary = CodableDetailLevel(from: draft.detailLevelOptionUnderQualityMenu)
+        let primary = draft.detailLevelOptionUnderQualityMenu
 
         VStack(alignment: .leading, spacing: 6) {
             Toggle("Generate additional models", isOn: $draft.detailLevelOptionsUnderAdvancedMenu.isSelected)
@@ -40,7 +40,7 @@ struct MultiModelOutputView: View {
                         levelToggle("Raw", level: .raw, primary: primary,
                                     isOn: $draft.detailLevelOptionsUnderAdvancedMenu.raw)
                     }
-                    .toggleStyle(.checkbox)
+                    .platformCheckboxToggleStyle()
                     .padding(.vertical, 2)
                 }
                 .padding(.leading, 4)
@@ -48,8 +48,8 @@ struct MultiModelOutputView: View {
         }
         .onChange(of: draft.detailLevelOptionUnderQualityMenu) {
             // Uncheck the new primary level if it was selected as an additional level.
-            let newPrimary = CodableDetailLevel(from: draft.detailLevelOptionUnderQualityMenu)
-            clearAdditionalLevel(newPrimary, in: &draft.detailLevelOptionsUnderAdvancedMenu)
+            clearAdditionalLevel(draft.detailLevelOptionUnderQualityMenu,
+                                 in: &draft.detailLevelOptionsUnderAdvancedMenu)
         }
     }
 

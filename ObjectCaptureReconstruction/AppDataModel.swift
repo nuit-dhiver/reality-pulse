@@ -88,6 +88,8 @@ extension PhotogrammetrySession.Error: @retroactive CustomStringConvertible {
     }
 }
 
+// The custom detail specification only exists on macOS.
+#if os(macOS)
 extension PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureFormat: @retroactive Hashable {
     public func hash(into hasher: inout Hasher) {
         switch self {
@@ -99,3 +101,4 @@ extension PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureF
         }
     }
 }
+#endif

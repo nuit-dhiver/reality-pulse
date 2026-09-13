@@ -19,10 +19,8 @@ struct ModelFolderView: View {
                 HStack {
                     if let selectedFolder = draft.modelFolder {
                         HStack {
-                            Image(nsImage: NSWorkspace.shared.icon(for: .folder))
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                            
+                            PlatformFolderIcon()
+
                             Text("\(selectedFolder.lastPathComponent)")
                         }
                     } else {

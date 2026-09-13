@@ -3,7 +3,8 @@ See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Reconstruction options laid out as distinct sections: quality, multi-model
-output, output preview, mesh type, masking, and bounding box.
+output, output preview, mesh type, masking, and bounding box. Options Object
+Capture only offers on macOS are left out of the iPhone and iPad builds.
 */
 
 import SwiftUI
@@ -14,7 +15,9 @@ struct ReconstructionOptionsView: View {
 
         Divider()
 
-        MultiModelOutputView()
+        if ReconstructionCapability.supportsMultipleDetailLevels {
+            MultiModelOutputView()
+        }
 
         ExportFormatView()
 
@@ -22,7 +25,9 @@ struct ReconstructionOptionsView: View {
 
         Divider()
 
+        #if os(macOS)
         MeshTypeView()
+        #endif
         MaskingView()
         IgnoreBoundingBoxView()
     }

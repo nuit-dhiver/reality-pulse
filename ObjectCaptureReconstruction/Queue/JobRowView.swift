@@ -94,7 +94,7 @@ struct JobRowView: View {
 
     private var detailLevelSummary: String {
         let levels = job.allRequestedDetailLevels
-            .map { $0.rawValue.capitalized }
+            .map(\.displayName)
             .sorted()
             .joined(separator: ", ")
         return levels.isEmpty ? "No detail levels" : levels

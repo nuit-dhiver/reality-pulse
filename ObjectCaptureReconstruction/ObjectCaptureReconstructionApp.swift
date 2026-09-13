@@ -21,16 +21,28 @@ struct ObjectCaptureReconstructionApp: App {
     }
 
     var body: some Scene {
+        #if os(macOS)
         Window("Reality Pulse", id: "main") {
-            if case .success(let modelContainer) = modelContainerResult {
-                ContentView(modelContainerResult: modelContainerResult)
-                    .modelContainer(modelContainer)
-                    .frame(minWidth: 840, minHeight: 600)
-            } else {
-                ContentView(modelContainerResult: modelContainerResult)
-                    .frame(minWidth: 840, minHeight: 600)
-            }
+            rootView
+                .frame(minWidth: 840, minHeight: 600)
         }
         .defaultSize(width: 960, height: 720)
+        #else
+        // iPhone and iPad manage their own window size, so the app uses a
+        // single scene without a minimum frame.
+        WindowGroup {
+            rootView
+        }
+        #endif
+    }
+
+    @ViewBuilder
+    private var rootView: some View {
+        if case .success(let modelContainer) = modelContainerResult {
+            ContentView(modelContainerResult: modelContainerResult)
+                .modelContainer(modelContainer)
+        } else {
+            ContentView(modelContainerResult: modelContainerResult)
+        }
     }
 }

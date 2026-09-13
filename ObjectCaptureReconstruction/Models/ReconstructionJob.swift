@@ -66,12 +66,12 @@ struct ReconstructionJob: Identifiable, Codable {
         self.exportFormats = exportFormats
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
-            options: .withSecurityScope,
+            options: FolderBookmark.creationOptions,
             includingResourceValuesForKeys: nil,
             relativeTo: nil
         ))
         self.modelFolderBookmark = modelFolderBookmark ?? (try? modelFolder.bookmarkData(
-            options: .withSecurityScope,
+            options: FolderBookmark.creationOptions,
             includingResourceValuesForKeys: nil,
             relativeTo: nil
         ))
@@ -98,6 +98,12 @@ struct ReconstructionJob: Identifiable, Codable {
 
     var requestedOutputCount: Int {
         requestedDetailLevels.count
+    }
+
+    /// Requested detail levels Object Capture cannot produce on this platform.
+    /// Always empty on macOS; on iPhone and iPad, everything but `.reduced`.
+    var unsupportedDetailLevels: [CodableDetailLevel] {
+        requestedDetailLevels.filter { !$0.isSupportedOnThisPlatform }
     }
 
     func outputURL(for level: CodableDetailLevel) -> URL {
@@ -154,8 +160,10 @@ struct ReconstructionJob: Identifiable, Codable {
                 return nil
             }
 
+            guard let detail = level.frameworkDetail else { return nil }
+
             let url = outputURL(for: level)
-            return .modelFile(url: url, detail: level.toFrameworkType)
+            return .modelFile(url: url, detail: detail)
         }
     }
 
@@ -169,19 +177,27 @@ struct ReconstructionJob: Identifiable, Codable {
 
         if let data = imageFolderBookmark {
             var stale = false
-            if let url = try? URL(resolvingBookmarkData: data, options: .withSecurityScope, bookmarkDataIsStale: &stale) {
+            if let url = try? URL(resolvingBookmarkData: data,
+                                  options: FolderBookmark.resolutionOptions,
+                                  bookmarkDataIsStale: &stale) {
                 imageURL = url
                 imageFolder = url
-                if stale { imageFolderBookmark = try? url.bookmarkData(options: .withSecurityScope) }
+                if stale {
+                    imageFolderBookmark = try? url.bookmarkData(options: FolderBookmark.creationOptions)
+                }
             }
         }
 
         if let data = modelFolderBookmark {
             var stale = false
-            if let url = try? URL(resolvingBookmarkData: data, options: .withSecurityScope, bookmarkDataIsStale: &stale) {
+            if let url = try? URL(resolvingBookmarkData: data,
+                                  options: FolderBookmark.resolutionOptions,
+                                  bookmarkDataIsStale: &stale) {
                 modelURL = url
                 modelFolder = url
-                if stale { modelFolderBookmark = try? url.bookmarkData(options: .withSecurityScope) }
+                if stale {
+                    modelFolderBookmark = try? url.bookmarkData(options: FolderBookmark.creationOptions)
+                }
             }
         }
 
@@ -225,19 +241,20 @@ enum JobStatus: String, Codable, CaseIterable {
 enum CodableDetailLevel: String, Codable, CaseIterable, Hashable {
     case preview, reduced, medium, full, raw, custom
 
-    init(from detail: PhotogrammetrySession.Request.Detail) {
-        switch detail {
-        case .preview:  self = .preview
-        case .reduced:  self = .reduced
-        case .medium:   self = .medium
-        case .full:     self = .full
-        case .raw:      self = .raw
-        case .custom:   self = .custom
-        @unknown default: self = .medium
-        }
+    /// Whether Object Capture can produce this level on the current platform.
+    var isSupportedOnThisPlatform: Bool {
+        ReconstructionCapability.supportedDetailLevels.contains(self)
     }
 
-    var toFrameworkType: PhotogrammetrySession.Request.Detail {
+    /// Display name used in menus, summaries, and error messages.
+    var displayName: String {
+        rawValue.capitalized
+    }
+
+    /// The matching framework detail level, or `nil` when this platform's
+    /// Object Capture implementation does not offer it.
+    var frameworkDetail: PhotogrammetrySession.Request.Detail? {
+        #if os(macOS)
         switch self {
         case .preview:  return .preview
         case .reduced:  return .reduced
@@ -246,6 +263,13 @@ enum CodableDetailLevel: String, Codable, CaseIterable, Hashable {
         case .raw:      return .raw
         case .custom:   return .custom
         }
+        #else
+        // iPhone and iPad only expose the reduced detail level.
+        switch self {
+        case .reduced:  return .reduced
+        default:        return nil
+        }
+        #endif
     }
 }
 

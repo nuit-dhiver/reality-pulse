@@ -11,12 +11,42 @@ import os
 private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
                             category: "QueueDashboardView")
 
+#if !os(macOS)
+/// Files handed to the system share sheet on iPhone and iPad. It keeps the
+/// output folder's security scope alive until the sheet is dismissed.
+private struct ShareRequest: Identifiable {
+    let id = UUID()
+    let urls: [URL]
+    let access: SecurityScopedAccess
+}
+#endif
+
 struct QueueDashboardView: View {
     @Environment(AppDataModel.self) private var appDataModel: AppDataModel
     @State private var isExporting = false
     @State private var exportErrorMessage: String?
 
+    #if os(macOS)
     var body: some View {
+        queue
+    }
+    #else
+    @State private var shareRequest: ShareRequest?
+
+    var body: some View {
+        queue
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
+            }
+            .sheet(item: $shareRequest) { request in
+                ShareSheet(urls: request.urls)
+            }
+    }
+    #endif
+
+    private var queue: some View {
         VStack(spacing: 0) {
             // Header with queue controls
             QueueHeaderView()
@@ -71,9 +101,16 @@ struct QueueDashboardView: View {
             ForEach(appDataModel.scheduler.jobs) { job in
                 JobRowView(job: job)
                     .contextMenu {
+                        #if os(macOS)
                         Button("Show in Finder") {
-                            showInFinder(job)
+                            revealOutputs(of: job)
                         }
+                        #else
+                        Button("Share Models…") {
+                            shareOutputs(of: job)
+                        }
+                        .disabled(!hasCompletedOutputs(job))
+                        #endif
 
                         if hasCompletedOutputs(job) {
                             Menu("Export As") {
@@ -115,10 +152,11 @@ struct QueueDashboardView: View {
                 appDataModel.scheduler.moveJob(from: source, to: destination)
             }
         }
-        .listStyle(.inset(alternatesRowBackgrounds: true))
+        .platformQueueListStyle()
     }
 
-    private func showInFinder(_ job: ReconstructionJob) {
+    #if os(macOS)
+    private func revealOutputs(of job: ReconstructionJob) {
         var job = job
         let (_, modelURL) = job.resolveBookmarks()
         let folderURL = modelURL ?? job.modelFolder
@@ -130,15 +168,29 @@ struct QueueDashboardView: View {
             }
         }
 
-        let outputURLs = job.requestedDetailLevels
+        OutputReveal.reveal(files: existingOutputURLs(of: job), inFolder: folderURL)
+    }
+    #else
+    private func shareOutputs(of job: ReconstructionJob) {
+        var job = job
+        let (_, modelURL) = job.resolveBookmarks()
+        let folderURL = modelURL ?? job.modelFolder
+        let access = SecurityScopedAccess(folderURL)
+
+        let outputURLs = existingOutputURLs(of: job)
+        guard !outputURLs.isEmpty else {
+            exportErrorMessage = "No finished models are available to share yet."
+            return
+        }
+
+        shareRequest = ShareRequest(urls: outputURLs, access: access)
+    }
+    #endif
+
+    private func existingOutputURLs(of job: ReconstructionJob) -> [URL] {
+        job.requestedDetailLevels
             .map { job.outputURL(for: $0) }
             .filter { FileManager.default.fileExists(atPath: $0.path) }
-
-        if outputURLs.isEmpty {
-            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)
-        } else {
-            NSWorkspace.shared.activateFileViewerSelecting(outputURLs)
-        }
     }
 
     private func hasCompletedOutputs(_ job: ReconstructionJob) -> Bool {
@@ -173,11 +225,21 @@ struct QueueDashboardView: View {
                     exportErrorMessage = "No completed USDZ outputs were available to export."
                     return
                 }
-                NSWorkspace.shared.activateFileViewerSelecting(exportedURLs)
+                presentExportedFiles(exportedURLs, in: folderURL)
             } catch {
                 exportErrorMessage = error.localizedDescription
             }
         }
+    }
+
+    /// Shows freshly exported files: in the Finder on macOS, and through the
+    /// share sheet on iPhone and iPad.
+    private func presentExportedFiles(_ urls: [URL], in folderURL: URL) {
+        #if os(macOS)
+        OutputReveal.reveal(files: urls, inFolder: folderURL)
+        #else
+        shareRequest = ShareRequest(urls: urls, access: SecurityScopedAccess(folderURL))
+        #endif
     }
 }
 
@@ -224,7 +286,14 @@ private struct QueueHeaderView: View {
                         scheduler.start()
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(scheduler.deviceCapabilityWarning != nil)
                 }
+            }
+
+            if let deviceCapabilityWarning = scheduler.deviceCapabilityWarning {
+                Label(deviceCapabilityWarning, systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
             }
 
             if let pauseExplanation {

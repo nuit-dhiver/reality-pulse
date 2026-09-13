@@ -3,10 +3,14 @@ See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the maximum dimension of the reconstructed texture maps.
+The custom detail specification is macOS only, so this control is left out of
+the iPhone and iPad builds.
 */
 
 import SwiftUI
 import RealityKit
+
+#if os(macOS)
 
 struct TextureResolutionView: View {
     @Environment(JobDraft.self) private var draft: JobDraft
@@ -32,3 +36,4 @@ struct TextureResolutionView: View {
         }
     }
 }
+#endif

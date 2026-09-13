@@ -84,9 +84,7 @@ struct VideoInputView: View {
                 } label: {
                     HStack {
                         if let videoFile = draft.videoFile {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: videoFile.path))
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
+                            PlatformFileIcon(url: videoFile, symbolName: "video.fill")
                             Text(videoFile.lastPathComponent)
                         } else {
                             Text("Choose Video...")

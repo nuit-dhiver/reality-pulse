@@ -48,7 +48,7 @@ struct JobSetupView: View {
                 .padding()
         }
         .environment(draft)
-        .frame(minWidth: 480, minHeight: 432)
+        .platformSheetFrame(minWidth: 480, minHeight: 432)
         .alert(draft.alertMessage, isPresented: $draft.hasError) {
             Button("OK") {}
         }

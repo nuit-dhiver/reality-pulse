@@ -7,7 +7,7 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = 'A macOS photogrammetry queue for Apple Object Capture.' } = Astro.props;
+const { title, description = 'A photogrammetry queue for Apple Object Capture on Mac, iPhone, and iPad.' } = Astro.props;
 const siteTitle = title === 'Reality Pulse' ? title : `${title} · Reality Pulse`;
 const homePath = withBase();
 const docsPath = withBase('docs/');
@@ -44,7 +44,7 @@ const docsPath = withBase('docs/');
 
 		<footer class="site-footer">
 			<div class="container">
-				<p>Reality Pulse — macOS photogrammetry queue for Apple Object Capture.</p>
+				<p>Reality Pulse — photogrammetry queue for Apple Object Capture on Mac, iPhone, and iPad.</p>
 				<p>
 					<a href="https://github.com/nuit-dhiver/reality-pulse">Source</a>
 					&nbsp;·&nbsp;

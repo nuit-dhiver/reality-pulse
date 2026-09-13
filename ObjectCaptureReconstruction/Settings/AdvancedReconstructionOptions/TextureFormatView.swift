@@ -3,10 +3,14 @@ See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
 Choose the output format to use for all textures.
+The custom detail specification is macOS only, so this control is left out of
+the iPhone and iPad builds.
 */
 
 import SwiftUI
 import RealityKit
+
+#if os(macOS)
 
 struct TextureFormatView: View {
     @Environment(JobDraft.self) private var draft: JobDraft
@@ -23,3 +27,4 @@ struct TextureFormatView: View {
         }
     }
 }
+#endif

@@ -1,6 +1,8 @@
 # Reality Pulse Architecture
 
-Reality Pulse is a native macOS SwiftUI app built around Apple Object Capture's `PhotogrammetrySession`. The app's main responsibility is to turn single-session reconstruction into a persistent, scheduled, retryable queue.
+Reality Pulse is a native SwiftUI app built around Apple Object Capture's `PhotogrammetrySession`. The app's main responsibility is to turn single-session reconstruction into a persistent, scheduled, retryable queue.
+
+One target and one scheme build the app for macOS, iOS, and iPadOS. The queue, scheduler, persistence, and export code are shared; the platform differences live in `ReconstructionCapability` and `Platform/`.
 
 ## Runtime Flow
 
@@ -25,7 +27,7 @@ ObjectCaptureReconstructionApp
 
 ### App Entry
 
-`ObjectCaptureReconstructionApp` owns the app-level SwiftData container and creates a single `Reality Pulse` window.
+`ObjectCaptureReconstructionApp` owns the app-level SwiftData container and creates the app's scene: a single `Reality Pulse` window with a minimum size on macOS, and a window group on iPhone and iPad, where `ContentView` also wraps the dashboard in a navigation stack.
 
 ### App State
 
@@ -53,6 +55,26 @@ SwiftUI views receive it through `@Environment(AppDataModel.self)`.
 - per-output retry preparation
 
 The scheduler does not auto-start restored work after launch. The user must press **Start**.
+
+### Platform Capabilities
+
+`ReconstructionCapability` answers what Object Capture supports where, so feature code asks it instead of testing the platform:
+
+- `supportedDetailLevels`: every level on macOS, and `.reduced` alone on iOS and iPadOS, which is all Object Capture exposes there
+- `defaultDetailLevel`: the level a new job starts with
+- `supportsMultipleDetailLevels`, `supportsCustomDetailSpecification`, `supportsMeshPrimitiveSelection`: which settings the job-setup UI shows
+- `isSupportedOnThisDevice`: `PhotogrammetrySession.isSupported`, which gates the queue's **Start** button and `JobScheduler.start()`
+- the messages shown for an unsupported device and for a job that asks for a detail level this platform cannot produce
+
+`CodableDetailLevel` keeps every case on every platform so stored jobs decode identically, and maps to the framework type through the optional `frameworkDetail`, which is `nil` for a level the platform cannot request. `CodableSessionConfiguration` does the same for settings: it stores mesh primitive and custom detail specification everywhere, and only converts them to framework values on macOS.
+
+`Platform/` holds the rest of the differences:
+
+- `FolderBookmark`: security-scoped bookmark options, which iOS bookmarks do not need
+- `SecurityScopedAccess`: access that lives as long as the object, used while the share sheet reads models
+- `OutputReveal`: reveal in the Finder on macOS; the mobile builds share instead
+- `QueueAwakeAssertion`: a `ProcessInfo` activity on macOS, and the idle timer on iPhone and iPad
+- `PlatformUI`: folder and file icons, the share sheet, and the toggle, list, and sheet-sizing shims
 
 ### Persistence
 
@@ -95,14 +117,16 @@ This avoids `file already exists` failures while preventing partial or ambiguous
 The `Settings/` views configure `PhotogrammetrySession.Configuration`, including:
 
 - detail level
-- additional model outputs
-- mesh primitive
+- additional model outputs (macOS)
+- mesh primitive (macOS)
 - masking
 - bounding-box behavior
-- custom polygon count
-- texture maps
-- texture format
-- texture dimension
+- custom polygon count (macOS)
+- texture maps (macOS)
+- texture format (macOS)
+- texture dimension (macOS)
+
+The macOS-only controls guard their whole file with `#if os(macOS)`, and `ReconstructionOptionsView` only references them from a guarded call site. On iPhone and iPad the quality row shows the single supported level instead of a picker.
 
 ### Processing UI
 
@@ -110,7 +134,9 @@ The `Processing/` views display progress, estimated time remaining, completion s
 
 ## Data And File Access
 
-The app is sandboxed. User-selected input and output folders are stored with security-scoped bookmarks so the queue can access them after relaunch.
+The app is sandboxed. User-selected input and output folders are stored with security-scoped bookmarks so the queue can access them after relaunch. macOS creates and resolves those bookmarks with an explicit security scope; bookmarks on iPhone and iPad are implicitly scoped, so `FolderBookmark` supplies the right options for each.
+
+The mobile builds declare `UIFileSharingEnabled` and `LSSupportsOpeningDocumentsInPlace`, so capture folders can be copied into the app's documents folder with the Files app and finished models copied back out.
 
 ## Test Coverage
 
@@ -125,3 +151,4 @@ The focused test target verifies:
 - completed-output preservation on retry
 - stale output deletion before retry
 - one-time legacy JSON migration
+- platform detail-level support, the requests a job creates from it, and stored settings round-tripping unchanged on every platform

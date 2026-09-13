@@ -19,9 +19,8 @@ struct ContentView: View {
     }
 
     var body: some View {
-        QueueDashboardView()
+        dashboard
             .environment(appDataModel)
-            .navigationTitle("Reality Pulse")
             .sheet(isPresented: $appDataModel.showingJobSetup) {
                 JobSetupView(existingJob: appDataModel.editingJob)
                     .environment(appDataModel)
@@ -45,5 +44,21 @@ struct ContentView: View {
                     appDataModel.state = .idle
                 }
             }
+    }
+
+    /// The queue dashboard, wrapped in a navigation stack on iPhone and iPad so
+    /// the title and the queue's edit controls have somewhere to live.
+    @ViewBuilder
+    private var dashboard: some View {
+        #if os(macOS)
+        QueueDashboardView()
+            .navigationTitle("Reality Pulse")
+        #else
+        NavigationStack {
+            QueueDashboardView()
+                .navigationTitle("Reality Pulse")
+                .navigationBarTitleDisplayMode(.inline)
+        }
+        #endif
     }
 }

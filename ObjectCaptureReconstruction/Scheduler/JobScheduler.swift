@@ -42,7 +42,7 @@ class JobScheduler {
 
     private var processingTask: Task<Void, Never>?
     private var currentSession: PhotogrammetrySession?
-    private var sleepPreventionActivity: NSObjectProtocol?
+    private let awakeAssertion = QueueAwakeAssertion()
     private var isLoadingPersistedState = false
     private let store: JobStore
 
@@ -52,6 +52,14 @@ class JobScheduler {
 
     var persistenceErrorMessage: String? {
         store.lastErrorMessage
+    }
+
+    /// Non-`nil` when this device cannot run Object Capture reconstruction, in
+    /// which case the queue refuses to start.
+    var deviceCapabilityWarning: String? {
+        ReconstructionCapability.isSupportedOnThisDevice
+            ? nil
+            : ReconstructionCapability.deviceUnsupportedMessage
     }
 
     // MARK: - Persistence helpers
@@ -125,6 +133,10 @@ class JobScheduler {
 
     func start() {
         guard !isRunning else { return }
+        guard ReconstructionCapability.isSupportedOnThisDevice else {
+            logger.warning("Start ignored: \(ReconstructionCapability.deviceUnsupportedMessage, privacy: .public)")
+            return
+        }
         isRunning = true
         isPaused = false
         isPauseRequested = false
@@ -245,26 +257,10 @@ class JobScheduler {
 
     private func updateSleepPreventionActivity() {
         if shouldPreventSleep {
-            beginSleepPreventionActivityIfNeeded()
+            awakeAssertion.begin()
         } else {
-            endSleepPreventionActivityIfNeeded()
+            awakeAssertion.end()
         }
-    }
-
-    private func beginSleepPreventionActivityIfNeeded() {
-        guard sleepPreventionActivity == nil else { return }
-        sleepPreventionActivity = ProcessInfo.processInfo.beginActivity(
-            options: [.idleSystemSleepDisabled],
-            reason: "Reality Pulse queue is active"
-        )
-        logger.log("Sleep prevention activity started.")
-    }
-
-    private func endSleepPreventionActivityIfNeeded() {
-        guard let activity = sleepPreventionActivity else { return }
-        ProcessInfo.processInfo.endActivity(activity)
-        sleepPreventionActivity = nil
-        logger.log("Sleep prevention activity ended.")
     }
 
     private func processJob(at index: Int) async {
@@ -293,6 +289,18 @@ class JobScheduler {
 
         jobs[index].progress = jobs[index].completedOutputFraction()
         persist()
+
+        let unsupportedLevels = jobs[index].unsupportedDetailLevels
+        guard unsupportedLevels.isEmpty else {
+            let message = ReconstructionCapability.unsupportedDetailLevelMessage(for: unsupportedLevels)
+            logger.warning("Job \(jobId) requests unsupported detail: \(message, privacy: .public)")
+            jobs[index].status = .failed
+            jobs[index].errorMessage = message
+            sendNotification(title: "Job Failed", body: jobName)
+            currentJobId = nil
+            persist()
+            return
+        }
 
         let config = jobs[index].sessionConfiguration.toSessionConfiguration()
         let totalOutputCount = jobs[index].requestedOutputCount

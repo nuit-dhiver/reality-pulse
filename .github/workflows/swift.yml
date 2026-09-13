@@ -1,4 +1,4 @@
-name: Build macOS app
+name: Build macOS and mobile apps
 
 on:
   push:
@@ -13,7 +13,8 @@ on:
       - ".github/workflows/website.yml"
 
 jobs:
-  build:
+  macos:
+    name: macOS
     runs-on: macos-latest
 
     steps:
@@ -29,3 +30,42 @@ jobs:
             -configuration Debug \
             -destination 'platform=macOS' \
             build
+
+  mobile:
+    name: iPhone and iPad
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Choose simulators
+        run: |
+          echo "IPHONE_SIMULATOR=$(python3 .github/scripts/pick-simulator.py iPhone)" >> "$GITHUB_ENV"
+          echo "IPAD_SIMULATOR=$(python3 .github/scripts/pick-simulator.py iPad)" >> "$GITHUB_ENV"
+
+      - name: Build for iPhone
+        run: |
+          xcodebuild -project RealityPulse.xcodeproj \
+            -scheme RealityPulse \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$IPHONE_SIMULATOR" \
+            build
+
+      - name: Build for iPad
+        run: |
+          xcodebuild -project RealityPulse.xcodeproj \
+            -scheme RealityPulse \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$IPAD_SIMULATOR" \
+            build
+
+      - name: Run tests on iPhone
+        run: |
+          xcodebuild -project RealityPulse.xcodeproj \
+            -scheme RealityPulse \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$IPHONE_SIMULATOR" \
+            test

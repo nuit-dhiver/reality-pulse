@@ -4,10 +4,14 @@ See the LICENSE.txt file for this sample's licensing information.
 Abstract:
 Choose the output texture maps to include in the output model.
 TextureMapOutputs is an OptionSet so multiple maps can be selected.
+The custom detail specification is macOS only, so this control is left out of
+the iPhone and iPad builds.
 */
 
 import SwiftUI
 import RealityKit
+
+#if os(macOS)
 
 private typealias TMO = PhotogrammetrySession.Configuration.CustomDetailSpecification.TextureMapOutputs
 
@@ -53,3 +57,4 @@ struct TextureMapsView: View {
         )
     }
 }
+#endif

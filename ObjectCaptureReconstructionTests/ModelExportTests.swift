@@ -84,6 +84,13 @@ final class ModelExportTests: XCTestCase {
     }
 
     private func writeSampleUSD(to url: URL) throws {
+        // Model I/O only exports USD on platforms that ship the USD plug-in, so
+        // the sample asset these tests read cannot always be created.
+        try XCTSkipUnless(
+            MDLAsset.canExportFileExtension(url.pathExtension),
+            "Model I/O cannot export .\(url.pathExtension) on this platform."
+        )
+
         let allocator = MDLMeshBufferDataAllocator()
         let mesh = MDLMesh(
             boxWithExtent: SIMD3<Float>(0.2, 0.2, 0.2),
