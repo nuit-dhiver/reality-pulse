@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+Export settings for Mac App Store builds, used by .github/workflows/app-store.yml:
+
+  xcodebuild -exportArchive -archivePath build/RealityPulse.xcarchive \
+    -exportOptionsPlist scripts/ExportOptions.plist -exportPath build/export
+
+Signing is manual so CI doesn't need a registered Mac. It expects:
+- an "Apple Distribution" certificate and a "Mac Installer Distribution"
+  certificate (common name "3rd Party Mac Developer Installer: …") in the keychain
+- a Mac App Store provisioning profile for com.openmuseum.realitypulse named
+  "Reality Pulse Mac App Store" (downloaded automatically when
+  -allowProvisioningUpdates is passed with an App Store Connect API key)
+
+The team ID is inserted by the workflow, so it isn't stored here.
+-->
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>destination</key>
+	<string>export</string>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>installerSigningCertificate</key>
+	<string>3rd Party Mac Developer Installer</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.openmuseum.realitypulse</key>
+		<string>Reality Pulse Mac App Store</string>
+	</dict>
+	<key>uploadSymbols</key>
+	<true/>
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>
