@@ -613,7 +613,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ObjectCaptureReconstruction/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Mohammad-Hossein Emami. Released under the MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sayed Mohammad Hossein Emami. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -652,7 +652,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ObjectCaptureReconstruction/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Mohammad-Hossein Emami. Released under the MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sayed Mohammad Hossein Emami. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
