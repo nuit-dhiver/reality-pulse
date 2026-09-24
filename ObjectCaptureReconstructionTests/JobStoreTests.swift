@@ -36,7 +36,8 @@ final class JobStoreTests: XCTestCase {
             delayedStart: delayedStart,
             allowedWindowStart: 22,
             allowedWindowEnd: 6,
-            preventSleepWhileQueueActive: true
+            preventSleepWhileQueueActive: true,
+            notifyOnQueueEvents: true
         )
 
         JobStore(modelContainer: container).saveSchedule(schedule)
