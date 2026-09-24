@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Samples the base (diffuse) color of an `MDLMaterial` at a UV coordinate. The

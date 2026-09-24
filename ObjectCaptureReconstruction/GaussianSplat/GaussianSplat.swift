@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 A single 3D Gaussian splat in the de-facto 3DGS storage convention. Values are

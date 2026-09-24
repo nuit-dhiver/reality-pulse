@@ -8,8 +8,8 @@ Reality Pulse is a native macOS app. Clone the repository, open the Xcode projec
 
 ## Requirements
 
-- macOS 14.0 or newer
-- Xcode 15.0 or newer
+- macOS 15.0 or newer
+- Xcode 16.0 or newer
 - A Mac supported by Apple Object Capture / RealityKit photogrammetry
 - Photo sets suitable for `PhotogrammetrySession`
 

@@ -2,8 +2,8 @@
 
 [![Build macOS app](https://github.com/nuit-dhiver/reality-pulse/actions/workflows/swift.yml/badge.svg)](https://github.com/nuit-dhiver/reality-pulse/actions/workflows/swift.yml)
 [![Swift](https://img.shields.io/badge/Swift-5-orange.svg)](https://www.swift.org/)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-blue.svg)](https://developer.apple.com/macos/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![macOS](https://img.shields.io/badge/macOS-15%2B-blue.svg)](https://developer.apple.com/macos/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Reality Pulse is a macOS photogrammetry queue for Apple Object Capture.** It turns folders of photos into USDZ 3D models with a SwiftUI batch interface, RealityKit reconstruction settings, scheduled processing windows, SwiftData persistence, and crash-aware retry recovery.
 
@@ -42,8 +42,8 @@ Reality Pulse restores the queue on launch, but it does not automatically start 
 
 ## Requirements
 
-- macOS 14.0 or newer
-- Xcode 15.0 or newer
+- macOS 15.0 or newer
+- Xcode 16.0 or newer
 - A Mac supported by Apple Object Capture / RealityKit photogrammetry
 - Photo sets suitable for `PhotogrammetrySession`
 
@@ -90,6 +90,20 @@ git push origin v1.1.0
 The release workflow builds `Reality Pulse.app` in Release configuration, runs the test suite, packages the app as a zip, writes a SHA-256 checksum, and attaches both files to the GitHub Release.
 
 The current release artifact is ad-hoc signed for local/open-source distribution, not notarized.
+
+### Versioning
+
+Bump the version before tagging or uploading to App Store Connect. Every command except `show` also increments the build number, which App Store Connect requires to increase with each upload:
+
+```bash
+scripts/bump-version.sh patch
+```
+
+Use `show`, `build`, `patch`, `minor`, `major`, or `set 1.4.0`.
+
+### Mac App Store
+
+The app target is sandboxed (`com.apple.security.files.user-selected.read-write` only), ships a privacy manifest (`PrivacyInfo.xcprivacy`), and declares `ITSAppUsesNonExemptEncryption = NO`. The bundle identifier is `com.openmuseum.realitypulse`. The privacy policy is in [PRIVACY.md](PRIVACY.md).
 
 ## Usage Notes
 
@@ -166,4 +180,4 @@ These topics help developers find the project when searching for SwiftUI photogr
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. It also contains components originally provided by Apple Inc. under the MIT License. See [LICENSE](LICENSE) for the full license text and retain upstream notices in sample-derived files.
+This project is licensed under the MIT License. It also contains components originally provided by Apple Inc. under the MIT License. See [LICENSE](LICENSE) for the full license text, including the Apple notice.
