@@ -1,0 +1,201 @@
+name: Mac App Store build
+
+# Archives, signs, and exports the Mac App Store package. Upload to App Store
+# Connect only happens when the "upload" box is ticked, so a run without it is
+# a dry run that still produces the signed .pkg as a workflow artifact.
+#
+# Required repository settings (Settings › Secrets and variables › Actions):
+#   Variables:
+#     APPLE_TEAM_ID                  10-character team ID from developer.apple.com
+#   Secrets:
+#     SIGNING_CERTIFICATES_P12       base64 of one .p12 containing both the
+#                                    "Apple Distribution" and "Mac Installer
+#                                    Distribution" identities (with private keys)
+#     SIGNING_CERTIFICATES_PASSWORD  password of that .p12
+#     ASC_KEY_ID                     App Store Connect API key ID
+#     ASC_ISSUER_ID                  App Store Connect API issuer ID
+#     ASC_PRIVATE_KEY                contents of the AuthKey_<ID>.p8 file
+#
+# The Mac App Store provisioning profile must exist in the developer portal
+# with the name "Reality Pulse Mac App Store" (see scripts/ExportOptions.plist);
+# xcodebuild downloads it using the API key.
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: "Upload the build to App Store Connect"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-store
+  cancel-in-progress: false
+
+env:
+  PROJECT: RealityPulse.xcodeproj
+  SCHEME: RealityPulse
+  ARCHIVE_PATH: build/RealityPulse.xcarchive
+  EXPORT_PATH: build/export
+  PROFILE_NAME: Reality Pulse Mac App Store
+
+jobs:
+  app-store:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Check signing configuration
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          SIGNING_CERTIFICATES_P12: ${{ secrets.SIGNING_CERTIFICATES_P12 }}
+          SIGNING_CERTIFICATES_PASSWORD: ${{ secrets.SIGNING_CERTIFICATES_PASSWORD }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          missing=()
+          for name in APPLE_TEAM_ID SIGNING_CERTIFICATES_P12 SIGNING_CERTIFICATES_PASSWORD \
+                      ASC_KEY_ID ASC_ISSUER_ID ASC_PRIVATE_KEY; do
+            [ -n "${!name}" ] || missing+=("$name")
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Missing repository settings: ${missing[*]}. See the header of .github/workflows/app-store.yml."
+            exit 1
+          fi
+
+      - name: Install App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          # altool looks for keys in ~/.appstoreconnect/private_keys.
+          key_dir="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$key_dir"
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_dir/AuthKey_${ASC_KEY_ID}.p8"
+          chmod 600 "$key_dir/AuthKey_${ASC_KEY_ID}.p8"
+          echo "ASC_KEY_PATH=$key_dir/AuthKey_${ASC_KEY_ID}.p8" >> "$GITHUB_ENV"
+
+      - name: Import signing certificates
+        env:
+          SIGNING_CERTIFICATES_P12: ${{ secrets.SIGNING_CERTIFICATES_P12 }}
+          SIGNING_CERTIFICATES_PASSWORD: ${{ secrets.SIGNING_CERTIFICATES_PASSWORD }}
+        run: |
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          keychain_password="$(uuidgen)"
+
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+
+          printf '%s' "$SIGNING_CERTIFICATES_P12" | base64 --decode > "$RUNNER_TEMP/certificates.p12"
+          security import "$RUNNER_TEMP/certificates.p12" -k "$keychain" \
+            -P "$SIGNING_CERTIFICATES_PASSWORD" -f pkcs12 \
+            -T /usr/bin/codesign -T /usr/bin/productbuild -T /usr/bin/security
+          rm "$RUNNER_TEMP/certificates.p12"
+
+          security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+
+          echo "Signing identities:"
+          security find-identity -v "$keychain"
+          echo "SIGNING_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+
+      - name: Run tests
+        run: |
+          xcodebuild -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            test
+
+      - name: Archive
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild archive \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $SIGNING_KEYCHAIN"
+
+      - name: Export package
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          options="$RUNNER_TEMP/ExportOptions.plist"
+          cp scripts/ExportOptions.plist "$options"
+          plutil -insert teamID -string "$APPLE_TEAM_ID" "$options"
+
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist "$options" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+          pkg="$(find "$EXPORT_PATH" -maxdepth 1 -name '*.pkg' | head -1)"
+          if [ -z "$pkg" ]; then
+            echo "::error::Export produced no .pkg"
+            exit 1
+          fi
+          echo "PKG_PATH=$pkg" >> "$GITHUB_ENV"
+
+          info="$ARCHIVE_PATH/Products/Applications/Reality Pulse.app/Contents/Info.plist"
+          version="$(plutil -extract CFBundleShortVersionString raw "$info")"
+          build="$(plutil -extract CFBundleVersion raw "$info")"
+          echo "Built Reality Pulse $version ($build)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reality-pulse-app-store
+          path: |
+            ${{ env.EXPORT_PATH }}/*.pkg
+            ${{ env.ARCHIVE_PATH }}/dSYMs
+          retention-days: 14
+
+      - name: Upload to App Store Connect
+        if: ${{ inputs.upload }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcrun altool --upload-app \
+            --type macos \
+            --file "$PKG_PATH" \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID"
+          echo "Uploaded to App Store Connect. The build appears in TestFlight after processing." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean up signing material
+        if: always()
+        run: |
+          if [ -n "${SIGNING_KEYCHAIN:-}" ]; then
+            security delete-keychain "$SIGNING_KEYCHAIN" || true
+          fi
+          rm -rf "$HOME/.appstoreconnect/private_keys"

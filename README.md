@@ -105,6 +105,18 @@ Use `show`, `build`, `patch`, `minor`, `major`, or `set 1.4.0`.
 
 The app target is sandboxed (`com.apple.security.files.user-selected.read-write` only), ships a privacy manifest (`PrivacyInfo.xcprivacy`), and declares `ITSAppUsesNonExemptEncryption = NO`. The bundle identifier is `com.openmuseum.realitypulse`. The privacy policy is in [PRIVACY.md](PRIVACY.md).
 
+The **Mac App Store build** workflow (`.github/workflows/app-store.yml`) is started manually from the Actions tab. It runs the tests, archives, signs, and exports the `.pkg` using [scripts/ExportOptions.plist](scripts/ExportOptions.plist). With **upload** unticked it's a dry run that attaches the signed package as an artifact; ticked, it also uploads the build to App Store Connect for TestFlight and review.
+
+One-time setup after joining the Apple Developer Program:
+
+1. Create the explicit App ID `com.openmuseum.realitypulse` and the app record in App Store Connect.
+2. Create an **Apple Distribution** certificate and a **Mac Installer Distribution** certificate, then export both identities from Keychain Access into one `.p12`.
+3. Create a **Mac App Store** provisioning profile for the App ID named exactly `Reality Pulse Mac App Store`.
+4. Create an App Store Connect API key (Users and Access › Integrations) with the App Manager role.
+5. In the repository's Actions settings, add the variable `APPLE_TEAM_ID` and the secrets `SIGNING_CERTIFICATES_P12` (`base64 -i certificates.p12 | pbcopy`), `SIGNING_CERTIFICATES_PASSWORD`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, and `ASC_PRIVATE_KEY` (the `.p8` file contents).
+
+Run `scripts/bump-version.sh` before each upload; App Store Connect rejects a build number it has already seen.
+
 ## Usage Notes
 
 ### Input Images
