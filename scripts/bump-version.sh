@@ -54,9 +54,8 @@ esac
 
 new_build=$((build + 1))
 
-sed -i '' -E \
-    -e "s/MARKETING_VERSION = [^;]*;/MARKETING_VERSION = $new_version;/" \
-    -e "s/CURRENT_PROJECT_VERSION = [^;]*;/CURRENT_PROJECT_VERSION = $new_build;/" \
+# perl -pi works the same on macOS and Linux, unlike BSD/GNU `sed -i`.
+perl -pi -e "s/MARKETING_VERSION = [^;]*;/MARKETING_VERSION = $new_version;/; s/CURRENT_PROJECT_VERSION = [^;]*;/CURRENT_PROJECT_VERSION = $new_build;/" \
     "$PBXPROJ"
 
 echo "$version ($build) -> $new_version ($new_build)"

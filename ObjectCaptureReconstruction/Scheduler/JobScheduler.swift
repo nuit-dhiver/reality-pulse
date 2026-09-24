@@ -592,8 +592,16 @@ class JobScheduler {
 
         Task {
             let settings = await center.notificationSettings()
-            guard settings.authorizationStatus == .authorized ||
-                  settings.authorizationStatus == .provisional else {
+            let isAuthorized: Bool
+            switch settings.authorizationStatus {
+            case .authorized, .provisional:
+                isAuthorized = true
+            case .notDetermined:
+                isAuthorized = await Self.requestNotificationAuthorization()
+            default:
+                isAuthorized = false
+            }
+            guard isAuthorized else {
                 logger.warning("Notifications enabled in settings but not authorized by the system.")
                 return
             }

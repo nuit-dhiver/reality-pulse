@@ -79,21 +79,24 @@ struct ScheduleSettingsView: View {
 
                     Toggle(
                         "Notify me when jobs finish",
-                        isOn: $notifyOnQueueEvents
-                    )
-                    .onChange(of: notifyOnQueueEvents) { _, isOn in
-                        guard isOn else {
-                            notificationsDenied = false
-                            return
-                        }
-                        Task {
-                            let granted = await JobScheduler.requestNotificationAuthorization()
-                            if !granted {
-                                notifyOnQueueEvents = false
-                                notificationsDenied = true
+                        isOn: Binding(
+                            get: { notifyOnQueueEvents },
+                            set: { isOn in
+                                notificationsDenied = false
+                                guard isOn else {
+                                    notifyOnQueueEvents = false
+                                    return
+                                }
+                                Task {
+                                    if await JobScheduler.requestNotificationAuthorization() {
+                                        notifyOnQueueEvents = true
+                                    } else {
+                                        notificationsDenied = true
+                                    }
+                                }
                             }
-                        }
-                    }
+                        )
+                    )
 
                     if notificationsDenied {
                         Text("Notifications are turned off for Reality Pulse. Allow them in System Settings › Notifications, then try again.")
@@ -108,7 +111,9 @@ struct ScheduleSettingsView: View {
 
             HStack {
                 Button("Clear") {
-                    appDataModel.scheduler.scheduleConfig = ScheduleConfig()
+                    appDataModel.scheduler.scheduleConfig = ScheduleConfig(
+                        notifyOnQueueEvents: appDataModel.scheduler.scheduleConfig.notifyOnQueueEvents
+                    )
                     appDataModel.scheduler.persist()
                     dismiss()
                 }
