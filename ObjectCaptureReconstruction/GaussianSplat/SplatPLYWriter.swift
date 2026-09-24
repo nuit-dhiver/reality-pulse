@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Serializes Gaussian splats to a binary-little-endian `.ply` using the de-facto

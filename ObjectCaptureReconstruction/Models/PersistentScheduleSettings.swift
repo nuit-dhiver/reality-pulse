@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 SwiftData model for persisted scheduler settings.
@@ -15,6 +15,7 @@ final class PersistentScheduleSettings {
     var allowedWindowStart: Int?
     var allowedWindowEnd: Int?
     var preventSleepWhileQueueActive: Bool
+    var notifyOnQueueEvents: Bool = false
     var updatedAt: Date
 
     init(id: String = "main", config: ScheduleConfig) {
@@ -23,6 +24,7 @@ final class PersistentScheduleSettings {
         allowedWindowStart = config.allowedWindowStart
         allowedWindowEnd = config.allowedWindowEnd
         preventSleepWhileQueueActive = config.preventSleepWhileQueueActive
+        notifyOnQueueEvents = config.notifyOnQueueEvents
         updatedAt = Date()
     }
 
@@ -31,6 +33,7 @@ final class PersistentScheduleSettings {
         allowedWindowStart = config.allowedWindowStart
         allowedWindowEnd = config.allowedWindowEnd
         preventSleepWhileQueueActive = config.preventSleepWhileQueueActive
+        notifyOnQueueEvents = config.notifyOnQueueEvents
         updatedAt = Date()
     }
 
@@ -39,7 +42,8 @@ final class PersistentScheduleSettings {
             delayedStart: delayedStart,
             allowedWindowStart: allowedWindowStart,
             allowedWindowEnd: allowedWindowEnd,
-            preventSleepWhileQueueActive: preventSleepWhileQueueActive
+            preventSleepWhileQueueActive: preventSleepWhileQueueActive,
+            notifyOnQueueEvents: notifyOnQueueEvents
         )
     }
 }

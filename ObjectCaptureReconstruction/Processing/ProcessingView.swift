@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Show the model creation progress and display the first created model.

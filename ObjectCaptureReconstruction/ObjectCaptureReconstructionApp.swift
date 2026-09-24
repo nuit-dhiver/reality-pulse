@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Top-level app structure of the view hierarchy.
@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct ObjectCaptureReconstructionApp: App {
-    static let subsystem: String = "com.example.apple-samplecode.ObjectCaptureReconstruction"
+    static let subsystem: String = "com.openmuseum.realitypulse"
 
     private let modelContainerResult: Result<ModelContainer, Error>
 

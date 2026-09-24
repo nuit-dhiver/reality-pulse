@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Configuration for delayed-start and allowed-hours scheduling.
@@ -23,23 +23,31 @@ struct ScheduleConfig: Codable, Equatable {
     /// When enabled, keep the Mac awake while a queue run is active.
     var preventSleepWhileQueueActive = false
 
+    /// When enabled, post a notification when a job finishes or fails and when
+    /// the queue completes. Off by default so the app never asks for notification
+    /// permission until the user opts in.
+    var notifyOnQueueEvents = false
+
     private enum CodingKeys: String, CodingKey {
         case delayedStart
         case allowedWindowStart
         case allowedWindowEnd
         case preventSleepWhileQueueActive
+        case notifyOnQueueEvents
     }
 
     init(
         delayedStart: Date? = nil,
         allowedWindowStart: Int? = nil,
         allowedWindowEnd: Int? = nil,
-        preventSleepWhileQueueActive: Bool = false
+        preventSleepWhileQueueActive: Bool = false,
+        notifyOnQueueEvents: Bool = false
     ) {
         self.delayedStart = delayedStart
         self.allowedWindowStart = allowedWindowStart
         self.allowedWindowEnd = allowedWindowEnd
         self.preventSleepWhileQueueActive = preventSleepWhileQueueActive
+        self.notifyOnQueueEvents = notifyOnQueueEvents
     }
 
     init(from decoder: Decoder) throws {
@@ -50,6 +58,10 @@ struct ScheduleConfig: Codable, Equatable {
         preventSleepWhileQueueActive = try container.decodeIfPresent(
             Bool.self,
             forKey: .preventSleepWhileQueueActive
+        ) ?? false
+        notifyOnQueueEvents = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .notifyOnQueueEvents
         ) ?? false
     }
 

@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Optional additional export formats (glTF, glb, Gaussian splat, text sculpture)
@@ -27,7 +27,24 @@ struct ExportFormatView: View {
 
                 ForEach(ModelExportFormat.allCases, id: \.self) { format in
                     Toggle(isOn: binding(for: format)) {
-                        Text(format.displayName)
+                        HStack(spacing: 6) {
+                            Text(format.displayName)
+                            if format.isExperimental {
+                                Text("Experimental")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.orange)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1)
+                                    .background(.orange.opacity(0.15), in: Capsule())
+                            }
+                        }
+                    }
+
+                    if format.isExperimental {
+                        Text("Gaussian Splat export is still under development. Results may be incomplete or change in future versions.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, 20)
                     }
 
                     if format == .textSculpture && draft.exportFormats.contains(format) {

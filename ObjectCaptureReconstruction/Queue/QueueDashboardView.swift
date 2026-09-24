@@ -1,10 +1,11 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Main dashboard showing the job queue, scheduler controls, and overall progress.
 */
 
+import RealityKit
 import SwiftUI
 import os
 
@@ -226,7 +227,17 @@ private struct QueueHeaderView: View {
                         scheduler.start()
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(!PhotogrammetrySession.isSupported)
                 }
+            }
+
+            if !PhotogrammetrySession.isSupported {
+                Label(
+                    "This Mac doesn't support Object Capture. Reconstruction requires a Mac with Apple silicon, or an Intel Mac with at least 16 GB of RAM and a GPU with at least 4 GB of memory.",
+                    systemImage: "exclamationmark.triangle"
+                )
+                .font(.caption)
+                .foregroundStyle(.orange)
             }
 
             if let pauseExplanation {
