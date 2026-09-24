@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Navigate to the model folder in Finder.

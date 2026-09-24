@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample’s licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Show a green photo badge icon for available gravity and depth in the image folder.

@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Data model for a single reconstruction job in the batch queue.
@@ -210,6 +210,11 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
         case .glb: return "glb (.glb)"
         case .gaussianSplat: return "Gaussian Splat (.ply)"
         }
+    }
+
+    /// Formats that are still under development and may produce rough results.
+    var isExperimental: Bool {
+        self == .gaussianSplat
     }
 }
 

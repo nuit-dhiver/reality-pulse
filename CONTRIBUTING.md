@@ -6,8 +6,8 @@ Thanks for helping improve Reality Pulse, a macOS SwiftUI app for queued Apple O
 
 Requirements:
 
-- macOS 14.0 or newer
-- Xcode 15.0 or newer
+- macOS 15.0 or newer
+- Xcode 16.0 or newer
 - Apple Object Capture / RealityKit support
 
 Open the project in Xcode:
