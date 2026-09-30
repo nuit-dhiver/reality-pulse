@@ -8,10 +8,14 @@ Data model for a single reconstruction job in the batch queue.
 import Foundation
 import RealityKit
 
-/// Represents a single reconstruction job: one image folder producing one or
-/// more 3D models at the selected detail levels.
+/// Represents a single queue job: either one image folder producing one or
+/// more 3D models at the selected detail levels, or one existing USDZ file
+/// converted to the selected export formats.
 struct ReconstructionJob: Identifiable, Codable {
     let id: UUID
+    var inputKind: JobInputKind = .images
+    /// The job's input: an image folder for `.images` jobs, or the source USDZ
+    /// file for `.usdzModel` conversion jobs. `imageFolderBookmark` follows suit.
     var imageFolder: URL
     var modelFolder: URL
     var modelName: String
@@ -34,6 +38,7 @@ struct ReconstructionJob: Identifiable, Codable {
 
     init(
         id: UUID = UUID(),
+        inputKind: JobInputKind = .images,
         imageFolder: URL,
         modelFolder: URL,
         modelName: String,
@@ -51,6 +56,7 @@ struct ReconstructionJob: Identifiable, Codable {
         modelFolderBookmark: Data? = nil
     ) {
         self.id = id
+        self.inputKind = inputKind
         self.imageFolder = imageFolder
         self.modelFolder = modelFolder
         self.modelName = modelName
@@ -75,6 +81,29 @@ struct ReconstructionJob: Identifiable, Codable {
             includingResourceValuesForKeys: nil,
             relativeTo: nil
         ))
+    }
+
+    // MARK: - Conversion helpers
+
+    /// Whether this job converts an existing USDZ file instead of reconstructing.
+    var isConversionJob: Bool {
+        inputKind == .usdzModel
+    }
+
+    func conversionFilename(for format: ModelExportFormat) -> String {
+        "\(modelName).\(format.fileExtension)"
+    }
+
+    func conversionURL(for format: ModelExportFormat) -> URL {
+        modelFolder.appending(path: conversionFilename(for: format))
+    }
+
+    var sortedExportFormats: [ModelExportFormat] {
+        exportFormats.sorted { $0.rawValue < $1.rawValue }
+    }
+
+    var conversionOutputURLs: [URL] {
+        sortedExportFormats.map { conversionURL(for: $0) }
     }
 
     // MARK: - Detail level helpers
@@ -190,6 +219,13 @@ struct ReconstructionJob: Identifiable, Codable {
 }
 
 // MARK: - Supporting types
+
+enum JobInputKind: String, Codable {
+    /// Reconstruct models from an image folder (also used for extracted video frames).
+    case images
+    /// Convert an existing USDZ file to the job's export formats.
+    case usdzModel
+}
 
 enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     case gltf

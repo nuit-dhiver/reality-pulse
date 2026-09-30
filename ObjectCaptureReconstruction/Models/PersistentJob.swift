@@ -12,6 +12,7 @@ import SwiftData
 final class PersistentJob {
     @Attribute(.unique) var id: UUID
     var queueOrder: Int
+    var inputKindRawValue: String?
     var imageFolderPath: String
     var modelFolderPath: String
     var modelName: String
@@ -32,6 +33,7 @@ final class PersistentJob {
     init(job: ReconstructionJob, queueOrder: Int) throws {
         id = job.id
         self.queueOrder = queueOrder
+        inputKindRawValue = job.inputKind.rawValue
         imageFolderPath = job.imageFolder.path
         modelFolderPath = job.modelFolder.path
         modelName = job.modelName
@@ -54,6 +56,7 @@ final class PersistentJob {
         if let queueOrder {
             self.queueOrder = queueOrder
         }
+        inputKindRawValue = job.inputKind.rawValue
         imageFolderPath = job.imageFolder.path
         modelFolderPath = job.modelFolder.path
         modelName = job.modelName
@@ -90,6 +93,7 @@ final class PersistentJob {
 
         return ReconstructionJob(
             id: id,
+            inputKind: inputKindRawValue.flatMap(JobInputKind.init(rawValue:)) ?? .images,
             imageFolder: URL(fileURLWithPath: imageFolderPath),
             modelFolder: URL(fileURLWithPath: modelFolderPath),
             modelName: modelName,

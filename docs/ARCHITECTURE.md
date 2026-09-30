@@ -80,6 +80,16 @@ Launch recovery:
 
 Completed output filenames are recorded when `PhotogrammetrySession.Output.requestComplete` is received.
 
+### Conversion Jobs
+
+A job with `inputKind == .usdzModel` converts an existing USDZ file instead of reconstructing. The source file URL and bookmark are stored in the same input slot as an image folder (`imageFolder` / `imageFolderBookmark`). The scheduler skips `PhotogrammetrySession` and runs `ModelExportService.export` once per selected format, writing:
+
+```text
+<model-name>.<gltf|glb|ply>
+```
+
+Retrying a conversion job re-runs every format and overwrites existing files.
+
 ### Interrupted Retry Handling
 
 Retry handling is deliberately conservative:

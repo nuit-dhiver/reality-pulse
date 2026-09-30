@@ -568,16 +568,7 @@ enum ModelExportService {
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
                 do {
-                    switch format {
-                    case .gaussianSplat:
-                        try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
-                    case .gltf, .glb:
-                        try USDZToGLTFConverter.convert(
-                            usdzURL: usdzURL,
-                            format: format,
-                            outputURL: outputURL
-                        )
-                    }
+                    try export(usdzURL: usdzURL, format: format, outputURL: outputURL)
                     exportedURLs.append(outputURL)
                 } catch {
                     exportErrors.append(error)
@@ -591,5 +582,23 @@ enum ModelExportService {
         }
 
         return exportedURLs
+    }
+
+    /// Convert a single USDZ file to one export format.
+    nonisolated static func export(
+        usdzURL: URL,
+        format: ModelExportFormat,
+        outputURL: URL
+    ) throws {
+        switch format {
+        case .gaussianSplat:
+            try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+        case .gltf, .glb:
+            try USDZToGLTFConverter.convert(
+                usdzURL: usdzURL,
+                format: format,
+                outputURL: outputURL
+            )
+        }
     }
 }

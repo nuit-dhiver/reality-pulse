@@ -291,6 +291,13 @@ class JobScheduler {
             if modelAccess { modelURL?.stopAccessingSecurityScopedResource() }
         }
 
+        if jobs[index].isConversionJob {
+            await processConversionJob(jobId: jobId, jobName: jobName)
+            currentJobId = nil
+            persist()
+            return
+        }
+
         jobs[index].progress = jobs[index].completedOutputFraction()
         persist()
 
@@ -413,6 +420,65 @@ class JobScheduler {
 
         currentJobId = nil
         persist()
+    }
+
+    /// Convert a job's source USDZ file to each selected export format.
+    /// Runs on the queue like a reconstruction job but without a PhotogrammetrySession.
+    private func processConversionJob(jobId: UUID, jobName: String) async {
+        guard let index = jobs.firstIndex(where: { $0.id == jobId }) else { return }
+        let sourceURL = jobs[index].imageFolder
+        let formats = jobs[index].sortedExportFormats
+
+        guard !formats.isEmpty else {
+            jobs[index].status = .failed
+            jobs[index].errorMessage = "No export formats selected."
+            sendNotification(title: "Job Failed", body: jobName)
+            return
+        }
+
+        var convertedCount = 0
+        for format in formats {
+            if Task.isCancelled { break }
+            guard let outputURL = jobs.first(where: { $0.id == jobId })?.conversionURL(for: format) else { return }
+
+            var conversionError: Error?
+            do {
+                logger.log("Converting \(sourceURL.lastPathComponent) to \(outputURL.lastPathComponent)")
+                try await Task.detached(priority: .userInitiated) {
+                    try ModelExportService.export(usdzURL: sourceURL, format: format, outputURL: outputURL)
+                }.value
+            } catch {
+                conversionError = error
+            }
+
+            // Look the job up again: the queue may have changed while converting.
+            guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
+            if let error = conversionError {
+                logger.warning("Conversion job \(jobId) failed: \(error)")
+                jobs[idx].status = .failed
+                jobs[idx].errorMessage = error.localizedDescription
+                sendNotification(title: "Job Failed", body: jobName)
+                return
+            }
+
+            convertedCount += 1
+            jobs[idx].markOutputCompleted(at: outputURL)
+            jobs[idx].progress = Double(convertedCount) / Double(formats.count)
+            currentProgress = jobs[idx].progress
+            store.saveJob(jobs[idx])
+        }
+
+        guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
+        if Task.isCancelled {
+            jobs[idx].status = .cancelled
+        } else {
+            jobs[idx].status = .completed
+            jobs[idx].progress = 1.0
+            sendNotification(
+                title: "Job Complete",
+                body: "\(jobName) — converted \(convertedCount) file(s)"
+            )
+        }
     }
 
     private func activatePauseIfNeeded() {

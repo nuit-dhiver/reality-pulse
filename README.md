@@ -19,6 +19,7 @@ Apple Object Capture is powerful, but running one folder at a time is tedious wh
 
 - **Batch Apple Object Capture queue**: add multiple image folders and process them sequentially.
 - **USDZ photogrammetry output**: export one or more `.usdz` models per job.
+- **USDZ conversion**: queue an existing `.usdz` file as a job to convert it to glTF, glb, or Gaussian Splat (`.ply`) without reconstructing.
 - **Multiple detail levels**: generate preview, reduced, medium, full, raw, or custom outputs from the same capture.
 - **Custom reconstruction settings**: configure mesh primitive, masking, bounding-box handling, polygon limits, texture maps, texture format, and texture resolution.
 - **Scheduled processing**: delay a queue run or restrict processing to allowed hours, including overnight windows.

@@ -23,6 +23,13 @@ struct ModelNameField: View {
                 draft.modelName = nil
             }
         }
+        .onChange(of: draft.modelName) {
+            // Pick up names set elsewhere, e.g. prefilled from a chosen USDZ file.
+            let name = draft.modelName ?? ""
+            if name != modelName {
+                modelName = name
+            }
+        }
         .onAppear {
             guard let name = draft.modelName else { return }
             modelName = name
