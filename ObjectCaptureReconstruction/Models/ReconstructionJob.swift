@@ -27,6 +27,8 @@ struct ReconstructionJob: Identifiable, Codable {
     var createdAt: Date
     var completedOutputFilenames: Set<String>?
     var exportFormats: Set<ModelExportFormat> = []
+    /// Settings for the `.textSculpture` export. `nil` means defaults.
+    var textSculptureOptions: TextSculptureOptions?
 
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
@@ -47,6 +49,7 @@ struct ReconstructionJob: Identifiable, Codable {
         createdAt: Date = Date(),
         completedOutputFilenames: Set<String>? = [],
         exportFormats: Set<ModelExportFormat> = [],
+        textSculptureOptions: TextSculptureOptions? = nil,
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
@@ -64,6 +67,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.createdAt = createdAt
         self.completedOutputFilenames = completedOutputFilenames
         self.exportFormats = exportFormats
+        self.textSculptureOptions = textSculptureOptions
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,
@@ -109,7 +113,7 @@ struct ReconstructionJob: Identifiable, Codable {
     }
 
     func exportFilename(for level: CodableDetailLevel, format: ModelExportFormat) -> String {
-        "\(modelName)-\(level.rawValue).\(format.fileExtension)"
+        format.exportFilename(modelName: modelName, level: level)
     }
 
     func exportURL(for level: CodableDetailLevel, format: ModelExportFormat) -> URL {
@@ -195,12 +199,22 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     case gltf
     case glb
     case gaussianSplat
+    case textSculpture
 
     var fileExtension: String {
         switch self {
         case .gltf: return "gltf"
         case .glb: return "glb"
         case .gaussianSplat: return "ply"
+        case .textSculpture: return "glb"
+        }
+    }
+
+    /// Appended to the base filename so formats sharing an extension don't collide.
+    var filenameSuffix: String {
+        switch self {
+        case .textSculpture: return "-text"
+        case .gltf, .glb, .gaussianSplat: return ""
         }
     }
 
@@ -209,7 +223,12 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
         case .gltf: return "glTF (.gltf)"
         case .glb: return "glb (.glb)"
         case .gaussianSplat: return "Gaussian Splat (.ply)"
+        case .textSculpture: return "Text Sculpture (.glb)"
         }
+    }
+
+    func exportFilename(modelName: String, level: CodableDetailLevel) -> String {
+        "\(modelName)-\(level.rawValue)\(filenameSuffix).\(fileExtension)"
     }
 }
 

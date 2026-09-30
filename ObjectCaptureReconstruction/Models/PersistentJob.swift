@@ -26,6 +26,7 @@ final class PersistentJob {
     var updatedAt: Date
     var completedOutputFilenamesData: Data?
     var exportFormatsData: Data?
+    var textSculptureOptionsData: Data?
     var imageFolderBookmark: Data?
     var modelFolderBookmark: Data?
 
@@ -46,6 +47,7 @@ final class PersistentJob {
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
+        textSculptureOptionsData = try job.textSculptureOptions.map { try JSONEncoder().encode($0) }
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -68,6 +70,7 @@ final class PersistentJob {
         updatedAt = Date()
         completedOutputFilenamesData = try JSONEncoder().encode(job.completedOutputFilenames ?? [])
         exportFormatsData = try JSONEncoder().encode(job.exportFormats)
+        textSculptureOptionsData = try job.textSculptureOptions.map { try JSONEncoder().encode($0) }
         imageFolderBookmark = job.imageFolderBookmark
         modelFolderBookmark = job.modelFolderBookmark
     }
@@ -87,6 +90,9 @@ final class PersistentJob {
         let exportFormats = try exportFormatsData.map {
             try JSONDecoder().decode(Set<ModelExportFormat>.self, from: $0)
         } ?? []
+        let textSculptureOptions = try textSculptureOptionsData.map {
+            try JSONDecoder().decode(TextSculptureOptions.self, from: $0)
+        }
 
         return ReconstructionJob(
             id: id,
@@ -103,6 +109,7 @@ final class PersistentJob {
             createdAt: createdAt,
             completedOutputFilenames: completedOutputFilenames,
             exportFormats: exportFormats,
+            textSculptureOptions: textSculptureOptions,
             imageFolderBookmark: imageFolderBookmark,
             modelFolderBookmark: modelFolderBookmark
         )

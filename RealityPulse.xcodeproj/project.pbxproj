@@ -38,6 +38,12 @@
 		BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */; };
 		BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */; };
 		BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */; };
+		BBBB0008BBBB0008BBBB0008 /* GlyphShaper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0008AAAA0008AAAA0008 /* GlyphShaper.swift */; };
+		BBBB0009BBBB0009BBBB0009 /* GlyphAtlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0009AAAA0009AAAA0009 /* GlyphAtlas.swift */; };
+		BBBB000ABBBB000ABBBB000A /* ContourSlicer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000AAAAA000AAAAA000A /* ContourSlicer.swift */; };
+		BBBB000BBBBB000BBBBB000B /* TextSculptureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000BAAAA000BAAAA000B /* TextSculptureGenerator.swift */; };
+		BBBB000CBBBB000CBBBB000C /* TextSculptureOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000CAAAA000CAAAA000C /* TextSculptureOptions.swift */; };
+		BBBB000DBBBB000DBBBB000D /* TextSculptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000DAAAA000DAAAA000D /* TextSculptureTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +99,12 @@
 		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
 		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
 		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
+		AAAA0008AAAA0008AAAA0008 /* GlyphShaper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlyphShaper.swift; sourceTree = "<group>"; };
+		AAAA0009AAAA0009AAAA0009 /* GlyphAtlas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlyphAtlas.swift; sourceTree = "<group>"; };
+		AAAA000AAAAA000AAAAA000A /* ContourSlicer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContourSlicer.swift; sourceTree = "<group>"; };
+		AAAA000BAAAA000BAAAA000B /* TextSculptureGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureGenerator.swift; sourceTree = "<group>"; };
+		AAAA000CAAAA000CAAAA000C /* TextSculptureOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureOptions.swift; sourceTree = "<group>"; };
+		AAAA000DAAAA000DAAAA000D /* TextSculptureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -120,6 +132,7 @@
 				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
+				ReconstructionOptions/TextSculptureOptionsView.swift,
 				SettingsView.swift,
 			);
 			target = F974D1152BE0484500EFACBA /* ObjectCaptureReconstruction */;
@@ -207,6 +220,7 @@
 				E195DA07BD54DDE970F27E56 /* Queue */,
 				E8F9A0B1C2D3E4F5A6B7C8DD /* Export */,
 				CCCC0001CCCC0001CCCC0001 /* GaussianSplat */,
+				CCCC0002CCCC0002CCCC0002 /* TextSculpture */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
 			);
 			path = ObjectCaptureReconstruction;
@@ -278,6 +292,7 @@
 				D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */,
 				F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */,
 				AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */,
+				AAAA000DAAAA000DAAAA000D /* TextSculptureTests.swift */,
 			);
 			path = ObjectCaptureReconstructionTests;
 			sourceTree = "<group>";
@@ -292,6 +307,18 @@
 				AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */,
 			);
 			path = GaussianSplat;
+			sourceTree = "<group>";
+		};
+		CCCC0002CCCC0002CCCC0002 /* TextSculpture */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA0008AAAA0008AAAA0008 /* GlyphShaper.swift */,
+				AAAA0009AAAA0009AAAA0009 /* GlyphAtlas.swift */,
+				AAAA000AAAAA000AAAAA000A /* ContourSlicer.swift */,
+				AAAA000BAAAA000BAAAA000B /* TextSculptureGenerator.swift */,
+				AAAA000CAAAA000CAAAA000C /* TextSculptureOptions.swift */,
+			);
+			path = TextSculpture;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -421,6 +448,11 @@
 				BBBB0004BBBB0004BBBB0004 /* GaussianSplat.swift in Sources */,
 				BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */,
 				BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */,
+				BBBB0008BBBB0008BBBB0008 /* GlyphShaper.swift in Sources */,
+				BBBB0009BBBB0009BBBB0009 /* GlyphAtlas.swift in Sources */,
+				BBBB000ABBBB000ABBBB000A /* ContourSlicer.swift in Sources */,
+				BBBB000BBBBB000BBBBB000B /* TextSculptureGenerator.swift in Sources */,
+				BBBB000CBBBB000CBBBB000C /* TextSculptureOptions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +463,7 @@
 				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
 				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
 				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
+				BBBB000DBBBB000DBBBB000D /* TextSculptureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

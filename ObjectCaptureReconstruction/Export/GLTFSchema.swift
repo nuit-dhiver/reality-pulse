@@ -85,6 +85,8 @@ struct GLTFMaterial: Codable {
     var normalTexture: GLTFNormalTextureInfo?
     var occlusionTexture: GLTFOcclusionTextureInfo?
     var doubleSided: Bool?
+    var alphaMode: String?
+    var alphaCutoff: Float?
 }
 
 struct GLTFPBRMetallicRoughness: Codable {
@@ -146,6 +148,7 @@ enum GLTFConstants {
     static let filterLinear = 9729
     static let filterLinearMipmapLinear = 9987
     static let wrapRepeat = 10497
+    static let wrapClampToEdge = 33071
 }
 
 // MARK: - Binary buffer builder
