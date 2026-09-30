@@ -7,20 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */; };
-		0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */; };
 		26B0954B2C091C770097324A /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B0954A2C091C770097324A /* ThumbnailView.swift */; };
-		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
-		4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5722048B055E10C8C4635BA /* JobScheduler.swift */; };
-		4BC3F99B1E9F4DFF83756389 /* PersistentJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BFD2F106FA346F1879FCC87 /* PersistentJob.swift */; };
-		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
-		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
-		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
-		5EF33318F00E443A81683739 /* PersistentMigrationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98675D558934377A48B11EB /* PersistentMigrationState.swift */; };
-		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
-		6E179F522E3A43939DF5BF80 /* PersistentScheduleSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88318DE6F7346A38820D6CA /* PersistentScheduleSettings.swift */; };
-		8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C4F782DCEACB71739E8182 /* JobStore.swift */; };
+		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
+		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
+		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
+		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
+		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* VideoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */; };
+		4A09793D6E37710A3E5C6A9E /* CodableSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */; };
+		4FEA8298C11A586715309B27 /* ReconstructionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */; };
+		5BB43283ED23CAD514525CCE /* ScheduleConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */; };
+		4BC3F99B1E9F4DFF83756389 /* PersistentJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BFD2F106FA346F1879FCC87 /* PersistentJob.swift */; };
+		6E179F522E3A43939DF5BF80 /* PersistentScheduleSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88318DE6F7346A38820D6CA /* PersistentScheduleSettings.swift */; };
+		5EF33318F00E443A81683739 /* PersistentMigrationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98675D558934377A48B11EB /* PersistentMigrationState.swift */; };
+		0DA909603009039BB1FEB542 /* JobDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */; };
+		4A45C797C462E066F321F944 /* JobScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5722048B055E10C8C4635BA /* JobScheduler.swift */; };
+		8EDA871038ABBECE6E11AF17 /* JobStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C4F782DCEACB71739E8182 /* JobStore.swift */; };
+		05E9773251F45705785EB1EC /* QueueDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */; };
+		665189C5915C218406A40D61 /* JobRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE344691F76FD3CE82E7FCF /* JobRowView.swift */; };
+		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
+		5B7275D8B81A2AA37B5D76A1 /* ScheduleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */; };
+		DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */; };
+		F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */; };
+		E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */; };
+		E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */; };
 		BBBB0001BBBB0001BBBB0001 /* MeshGeometryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */; };
 		BBBB0002BBBB0002BBBB0002 /* SurfaceSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */; };
 		BBBB0003BBBB0003BBBB0003 /* TextureColorSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */; };
@@ -28,16 +38,6 @@
 		BBBB0005BBBB0005BBBB0005 /* SplatPLYWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */; };
 		BBBB0006BBBB0006BBBB0006 /* SplatSampleGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */; };
 		BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */; };
-		DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */; };
-		DC9509AE8DE723BBD01EC86D /* JobSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */; };
-		E8F9A0B1C2D3E4F5A6B7C8D9 /* GLTFSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */; };
-		E8F9A0B1C2D3E4F5A6B7C8DB /* USDZToGLTFConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */; };
-		F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */; };
-		F974D11A2BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */; };
-		F974D11C2BE0484500EFACBA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D11B2BE0484500EFACBA /* ContentView.swift */; };
-		F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F974D11D2BE0484700EFACBA /* Assets.xcassets */; };
-		F974D56A2BE1BCB600EFACBA /* AppDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F974D5692BE1BCB600EFACBA /* AppDataModel.swift */; };
-		F9D806832BFE6EA1005A4B94 /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,39 +51,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1BFD2F106FA346F1879FCC87 /* PersistentJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentJob.swift; sourceTree = "<group>"; };
 		26B095462C091BC80097324A /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		26B095482C091BEA0097324A /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
 		26B0954A2C091C770097324A /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
-		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
-		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
 		3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
-		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
 		79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
-		958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleConfig.swift; sourceTree = "<group>"; };
 		971147DC9E6FE3FF0398B220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoHelper.swift; sourceTree = "<group>"; };
-		A5722048B055E10C8C4635BA /* JobScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobScheduler.swift; sourceTree = "<group>"; };
-		A88318DE6F7346A38820D6CA /* PersistentScheduleSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentScheduleSettings.swift; sourceTree = "<group>"; };
-		AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGeometryReader.swift; sourceTree = "<group>"; };
-		AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceSampler.swift; sourceTree = "<group>"; };
-		AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureColorSampler.swift; sourceTree = "<group>"; };
-		AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplat.swift; sourceTree = "<group>"; };
-		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
-		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
-		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
-		AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionJob.swift; sourceTree = "<group>"; };
-		B0C4F782DCEACB71739E8182 /* JobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStore.swift; sourceTree = "<group>"; };
-		B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDashboardView.swift; sourceTree = "<group>"; };
-		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
-		C98675D558934377A48B11EB /* PersistentMigrationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentMigrationState.swift; sourceTree = "<group>"; };
-		D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStoreTests.swift; sourceTree = "<group>"; };
-		E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDraft.swift; sourceTree = "<group>"; };
-		E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLTFSchema.swift; sourceTree = "<group>"; };
-		E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZToGLTFConverter.swift; sourceTree = "<group>"; };
-		F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelExportTests.swift; sourceTree = "<group>"; };
-		F5A38ACB50CF47AE95A5E30A /* ObjectCaptureReconstructionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectCaptureReconstructionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F974D1162BE0484500EFACBA /* Reality Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reality Pulse.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5A38ACB50CF47AE95A5E30A /* ObjectCaptureReconstructionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectCaptureReconstructionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F974D1192BE0484500EFACBA /* ObjectCaptureReconstructionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectCaptureReconstructionApp.swift; sourceTree = "<group>"; };
 		F974D11B2BE0484500EFACBA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F974D11D2BE0484700EFACBA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -91,8 +66,33 @@
 		F974D56B2BE1CF0600EFACBA /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
 		F99368C22BE3118600DAA789 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		F9D806822BFE6EA1005A4B94 /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F3 /* VideoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoHelper.swift; sourceTree = "<group>"; };
 		F9F1BEDA2C6433340066F3D3 /* ReconstructionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionProgressView.swift; sourceTree = "<group>"; };
 		F9F1BEDB2C6433340066F3D3 /* ReprocessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprocessView.swift; sourceTree = "<group>"; };
+		5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableSessionConfiguration.swift; sourceTree = "<group>"; };
+		AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconstructionJob.swift; sourceTree = "<group>"; };
+		958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleConfig.swift; sourceTree = "<group>"; };
+		1BFD2F106FA346F1879FCC87 /* PersistentJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentJob.swift; sourceTree = "<group>"; };
+		A88318DE6F7346A38820D6CA /* PersistentScheduleSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentScheduleSettings.swift; sourceTree = "<group>"; };
+		C98675D558934377A48B11EB /* PersistentMigrationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentMigrationState.swift; sourceTree = "<group>"; };
+		E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDraft.swift; sourceTree = "<group>"; };
+		A5722048B055E10C8C4635BA /* JobScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobScheduler.swift; sourceTree = "<group>"; };
+		B0C4F782DCEACB71739E8182 /* JobStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStore.swift; sourceTree = "<group>"; };
+		B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDashboardView.swift; sourceTree = "<group>"; };
+		BCE344691F76FD3CE82E7FCF /* JobRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRowView.swift; sourceTree = "<group>"; };
+		33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSetupView.swift; sourceTree = "<group>"; };
+		37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSettingsView.swift; sourceTree = "<group>"; };
+		D729E04F4B0947929FF2F4C2 /* JobStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobStoreTests.swift; sourceTree = "<group>"; };
+		F1E2D3C4B5A6978899AABBCD /* ModelExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelExportTests.swift; sourceTree = "<group>"; };
+		E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLTFSchema.swift; sourceTree = "<group>"; };
+		E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDZToGLTFConverter.swift; sourceTree = "<group>"; };
+		AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGeometryReader.swift; sourceTree = "<group>"; };
+		AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceSampler.swift; sourceTree = "<group>"; };
+		AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureColorSampler.swift; sourceTree = "<group>"; };
+		AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaussianSplat.swift; sourceTree = "<group>"; };
+		AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatPLYWriter.swift; sourceTree = "<group>"; };
+		AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatSampleGenerator.swift; sourceTree = "<group>"; };
+		AAAA0007AAAA0007AAAA0007 /* SplatGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplatGenerationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -113,12 +113,12 @@
 				FolderOptions/VideoInputView.swift,
 				FolderOptions/USDZInputView.swift,
 				ProcessButton/ProcessButton.swift,
-				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/IgnoreBoundingBoxView.swift,
 				ReconstructionOptions/MaskingView.swift,
 				ReconstructionOptions/MeshTypeView.swift,
 				ReconstructionOptions/MultiModelOutputView.swift,
 				ReconstructionOptions/OutputPreviewView.swift,
+				ReconstructionOptions/ExportFormatView.swift,
 				ReconstructionOptions/QualityView.swift,
 				ReconstructionOptions/ReconstructionOptionsView.swift,
 				SettingsView.swift,
@@ -132,14 +132,14 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		414A6A05333346B7A035087B /* Frameworks */ = {
+		F974D1132BE0484500EFACBA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F974D1132BE0484500EFACBA /* Frameworks */ = {
+		414A6A05333346B7A035087B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -149,14 +149,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		195BAF6352F89DD77AFC2745 /* Store */ = {
-			isa = PBXGroup;
-			children = (
-				B0C4F782DCEACB71739E8182 /* JobStore.swift */,
-			);
-			path = Store;
-			sourceTree = "<group>";
-		};
 		26B095232C091B810097324A /* Processing */ = {
 			isa = PBXGroup;
 			children = (
@@ -170,67 +162,12 @@
 			path = Processing;
 			sourceTree = "<group>";
 		};
-		992CB303C65294FA4C0E9608 /* Scheduler */ = {
-			isa = PBXGroup;
-			children = (
-				A5722048B055E10C8C4635BA /* JobScheduler.swift */,
-			);
-			path = Scheduler;
-			sourceTree = "<group>";
-		};
-		AAC7DC5DCD23638D271D3093 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				5A00FFF0EB8B4E921061918F /* CodableSessionConfiguration.swift */,
-				AFC5AB62125CB98EAA9DF3F6 /* ReconstructionJob.swift */,
-				958B6CDE5F744C8A9E27719D /* ScheduleConfig.swift */,
-				1BFD2F106FA346F1879FCC87 /* PersistentJob.swift */,
-				A88318DE6F7346A38820D6CA /* PersistentScheduleSettings.swift */,
-				C98675D558934377A48B11EB /* PersistentMigrationState.swift */,
-				E3A4F851B39B9C4EA08E7C13 /* JobDraft.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		BD87F13DD4B2159CCB69FFA2 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
 				79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */,
 			);
 			name = Configuration;
-			sourceTree = "<group>";
-		};
-		CCCC0001CCCC0001CCCC0001 /* GaussianSplat */ = {
-			isa = PBXGroup;
-			children = (
-				AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */,
-				AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */,
-				AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */,
-				AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */,
-				AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */,
-			);
-			path = GaussianSplat;
-			sourceTree = "<group>";
-		};
-		E195DA07BD54DDE970F27E56 /* Queue */ = {
-			isa = PBXGroup;
-			children = (
-				B18D78DD28112179ED6A17EA /* QueueDashboardView.swift */,
-				BCE344691F76FD3CE82E7FCF /* JobRowView.swift */,
-				33550E6E2F6D8F14E9A9C282 /* JobSetupView.swift */,
-				37404910B7FC7310289216C7 /* ScheduleSettingsView.swift */,
-			);
-			path = Queue;
-			sourceTree = "<group>";
-		};
-		E8F9A0B1C2D3E4F5A6B7C8DD /* Export */ = {
-			isa = PBXGroup;
-			children = (
-				E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */,
-				E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */,
-				AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */,
-			);
-			path = Export;
 			sourceTree = "<group>";
 		};
 		F974D10D2BE0484500EFACBA = {
@@ -276,6 +213,66 @@
 			path = ObjectCaptureReconstruction;
 			sourceTree = "<group>";
 		};
+		FE08FBE5E15C9B39D4421FC8 /* LICENSE */ = {
+			isa = PBXGroup;
+			children = (
+				3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */,
+			);
+			name = LICENSE;
+			path = .;
+			sourceTree = "<group>";
+		};
+		AAC7DC5DCD23638D271D3093 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5A00FFF0EB8B4E921061918F /* */,
+				AFC5AB62125CB98EAA9DF3F6 /* */,
+				958B6CDE5F744C8A9E27719D /* */,
+				1BFD2F106FA346F1879FCC87 /* */,
+				A88318DE6F7346A38820D6CA /* */,
+				C98675D558934377A48B11EB /* */,
+				E3A4F851B39B9C4EA08E7C13 /* */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		992CB303C65294FA4C0E9608 /* Scheduler */ = {
+			isa = PBXGroup;
+			children = (
+				A5722048B055E10C8C4635BA /* */,
+			);
+			path = Scheduler;
+			sourceTree = "<group>";
+		};
+		195BAF6352F89DD77AFC2745 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				B0C4F782DCEACB71739E8182 /* */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		E195DA07BD54DDE970F27E56 /* Queue */ = {
+			isa = PBXGroup;
+			children = (
+				B18D78DD28112179ED6A17EA /* */,
+				BCE344691F76FD3CE82E7FCF /* */,
+				33550E6E2F6D8F14E9A9C282 /* */,
+				37404910B7FC7310289216C7 /* */,
+			);
+			path = Queue;
+			sourceTree = "<group>";
+		};
+		E8F9A0B1C2D3E4F5A6B7C8DD /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				E8F9A0B1C2D3E4F5A6B7C8DA /* GLTFSchema.swift */,
+				E8F9A0B1C2D3E4F5A6B7C8DC /* USDZToGLTFConverter.swift */,
+				AAAA0001AAAA0001AAAA0001 /* MeshGeometryReader.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
 		FA6C5F5E612145E7A0847A6A /* ObjectCaptureReconstructionTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -286,18 +283,38 @@
 			path = ObjectCaptureReconstructionTests;
 			sourceTree = "<group>";
 		};
-		FE08FBE5E15C9B39D4421FC8 /* LICENSE */ = {
+		CCCC0001CCCC0001CCCC0001 /* GaussianSplat */ = {
 			isa = PBXGroup;
 			children = (
-				3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */,
+				AAAA0002AAAA0002AAAA0002 /* SurfaceSampler.swift */,
+				AAAA0003AAAA0003AAAA0003 /* TextureColorSampler.swift */,
+				AAAA0004AAAA0004AAAA0004 /* GaussianSplat.swift */,
+				AAAA0005AAAA0005AAAA0005 /* SplatPLYWriter.swift */,
+				AAAA0006AAAA0006AAAA0006 /* SplatSampleGenerator.swift */,
 			);
-			name = LICENSE;
-			path = .;
+			path = GaussianSplat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F974D1152BE0484500EFACBA /* ObjectCaptureReconstruction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F974D1242BE0484700EFACBA /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstruction" */;
+			buildPhases = (
+				F974D1122BE0484500EFACBA /* Sources */,
+				F974D1132BE0484500EFACBA /* Frameworks */,
+				F974D1142BE0484500EFACBA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ObjectCaptureReconstruction;
+			productName = ObjectCaptureReconstruction;
+			productReference = F974D1162BE0484500EFACBA /* Reality Pulse.app */;
+			productType = "com.apple.product-type.application";
+		};
 		3FF53D6DB5C4409ABA48B27A /* ObjectCaptureReconstructionTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EB162F90141D4B739B4B48EE /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstructionTests" */;
@@ -315,23 +332,6 @@
 			productName = ObjectCaptureReconstructionTests;
 			productReference = F5A38ACB50CF47AE95A5E30A /* ObjectCaptureReconstructionTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		F974D1152BE0484500EFACBA /* ObjectCaptureReconstruction */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F974D1242BE0484700EFACBA /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstruction" */;
-			buildPhases = (
-				F974D1122BE0484500EFACBA /* Sources */,
-				F974D1132BE0484500EFACBA /* Frameworks */,
-				F974D1142BE0484500EFACBA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = ObjectCaptureReconstruction;
-			productName = ObjectCaptureReconstruction;
-			productReference = F974D1162BE0484500EFACBA /* Reality Pulse.app */;
-			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -353,7 +353,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F974D1112BE0484500EFACBA /* Build configuration list for PBXProject "RealityPulse" */;
+			buildConfigurationList = F974D1112BE0484500EFACBA /* Build configuration list for PBXProject "ObjectCaptureReconstruction" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -373,13 +373,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		2CB593E568E34547998E35E0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F974D1142BE0484500EFACBA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -388,19 +381,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		29C946EE71FB41A9BACB4D9E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
+		2CB593E568E34547998E35E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
-				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
-				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
 		F974D1122BE0484500EFACBA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -435,6 +425,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		29C946EE71FB41A9BACB4D9E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA46AD02680942AA94FEBCBB /* JobStoreTests.swift in Sources */,
+				F1E2D3C4B5A6978899AABBCC /* ModelExportTests.swift in Sources */,
+				BBBB0007BBBB0007BBBB0007 /* SplatGenerationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -446,62 +446,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		631DAC632DE04FB9A8393549 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
-			};
-			name = Release;
-		};
-		CA11244782FA4192B413EB10 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
-			};
-			name = Debug;
-		};
 		F974D1222BE0484700EFACBA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
@@ -636,8 +580,6 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
-				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -650,6 +592,8 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
+				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
 				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -676,8 +620,6 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
-				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -690,6 +632,8 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
+				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
+				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
 				PRODUCT_NAME = "Reality Pulse";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -703,19 +647,66 @@
 			};
 			name = Release;
 		};
+		CA11244782FA4192B413EB10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 6;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
+			};
+			name = Debug;
+		};
+		631DAC632DE04FB9A8393549 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 6;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EB162F90141D4B739B4B48EE /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstructionTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				CA11244782FA4192B413EB10 /* Debug */,
-				631DAC632DE04FB9A8393549 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F974D1112BE0484500EFACBA /* Build configuration list for PBXProject "RealityPulse" */ = {
+		F974D1112BE0484500EFACBA /* Build configuration list for PBXProject "ObjectCaptureReconstruction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F974D1222BE0484700EFACBA /* Debug */,
@@ -729,6 +720,15 @@
 			buildConfigurations = (
 				F974D1252BE0484700EFACBA /* Debug */,
 				F974D1262BE0484700EFACBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB162F90141D4B739B4B48EE /* Build configuration list for PBXNativeTarget "ObjectCaptureReconstructionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA11244782FA4192B413EB10 /* Debug */,
+				631DAC632DE04FB9A8393549 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

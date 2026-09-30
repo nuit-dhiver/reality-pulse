@@ -185,21 +185,11 @@ class JobScheduler {
 
     private func processQueue() async {
         defer {
-            isRunning = false
-            currentJobId = nil
-            currentProgress = 0
-            estimatedTimeRemaining = nil
-            updateSleepPreventionActivity()
-
-            let succeeded = jobs.filter { $0.status == .completed }.count
-            let failed = jobs.filter { $0.status == .failed }.count
-            sendNotification(
-                title: "Queue Complete",
-                body: "\(succeeded) succeeded, \(failed) failed"
-            )
-
-            persist()
-            logger.log("Scheduler finished.")
+            // After Stop, `cancel()` has already reset and persisted the scheduler,
+            // and a new run may own its state by the time this task unwinds.
+            if !Task.isCancelled {
+                finishRun()
+            }
         }
 
         while !Task.isCancelled {
@@ -235,6 +225,24 @@ class JobScheduler {
 
             await processJob(at: index)
         }
+    }
+
+    private func finishRun() {
+        isRunning = false
+        currentJobId = nil
+        currentProgress = 0
+        estimatedTimeRemaining = nil
+        updateSleepPreventionActivity()
+
+        let succeeded = jobs.filter { $0.status == .completed }.count
+        let failed = jobs.filter { $0.status == .failed }.count
+        sendNotification(
+            title: "Queue Complete",
+            body: "\(succeeded) succeeded, \(failed) failed"
+        )
+
+        persist()
+        logger.log("Scheduler finished.")
     }
 
     // MARK: - Sleep prevention
@@ -293,8 +301,7 @@ class JobScheduler {
 
         if jobs[index].isConversionJob {
             await processConversionJob(jobId: jobId, jobName: jobName)
-            currentJobId = nil
-            persist()
+            finishJob()
             return
         }
 
@@ -389,7 +396,7 @@ class JobScheduler {
                 }
             }
 
-            currentSession = nil
+            if !Task.isCancelled { currentSession = nil }
 
             if Task.isCancelled {
                 if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
@@ -410,7 +417,7 @@ class JobScheduler {
 
         } catch {
             logger.warning("Job \(jobId) failed: \(error)")
-            currentSession = nil
+            if !Task.isCancelled { currentSession = nil }
             if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .failed
                 jobs[idx].errorMessage = "\(error)"
@@ -418,7 +425,15 @@ class JobScheduler {
             sendNotification(title: "Job Failed", body: jobName)
         }
 
-        currentJobId = nil
+        finishJob()
+    }
+
+    /// Clear the active job once it ends. A cancelled task leaves the scheduler
+    /// state alone: `cancel()` already reset it and a new run may own it now.
+    private func finishJob() {
+        if !Task.isCancelled {
+            currentJobId = nil
+        }
         persist()
     }
 
@@ -454,6 +469,8 @@ class JobScheduler {
             // Look the job up again: the queue may have changed while converting.
             guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
             if let error = conversionError {
+                // A Stop during conversion already marked the job cancelled.
+                if Task.isCancelled { return }
                 logger.warning("Conversion job \(jobId) failed: \(error)")
                 jobs[idx].status = .failed
                 jobs[idx].errorMessage = error.localizedDescription
@@ -464,7 +481,9 @@ class JobScheduler {
             convertedCount += 1
             jobs[idx].markOutputCompleted(at: outputURL)
             jobs[idx].progress = Double(convertedCount) / Double(formats.count)
-            currentProgress = jobs[idx].progress
+            if !Task.isCancelled {
+                currentProgress = jobs[idx].progress
+            }
             store.saveJob(jobs[idx])
         }
 

@@ -218,6 +218,33 @@ struct ReconstructionJob: Identifiable, Codable {
     }
 }
 
+// MARK: - Decoding
+
+extension ReconstructionJob {
+    /// Tolerates keys added after the legacy `jobs.json` format (`inputKind`,
+    /// `exportFormats`) so the one-time JSON migration can still read old files.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        inputKind = try container.decodeIfPresent(JobInputKind.self, forKey: .inputKind) ?? .images
+        imageFolder = try container.decode(URL.self, forKey: .imageFolder)
+        modelFolder = try container.decode(URL.self, forKey: .modelFolder)
+        modelName = try container.decode(String.self, forKey: .modelName)
+        sessionConfiguration = try container.decode(CodableSessionConfiguration.self, forKey: .sessionConfiguration)
+        primaryDetailLevel = try container.decode(CodableDetailLevel.self, forKey: .primaryDetailLevel)
+        additionalDetailLevels = try container.decode(CodableDetailLevelOptions.self, forKey: .additionalDetailLevels)
+        status = try container.decode(JobStatus.self, forKey: .status)
+        progress = try container.decode(Double.self, forKey: .progress)
+        errorMessage = try container.decodeIfPresent(String.self, forKey: .errorMessage)
+        boundingBoxAvailable = try container.decode(Bool.self, forKey: .boundingBoxAvailable)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        completedOutputFilenames = try container.decodeIfPresent(Set<String>.self, forKey: .completedOutputFilenames)
+        exportFormats = try container.decodeIfPresent(Set<ModelExportFormat>.self, forKey: .exportFormats) ?? []
+        imageFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .imageFolderBookmark)
+        modelFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .modelFolderBookmark)
+    }
+}
+
 // MARK: - Supporting types
 
 enum JobInputKind: String, Codable {

@@ -17,8 +17,13 @@ struct USDZInputView: View {
     @Environment(JobDraft.self) private var draft: JobDraft
 
     @State private var showFileImporter = false
-    /// Tracks whether the current `draft.sourceModelFile` URL has an active security scope.
-    @State private var isAccessingSecurityScope = false
+    /// The URL whose security scope this view opened. Tracked here rather than read
+    /// from `draft.sourceModelFile`, which can be cleared (e.g. by an input-mode
+    /// switch) before this view releases the scope.
+    @State private var scopedURL: URL?
+    /// The model name this view filled in from the chosen file, so choosing another
+    /// file replaces it without overwriting a name the user typed.
+    @State private var prefilledModelName: String?
 
     var body: some View {
         LabeledContent("USDZ File:") {
@@ -119,22 +124,33 @@ struct USDZInputView: View {
     private func selectModel(_ url: URL, releaseScopeOnClear: Bool) {
         releaseSecurityScope()
         draft.sourceModelFile = url
-        isAccessingSecurityScope = releaseScopeOnClear
+        scopedURL = releaseScopeOnClear ? url : nil
 
-        if draft.modelName?.isEmpty ?? true {
-            draft.modelName = url.deletingPathExtension().lastPathComponent
+        if isModelNameUnedited {
+            let name = url.deletingPathExtension().lastPathComponent
+            draft.modelName = name
+            prefilledModelName = name
         }
     }
 
     private func clearModel() {
         releaseSecurityScope()
         draft.sourceModelFile = nil
+
+        if isModelNameUnedited {
+            draft.modelName = nil
+            prefilledModelName = nil
+        }
+    }
+
+    /// True when the name is empty or still the one prefilled from a file.
+    private var isModelNameUnedited: Bool {
+        guard let name = draft.modelName, !name.isEmpty else { return true }
+        return name == prefilledModelName
     }
 
     private func releaseSecurityScope() {
-        if isAccessingSecurityScope, let url = draft.sourceModelFile {
-            url.stopAccessingSecurityScopedResource()
-            isAccessingSecurityScope = false
-        }
+        scopedURL?.stopAccessingSecurityScopedResource()
+        scopedURL = nil
     }
 }

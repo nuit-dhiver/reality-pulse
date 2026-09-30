@@ -24,8 +24,10 @@ struct VideoInputView: View {
     @State private var isExtracting = false
     @State private var extractedFrameCount: Int?
     @State private var extractionTask: Task<Void, Never>?
-    /// Tracks whether the current `draft.videoFile` URL has an active security scope.
-    @State private var isAccessingSecurityScope = false
+    /// The URL whose security scope this view opened. Tracked here rather than read
+    /// from `draft.videoFile`, which can be cleared (e.g. by an input-mode switch)
+    /// before this view releases the scope.
+    @State private var scopedURL: URL?
 
     var body: some View {
         LabeledContent("Video File:") {
@@ -158,7 +160,7 @@ struct VideoInputView: View {
         isExtracting = true
         extractionProgress = 0
         thumbnail = nil
-        isAccessingSecurityScope = releaseScopeOnClear
+        scopedURL = releaseScopeOnClear ? url : nil
 
         extractionTask = Task {
             do {
@@ -207,9 +209,7 @@ struct VideoInputView: View {
     }
 
     private func releaseSecurityScope() {
-        if isAccessingSecurityScope, let url = draft.videoFile {
-            url.stopAccessingSecurityScopedResource()
-            isAccessingSecurityScope = false
-        }
+        scopedURL?.stopAccessingSecurityScopedResource()
+        scopedURL = nil
     }
 }
