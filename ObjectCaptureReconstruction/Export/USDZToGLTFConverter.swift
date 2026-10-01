@@ -591,12 +591,15 @@ enum ModelExportService {
     }
 
     /// Convert a single USDZ file to one export format.
+    /// - Parameters:
+    ///   - textSculptureOptions: the job's settings for `.textSculpture` (`nil` means defaults).
+    ///   - fallbackText: the text a sculpture spells when the options' text is blank (the model name).
     nonisolated static func export(
         usdzURL: URL,
         format: ModelExportFormat,
         outputURL: URL,
-        textSculptureOptions: TextSculptureOptions? = nil,
-        fallbackText: String = ""
+        textSculptureOptions: TextSculptureOptions?,
+        fallbackText: String
     ) throws {
         switch format {
         case .gaussianSplat:

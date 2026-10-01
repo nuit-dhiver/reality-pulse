@@ -183,8 +183,15 @@ final class ModelExportTests: XCTestCase {
 
         try writeSampleUSD(to: sourceURL)
 
-        try ModelExportService.export(usdzURL: sourceURL, format: .glb, outputURL: glbURL)
-        try ModelExportService.export(usdzURL: sourceURL, format: .gltf, outputURL: gltfURL)
+        for (format, outputURL) in [(ModelExportFormat.glb, glbURL), (.gltf, gltfURL)] {
+            try ModelExportService.export(
+                usdzURL: sourceURL,
+                format: format,
+                outputURL: outputURL,
+                textSculptureOptions: nil,
+                fallbackText: "Box"
+            )
+        }
 
         XCTAssertEqual(try Data(contentsOf: glbURL).prefix(4), Data([0x67, 0x6C, 0x54, 0x46]))
         XCTAssertTrue(FileManager.default.fileExists(atPath: gltfURL.path))

@@ -411,8 +411,11 @@ class JobScheduler {
             } else if let idx = jobs.firstIndex(where: { $0.id == jobId }) {
                 jobs[idx].status = .completed
                 jobs[idx].progress = 1.0
-                let notificationBody = exportAdditionalFormats(for: jobs[idx]) ?? jobName
-                sendNotification(title: "Job Complete", body: notificationBody)
+                let notificationBody = await exportAdditionalFormats(for: jobs[idx]) ?? jobName
+                // A Stop during export already marked the job cancelled.
+                if !Task.isCancelled {
+                    sendNotification(title: "Job Complete", body: notificationBody)
+                }
             }
 
         } catch {
@@ -539,14 +542,18 @@ class JobScheduler {
         job.markOutputCompleted(at: url)
     }
 
-    private func exportAdditionalFormats(for job: ReconstructionJob) -> String? {
+    /// Export the job's additional formats off the main actor: text sculptures
+    /// and splats can take a while on large models.
+    private func exportAdditionalFormats(for job: ReconstructionJob) async -> String? {
         guard !job.exportFormats.isEmpty else { return nil }
 
         do {
-            let exportedURLs = try ModelExportService.exportCompletedOutputs(
-                for: job,
-                formats: job.exportFormats
-            )
+            let exportedURLs = try await Task.detached(priority: .userInitiated) {
+                try ModelExportService.exportCompletedOutputs(
+                    for: job,
+                    formats: job.exportFormats
+                )
+            }.value
             guard !exportedURLs.isEmpty else { return nil }
             return "\(job.modelName) — exported \(exportedURLs.count) additional file(s)"
         } catch {

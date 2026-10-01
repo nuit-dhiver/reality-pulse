@@ -243,6 +243,50 @@ final class TextSculptureTests: XCTestCase {
         }
     }
 
+    func testModelExportServicePassesJobOptionsToGenerator() throws {
+        let directory = try makeTemporaryDirectory()
+        let usdURL = directory.appending(path: "box.usdc")
+        let glbURL = directory.appending(path: "Box-text.glb")
+        try writeSampleBox(to: usdURL)
+
+        var options = TextSculptureOptions()
+        options.layout = .cloud
+        options.letterSize = .large
+        options.useInkColor = true
+        options.inkColor = SIMD3<Float>(0, 0, 1)
+        try ModelExportService.export(
+            usdzURL: usdURL,
+            format: .textSculpture,
+            outputURL: glbURL,
+            textSculptureOptions: options,
+            fallbackText: "Box"
+        )
+
+        let glb = try parseGLB(Data(contentsOf: glbURL))
+        let attributes = try XCTUnwrap(glb.document.meshes?.first?.primitives.first?.attributes)
+        let colors = try glb.vec3(accessor: attributes["COLOR_0"]!)
+        XCTAssertFalse(colors.isEmpty)
+        for color in colors {
+            XCTAssertEqual(color, SIMD3<Float>(0, 0, 1))
+        }
+    }
+
+    func testOptionsSurviveJSONRoundTrip() throws {
+        var options = TextSculptureOptions()
+        options.text = "hello"
+        options.layout = .cloud
+        let job = ReconstructionJob(
+            imageFolder: URL(fileURLWithPath: "/tmp/images"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Vase",
+            exportFormats: [.textSculpture],
+            textSculptureOptions: options
+        )
+
+        let decoded = try JSONDecoder().decode(ReconstructionJob.self, from: JSONEncoder().encode(job))
+        XCTAssertEqual(decoded.textSculptureOptions, options)
+    }
+
     func testGenerationIsDeterministic() throws {
         let directory = try makeTemporaryDirectory()
         let usdURL = directory.appending(path: "box.usdc")

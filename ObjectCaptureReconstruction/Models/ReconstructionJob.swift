@@ -95,7 +95,7 @@ struct ReconstructionJob: Identifiable, Codable {
     }
 
     func conversionFilename(for format: ModelExportFormat) -> String {
-        "\(modelName)\(format.filenameSuffix).\(format.fileExtension)"
+        format.conversionFilename(modelName: modelName)
     }
 
     func conversionURL(for format: ModelExportFormat) -> URL {
@@ -226,7 +226,8 @@ struct ReconstructionJob: Identifiable, Codable {
 
 extension ReconstructionJob {
     /// Tolerates keys added after the legacy `jobs.json` format (`inputKind`,
-    /// `exportFormats`) so the one-time JSON migration can still read old files.
+    /// `exportFormats`, `textSculptureOptions`) so the one-time JSON migration
+    /// can still read old files.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -244,6 +245,7 @@ extension ReconstructionJob {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         completedOutputFilenames = try container.decodeIfPresent(Set<String>.self, forKey: .completedOutputFilenames)
         exportFormats = try container.decodeIfPresent(Set<ModelExportFormat>.self, forKey: .exportFormats) ?? []
+        textSculptureOptions = try container.decodeIfPresent(TextSculptureOptions.self, forKey: .textSculptureOptions)
         imageFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .imageFolderBookmark)
         modelFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .modelFolderBookmark)
     }
@@ -291,7 +293,12 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     }
 
     func exportFilename(modelName: String, level: CodableDetailLevel) -> String {
-        "\(modelName)-\(level.rawValue)\(filenameSuffix).\(fileExtension)"
+        conversionFilename(modelName: "\(modelName)-\(level.rawValue)")
+    }
+
+    /// Filename for a conversion job's output, which has no detail level.
+    func conversionFilename(modelName: String) -> String {
+        "\(modelName)\(filenameSuffix).\(fileExtension)"
     }
 }
 
