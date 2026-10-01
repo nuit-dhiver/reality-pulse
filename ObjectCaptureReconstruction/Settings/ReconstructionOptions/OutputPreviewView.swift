@@ -57,7 +57,7 @@ struct OutputPreviewView: View {
 
         for level in sortedLevels {
             for format in draft.exportFormats.sorted(by: { $0.rawValue < $1.rawValue }) {
-                filenames.append("\(name)-\(level.rawValue).\(format.fileExtension)")
+                filenames.append(format.exportFilename(modelName: name, level: level))
             }
         }
 

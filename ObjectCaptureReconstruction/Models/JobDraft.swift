@@ -21,6 +21,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     enum InputMode: String, CaseIterable {
         case images
         case video
+        case usdz
     }
 
     var inputMode: InputMode = .images
@@ -35,12 +36,16 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     /// The source video file selected by the user (video input mode only).
     var videoFile: URL?
 
+    /// The existing USDZ model to convert (USDZ input mode only).
+    var sourceModelFile: URL?
+
     // MARK: - Session configuration (live framework type for picker bindings)
 
     var sessionConfiguration: PhotogrammetrySession.Configuration = PhotogrammetrySession.Configuration()
     var detailLevelOptionUnderQualityMenu: PhotogrammetrySession.Request.Detail = .medium
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
     var exportFormats: Set<ModelExportFormat> = []
+    var textSculptureOptions = TextSculptureOptions()
 
     // MARK: - Error surface (used by ImageFolderView, ModelFolderView, etc.)
 
@@ -54,7 +59,12 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
 
     /// Create a draft pre-filled from an existing job for editing.
     init(from job: ReconstructionJob) {
-        imageFolder = job.imageFolder
+        if job.isConversionJob {
+            inputMode = .usdz
+            sourceModelFile = job.imageFolder
+        } else {
+            imageFolder = job.imageFolder
+        }
         modelFolder = job.modelFolder
         modelName = job.modelName
         boundingBoxAvailable = job.boundingBoxAvailable
@@ -63,6 +73,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         detailLevelOptionUnderQualityMenu = job.primaryDetailLevel.toFrameworkType
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
         exportFormats = job.exportFormats
+        textSculptureOptions = job.textSculptureOptions ?? TextSculptureOptions()
     }
 
     // MARK: - Conversion
@@ -70,13 +81,15 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     /// Build a `ReconstructionJob` from the current draft.
     /// Returns `nil` if required fields are missing.
     func toJob(existingId: UUID? = nil, createdAt: Date = Date()) -> ReconstructionJob? {
-        guard let imageFolder, let modelFolder, let modelName, !modelName.isEmpty else {
+        let inputURL = inputMode == .usdz ? sourceModelFile : imageFolder
+        guard let inputURL, let modelFolder, let modelName, !modelName.isEmpty else {
             return nil
         }
 
         var job = ReconstructionJob(
             id: existingId ?? UUID(),
-            imageFolder: imageFolder,
+            inputKind: inputMode == .usdz ? .usdzModel : .images,
+            imageFolder: inputURL,
             modelFolder: modelFolder,
             modelName: modelName,
             sessionConfiguration: CodableSessionConfiguration(from: sessionConfiguration),
@@ -86,12 +99,19 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         )
         job.boundingBoxAvailable = boundingBoxAvailable
         job.exportFormats = exportFormats
+        job.textSculptureOptions = textSculptureOptions
         return job
     }
 
     /// Validate required fields and set the error state if anything is missing.
     func validate() -> Bool {
-        if imageFolder == nil {
+        if inputMode == .usdz {
+            if sourceModelFile == nil {
+                alertMessage = "No USDZ file selected"
+                hasError = true
+                return false
+            }
+        } else if imageFolder == nil {
             if inputMode == .video {
                 alertMessage = videoFile == nil
                     ? "No video file selected"
@@ -109,6 +129,11 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         }
         if modelFolder == nil {
             alertMessage = "Output folder is not selected"
+            hasError = true
+            return false
+        }
+        if inputMode == .usdz && exportFormats.isEmpty {
+            alertMessage = "Choose at least one export format"
             hasError = true
             return false
         }

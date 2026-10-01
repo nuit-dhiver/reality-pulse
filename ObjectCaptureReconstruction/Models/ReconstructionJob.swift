@@ -8,10 +8,14 @@ Data model for a single reconstruction job in the batch queue.
 import Foundation
 import RealityKit
 
-/// Represents a single reconstruction job: one image folder producing one or
-/// more 3D models at the selected detail levels.
+/// Represents a single queue job: either one image folder producing one or
+/// more 3D models at the selected detail levels, or one existing USDZ file
+/// converted to the selected export formats.
 struct ReconstructionJob: Identifiable, Codable {
     let id: UUID
+    var inputKind: JobInputKind = .images
+    /// The job's input: an image folder for `.images` jobs, or the source USDZ
+    /// file for `.usdzModel` conversion jobs. `imageFolderBookmark` follows suit.
     var imageFolder: URL
     var modelFolder: URL
     var modelName: String
@@ -27,6 +31,8 @@ struct ReconstructionJob: Identifiable, Codable {
     var createdAt: Date
     var completedOutputFilenames: Set<String>?
     var exportFormats: Set<ModelExportFormat> = []
+    /// Settings for the `.textSculpture` export. `nil` means defaults.
+    var textSculptureOptions: TextSculptureOptions?
 
     /// Security-scoped bookmark data for persisting sandbox access across launches.
     var imageFolderBookmark: Data?
@@ -34,6 +40,7 @@ struct ReconstructionJob: Identifiable, Codable {
 
     init(
         id: UUID = UUID(),
+        inputKind: JobInputKind = .images,
         imageFolder: URL,
         modelFolder: URL,
         modelName: String,
@@ -47,10 +54,12 @@ struct ReconstructionJob: Identifiable, Codable {
         createdAt: Date = Date(),
         completedOutputFilenames: Set<String>? = [],
         exportFormats: Set<ModelExportFormat> = [],
+        textSculptureOptions: TextSculptureOptions? = nil,
         imageFolderBookmark: Data? = nil,
         modelFolderBookmark: Data? = nil
     ) {
         self.id = id
+        self.inputKind = inputKind
         self.imageFolder = imageFolder
         self.modelFolder = modelFolder
         self.modelName = modelName
@@ -64,6 +73,7 @@ struct ReconstructionJob: Identifiable, Codable {
         self.createdAt = createdAt
         self.completedOutputFilenames = completedOutputFilenames
         self.exportFormats = exportFormats
+        self.textSculptureOptions = textSculptureOptions
 
         self.imageFolderBookmark = imageFolderBookmark ?? (try? imageFolder.bookmarkData(
             options: .withSecurityScope,
@@ -75,6 +85,29 @@ struct ReconstructionJob: Identifiable, Codable {
             includingResourceValuesForKeys: nil,
             relativeTo: nil
         ))
+    }
+
+    // MARK: - Conversion helpers
+
+    /// Whether this job converts an existing USDZ file instead of reconstructing.
+    var isConversionJob: Bool {
+        inputKind == .usdzModel
+    }
+
+    func conversionFilename(for format: ModelExportFormat) -> String {
+        format.conversionFilename(modelName: modelName)
+    }
+
+    func conversionURL(for format: ModelExportFormat) -> URL {
+        modelFolder.appending(path: conversionFilename(for: format))
+    }
+
+    var sortedExportFormats: [ModelExportFormat] {
+        exportFormats.sorted { $0.rawValue < $1.rawValue }
+    }
+
+    var conversionOutputURLs: [URL] {
+        sortedExportFormats.map { conversionURL(for: $0) }
     }
 
     // MARK: - Detail level helpers
@@ -109,7 +142,7 @@ struct ReconstructionJob: Identifiable, Codable {
     }
 
     func exportFilename(for level: CodableDetailLevel, format: ModelExportFormat) -> String {
-        "\(modelName)-\(level.rawValue).\(format.fileExtension)"
+        format.exportFilename(modelName: modelName, level: level)
     }
 
     func exportURL(for level: CodableDetailLevel, format: ModelExportFormat) -> URL {
@@ -189,18 +222,64 @@ struct ReconstructionJob: Identifiable, Codable {
     }
 }
 
+// MARK: - Decoding
+
+extension ReconstructionJob {
+    /// Tolerates keys added after the legacy `jobs.json` format (`inputKind`,
+    /// `exportFormats`, `textSculptureOptions`) so the one-time JSON migration
+    /// can still read old files.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        inputKind = try container.decodeIfPresent(JobInputKind.self, forKey: .inputKind) ?? .images
+        imageFolder = try container.decode(URL.self, forKey: .imageFolder)
+        modelFolder = try container.decode(URL.self, forKey: .modelFolder)
+        modelName = try container.decode(String.self, forKey: .modelName)
+        sessionConfiguration = try container.decode(CodableSessionConfiguration.self, forKey: .sessionConfiguration)
+        primaryDetailLevel = try container.decode(CodableDetailLevel.self, forKey: .primaryDetailLevel)
+        additionalDetailLevels = try container.decode(CodableDetailLevelOptions.self, forKey: .additionalDetailLevels)
+        status = try container.decode(JobStatus.self, forKey: .status)
+        progress = try container.decode(Double.self, forKey: .progress)
+        errorMessage = try container.decodeIfPresent(String.self, forKey: .errorMessage)
+        boundingBoxAvailable = try container.decode(Bool.self, forKey: .boundingBoxAvailable)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        completedOutputFilenames = try container.decodeIfPresent(Set<String>.self, forKey: .completedOutputFilenames)
+        exportFormats = try container.decodeIfPresent(Set<ModelExportFormat>.self, forKey: .exportFormats) ?? []
+        textSculptureOptions = try container.decodeIfPresent(TextSculptureOptions.self, forKey: .textSculptureOptions)
+        imageFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .imageFolderBookmark)
+        modelFolderBookmark = try container.decodeIfPresent(Data.self, forKey: .modelFolderBookmark)
+    }
+}
+
 // MARK: - Supporting types
+
+enum JobInputKind: String, Codable {
+    /// Reconstruct models from an image folder (also used for extracted video frames).
+    case images
+    /// Convert an existing USDZ file to the job's export formats.
+    case usdzModel
+}
 
 enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     case gltf
     case glb
     case gaussianSplat
+    case textSculpture
 
     var fileExtension: String {
         switch self {
         case .gltf: return "gltf"
         case .glb: return "glb"
         case .gaussianSplat: return "ply"
+        case .textSculpture: return "glb"
+        }
+    }
+
+    /// Appended to the base filename so formats sharing an extension don't collide.
+    var filenameSuffix: String {
+        switch self {
+        case .textSculpture: return "-text"
+        case .gltf, .glb, .gaussianSplat: return ""
         }
     }
 
@@ -209,7 +288,17 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
         case .gltf: return "glTF (.gltf)"
         case .glb: return "glb (.glb)"
         case .gaussianSplat: return "Gaussian Splat (.ply)"
+        case .textSculpture: return "Text Sculpture (.glb)"
         }
+    }
+
+    func exportFilename(modelName: String, level: CodableDetailLevel) -> String {
+        conversionFilename(modelName: "\(modelName)-\(level.rawValue)")
+    }
+
+    /// Filename for a conversion job's output, which has no detail level.
+    func conversionFilename(modelName: String) -> String {
+        "\(modelName)\(filenameSuffix).\(fileExtension)"
     }
 }
 

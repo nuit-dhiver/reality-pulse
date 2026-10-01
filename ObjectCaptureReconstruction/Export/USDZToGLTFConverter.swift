@@ -187,8 +187,8 @@ enum USDZToGLTFConverter {
             try GLTFWriter.writeGLB(document: document, binaryData: builder.data, to: outputURL)
         case .gltf:
             try GLTFWriter.writeGLTF(document: document, binaryData: builder.data, to: outputURL)
-        case .gaussianSplat:
-            // Splats are produced by `SplatSampleGenerator`, not this converter.
+        case .gaussianSplat, .textSculpture:
+            // Splats and text sculptures have their own generators, not this converter.
             throw USDZToGLTFConverterError.unsupportedExportFormat(format)
         }
 
@@ -501,7 +501,7 @@ enum USDZToGLTFConverter {
         return pngData(from: output)
     }
 
-    private nonisolated static func pngData(from image: CGImage) -> Data? {
+    nonisolated static func pngData(from image: CGImage) -> Data? {
         let data = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(
             data,
@@ -568,16 +568,13 @@ enum ModelExportService {
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
                 do {
-                    switch format {
-                    case .gaussianSplat:
-                        try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
-                    case .gltf, .glb:
-                        try USDZToGLTFConverter.convert(
-                            usdzURL: usdzURL,
-                            format: format,
-                            outputURL: outputURL
-                        )
-                    }
+                    try export(
+                        usdzURL: usdzURL,
+                        format: format,
+                        outputURL: outputURL,
+                        textSculptureOptions: job.textSculptureOptions,
+                        fallbackText: job.modelName
+                    )
                     exportedURLs.append(outputURL)
                 } catch {
                     exportErrors.append(error)
@@ -591,5 +588,35 @@ enum ModelExportService {
         }
 
         return exportedURLs
+    }
+
+    /// Convert a single USDZ file to one export format.
+    /// - Parameters:
+    ///   - textSculptureOptions: the job's settings for `.textSculpture` (`nil` means defaults).
+    ///   - fallbackText: the text a sculpture spells when the options' text is blank (the model name).
+    nonisolated static func export(
+        usdzURL: URL,
+        format: ModelExportFormat,
+        outputURL: URL,
+        textSculptureOptions: TextSculptureOptions?,
+        fallbackText: String
+    ) throws {
+        switch format {
+        case .gaussianSplat:
+            try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+        case .textSculpture:
+            try TextSculptureGenerator.generate(
+                usdzURL: usdzURL,
+                outputURL: outputURL,
+                options: textSculptureOptions ?? TextSculptureOptions(),
+                fallbackText: fallbackText
+            )
+        case .gltf, .glb:
+            try USDZToGLTFConverter.convert(
+                usdzURL: usdzURL,
+                format: format,
+                outputURL: outputURL
+            )
+        }
     }
 }

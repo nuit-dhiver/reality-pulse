@@ -80,6 +80,24 @@ Launch recovery:
 
 Completed output filenames are recorded when `PhotogrammetrySession.Output.requestComplete` is received.
 
+### Additional Exports
+
+After a job completes, `ModelExportService` converts each completed USDZ into the job's selected `ModelExportFormat`s, written next to it:
+
+- `gltf` / `glb`: `USDZToGLTFConverter` (Model I/O import, custom glTF serializer).
+- `gaussianSplat`: `SplatSampleGenerator` samples the surface into a 3DGS `.ply`.
+- `textSculpture`: `TextSculptureGenerator` rebuilds the model out of letters as `<model-name>-<detail-level>-text.glb`. Text is shaped with Core Text (`GlyphShaper`) and placed either along horizontal contour rings (`ContourSlicer`) or on sampled surface points, rasterized into one alpha-cut atlas (`GlyphAtlas`), and colored per letter from the base-color texture or a single ink. Per-job settings live in `TextSculptureOptions`.
+
+### Conversion Jobs
+
+A job with `inputKind == .usdzModel` converts an existing USDZ file instead of reconstructing. The source file URL and bookmark are stored in the same input slot as an image folder (`imageFolder` / `imageFolderBookmark`). The scheduler skips `PhotogrammetrySession` and runs `ModelExportService.export` once per selected format, writing:
+
+```text
+<model-name>[-text].<gltf|glb|ply>
+```
+
+Retrying a conversion job re-runs every format and overwrites existing files.
+
 ### Interrupted Retry Handling
 
 Retry handling is deliberately conservative:

@@ -2,7 +2,8 @@
 See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
-Optional glTF and glb export formats generated from each completed USDZ output.
+Optional additional export formats (glTF, glb, Gaussian splat, text sculpture)
+generated from each completed USDZ output.
 */
 
 import SwiftUI
@@ -13,11 +14,14 @@ struct ExportFormatView: View {
     var body: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 8) {
-                Label("Additional Export Formats", systemImage: "square.and.arrow.up")
+                Label(isConversion ? "Export Formats" : "Additional Export Formats",
+                      systemImage: "square.and.arrow.up")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                Text("Converted from USDZ after reconstruction completes.")
+                Text(isConversion
+                     ? "Converted from the selected USDZ file."
+                     : "Converted from USDZ after reconstruction completes.")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
 
@@ -25,10 +29,19 @@ struct ExportFormatView: View {
                     Toggle(isOn: binding(for: format)) {
                         Text(format.displayName)
                     }
+
+                    if format == .textSculpture && draft.exportFormats.contains(format) {
+                        TextSculptureOptionsView()
+                            .padding(.leading, 20)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private var isConversion: Bool {
+        draft.inputMode == .usdz
     }
 
     private func binding(for format: ModelExportFormat) -> Binding<Bool> {

@@ -75,7 +75,7 @@ struct QueueDashboardView: View {
                             showInFinder(job)
                         }
 
-                        if hasCompletedOutputs(job) {
+                        if !job.isConversionJob && hasCompletedOutputs(job) {
                             Menu("Export As") {
                                 Button("glTF (.gltf)") {
                                     exportJob(job, format: .gltf)
@@ -130,8 +130,10 @@ struct QueueDashboardView: View {
             }
         }
 
-        let outputURLs = job.requestedDetailLevels
-            .map { job.outputURL(for: $0) }
+        let candidateURLs = job.isConversionJob
+            ? job.conversionOutputURLs
+            : job.requestedDetailLevels.map { job.outputURL(for: $0) }
+        let outputURLs = candidateURLs
             .filter { FileManager.default.fileExists(atPath: $0.path) }
 
         if outputURLs.isEmpty {

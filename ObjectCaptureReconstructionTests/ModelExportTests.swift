@@ -83,6 +83,120 @@ final class ModelExportTests: XCTestCase {
         XCTAssertFalse(document.meshes?.isEmpty ?? true)
     }
 
+    func testConversionJobInputKindPersistsThroughJobStore() throws {
+        let container = try JobStore.makeModelContainer(inMemory: true)
+        let conversionJob = ReconstructionJob(
+            inputKind: .usdzModel,
+            imageFolder: URL(fileURLWithPath: "/tmp/source/Chair.usdz"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Chair",
+            exportFormats: [.glb]
+        )
+        let imageJob = ReconstructionJob(
+            imageFolder: URL(fileURLWithPath: "/tmp/images"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Teapot"
+        )
+
+        let store = JobStore(modelContainer: container)
+        store.saveJobs([conversionJob, imageJob])
+        let reloaded = JobStore(modelContainer: container).loadJobs()
+
+        XCTAssertEqual(reloaded.map(\.inputKind), [.usdzModel, .images])
+        XCTAssertEqual(reloaded.first?.imageFolder.lastPathComponent, "Chair.usdz")
+    }
+
+    func testMissingInputKindLoadsAsImages() throws {
+        let job = ReconstructionJob(
+            imageFolder: URL(fileURLWithPath: "/tmp/images"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Legacy"
+        )
+        let persistentJob = try PersistentJob(job: job, queueOrder: 0)
+        persistentJob.inputKindRawValue = nil
+
+        XCTAssertEqual(try persistentJob.toJob().inputKind, .images)
+    }
+
+    func testConversionURLHelpers() {
+        let job = ReconstructionJob(
+            inputKind: .usdzModel,
+            imageFolder: URL(fileURLWithPath: "/tmp/source/Vase.usdz"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Vase",
+            exportFormats: [.glb, .gaussianSplat]
+        )
+
+        XCTAssertTrue(job.isConversionJob)
+        XCTAssertEqual(job.conversionFilename(for: .glb), "Vase.glb")
+        XCTAssertEqual(
+            job.conversionOutputURLs.map(\.path),
+            ["/tmp/models/Vase.ply", "/tmp/models/Vase.glb"]
+        )
+    }
+
+    func testConversionTextSculptureDoesNotCollideWithGLB() {
+        let job = ReconstructionJob(
+            inputKind: .usdzModel,
+            imageFolder: URL(fileURLWithPath: "/tmp/source/Vase.usdz"),
+            modelFolder: URL(fileURLWithPath: "/tmp/models"),
+            modelName: "Vase",
+            exportFormats: [.glb, .textSculpture]
+        )
+
+        XCTAssertEqual(job.conversionFilename(for: .textSculpture), "Vase-text.glb")
+        XCTAssertEqual(
+            job.conversionOutputURLs.map(\.path),
+            ["/tmp/models/Vase.glb", "/tmp/models/Vase-text.glb"]
+        )
+    }
+
+    func testJobDraftInUSDZModeBuildsConversionJob() {
+        let draft = JobDraft()
+        draft.inputMode = .usdz
+        draft.sourceModelFile = URL(fileURLWithPath: "/tmp/source/Chair.usdz")
+        draft.modelFolder = URL(fileURLWithPath: "/tmp/models")
+        draft.modelName = "Chair"
+
+        XCTAssertFalse(draft.validate(), "A conversion job needs at least one export format.")
+        XCTAssertEqual(draft.alertMessage, "Choose at least one export format")
+
+        draft.hasError = false
+        draft.exportFormats = [.gltf]
+        XCTAssertTrue(draft.validate())
+
+        let job = draft.toJob()
+        XCTAssertEqual(job?.inputKind, .usdzModel)
+        XCTAssertEqual(job?.imageFolder.lastPathComponent, "Chair.usdz")
+
+        let reopened = JobDraft(from: job!)
+        XCTAssertEqual(reopened.inputMode, .usdz)
+        XCTAssertEqual(reopened.sourceModelFile?.lastPathComponent, "Chair.usdz")
+        XCTAssertNil(reopened.imageFolder)
+    }
+
+    func testModelExportServiceConvertsSingleFile() throws {
+        let directory = try makeTemporaryDirectory()
+        let sourceURL = directory.appending(path: "box.usdc")
+        let glbURL = directory.appending(path: "out.glb")
+        let gltfURL = directory.appending(path: "out.gltf")
+
+        try writeSampleUSD(to: sourceURL)
+
+        for (format, outputURL) in [(ModelExportFormat.glb, glbURL), (.gltf, gltfURL)] {
+            try ModelExportService.export(
+                usdzURL: sourceURL,
+                format: format,
+                outputURL: outputURL,
+                textSculptureOptions: nil,
+                fallbackText: "Box"
+            )
+        }
+
+        XCTAssertEqual(try Data(contentsOf: glbURL).prefix(4), Data([0x67, 0x6C, 0x54, 0x46]))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: gltfURL.path))
+    }
+
     private func writeSampleUSD(to url: URL) throws {
         let allocator = MDLMeshBufferDataAllocator()
         let mesh = MDLMesh(
