@@ -2,7 +2,7 @@
 See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
-Choose the image folder, model folder, and the model name.
+Choose the input (image folder, video, or USDZ file), model folder, and the model name.
 */
 
 import SwiftUI
@@ -18,6 +18,7 @@ struct FolderOptionsView: View {
             Picker("Input Type:", selection: $draft.inputMode) {
                 Text("Image Folder").tag(JobDraft.InputMode.images)
                 Text("Video File").tag(JobDraft.InputMode.video)
+                Text("USDZ File").tag(JobDraft.InputMode.usdz)
             }
             .pickerStyle(.segmented)
             .onChange(of: draft.inputMode) {
@@ -27,13 +28,17 @@ struct FolderOptionsView: View {
                 // mode change (see VideoInputView.onDisappear for that cleanup).
                 draft.imageFolder = nil
                 draft.videoFile = nil
+                draft.sourceModelFile = nil
                 draft.boundingBoxAvailable = false
             }
 
-            if draft.inputMode == .images {
+            switch draft.inputMode {
+            case .images:
                 ImageFolderView()
-            } else {
+            case .video:
                 VideoInputView()
+            case .usdz:
+                USDZInputView()
             }
 
             ModelNameField()

@@ -167,6 +167,34 @@ final class JobStoreTests: XCTestCase {
         XCTAssertEqual(secondStore.loadJobs().map(\.id), [legacyJob.id])
     }
 
+    func testLegacyJSONMigrationToleratesKeysAddedLater() throws {
+        let container = try JobStore.makeModelContainer(inMemory: true)
+        let legacyDirectory = try makeTemporaryDirectory()
+        let legacyJob = makeJob(modelName: "Legacy")
+
+        // Pre-SwiftData jobs.json files predate these keys.
+        var object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: JSONEncoder().encode(legacyJob)) as? [String: Any]
+        )
+        for key in ["inputKind", "exportFormats", "completedOutputFilenames"] {
+            object.removeValue(forKey: key)
+        }
+        try JSONSerialization.data(withJSONObject: [object]).write(
+            to: legacyDirectory.appending(path: "jobs.json")
+        )
+
+        let store = JobStore(
+            modelContainer: container,
+            legacyStoreDirectory: legacyDirectory
+        )
+        store.performLaunchRecovery()
+
+        let reloaded = try XCTUnwrap(store.loadJobs().first)
+        XCTAssertEqual(reloaded.id, legacyJob.id)
+        XCTAssertEqual(reloaded.inputKind, .images)
+        XCTAssertEqual(reloaded.exportFormats, [])
+    }
+
     private func makeJob(
         modelName: String,
         modelFolder: URL? = nil,

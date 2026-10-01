@@ -21,7 +21,7 @@ struct JobRowView: View {
                     .fontWeight(.medium)
 
                 HStack(spacing: 4) {
-                    Image(systemName: "folder")
+                    Image(systemName: job.isConversionJob ? "cube" : "folder")
                         .font(.caption2)
                     Text(job.imageFolder.lastPathComponent)
                         .font(.caption)
@@ -29,7 +29,7 @@ struct JobRowView: View {
                         .lineLimit(1)
                 }
 
-                Text(detailLevelSummary)
+                Text(job.isConversionJob ? conversionSummary : detailLevelSummary)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
@@ -90,6 +90,13 @@ struct JobRowView: View {
         default:
             return job.status.rawValue.capitalized
         }
+    }
+
+    private var conversionSummary: String {
+        let formats = job.sortedExportFormats
+            .map(\.displayName)
+            .joined(separator: ", ")
+        return formats.isEmpty ? "No export formats" : "Convert to \(formats)"
     }
 
     private var detailLevelSummary: String {

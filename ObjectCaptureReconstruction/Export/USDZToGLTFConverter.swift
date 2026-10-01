@@ -568,23 +568,13 @@ enum ModelExportService {
             for format in formats.sorted(by: { $0.rawValue < $1.rawValue }) {
                 let outputURL = job.exportURL(for: level, format: format)
                 do {
-                    switch format {
-                    case .gaussianSplat:
-                        try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
-                    case .textSculpture:
-                        try TextSculptureGenerator.generate(
-                            usdzURL: usdzURL,
-                            outputURL: outputURL,
-                            options: job.textSculptureOptions ?? TextSculptureOptions(),
-                            fallbackText: job.modelName
-                        )
-                    case .gltf, .glb:
-                        try USDZToGLTFConverter.convert(
-                            usdzURL: usdzURL,
-                            format: format,
-                            outputURL: outputURL
-                        )
-                    }
+                    try export(
+                        usdzURL: usdzURL,
+                        format: format,
+                        outputURL: outputURL,
+                        textSculptureOptions: job.textSculptureOptions,
+                        fallbackText: job.modelName
+                    )
                     exportedURLs.append(outputURL)
                 } catch {
                     exportErrors.append(error)
@@ -598,5 +588,32 @@ enum ModelExportService {
         }
 
         return exportedURLs
+    }
+
+    /// Convert a single USDZ file to one export format.
+    nonisolated static func export(
+        usdzURL: URL,
+        format: ModelExportFormat,
+        outputURL: URL,
+        textSculptureOptions: TextSculptureOptions? = nil,
+        fallbackText: String = ""
+    ) throws {
+        switch format {
+        case .gaussianSplat:
+            try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+        case .textSculpture:
+            try TextSculptureGenerator.generate(
+                usdzURL: usdzURL,
+                outputURL: outputURL,
+                options: textSculptureOptions ?? TextSculptureOptions(),
+                fallbackText: fallbackText
+            )
+        case .gltf, .glb:
+            try USDZToGLTFConverter.convert(
+                usdzURL: usdzURL,
+                format: format,
+                outputURL: outputURL
+            )
+        }
     }
 }

@@ -123,6 +123,7 @@
 				FolderOptions/ModelFolderView.swift,
 				FolderOptions/ModelNameField.swift,
 				FolderOptions/VideoInputView.swift,
+				FolderOptions/USDZInputView.swift,
 				ProcessButton/ProcessButton.swift,
 				ReconstructionOptions/IgnoreBoundingBoxView.swift,
 				ReconstructionOptions/MaskingView.swift,
