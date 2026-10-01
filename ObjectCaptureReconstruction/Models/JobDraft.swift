@@ -41,6 +41,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
     var detailLevelOptionUnderQualityMenu: PhotogrammetrySession.Request.Detail = .medium
     var detailLevelOptionsUnderAdvancedMenu = CodableDetailLevelOptions()
     var exportFormats: Set<ModelExportFormat> = []
+    var textSculptureOptions = TextSculptureOptions()
 
     // MARK: - Error surface (used by ImageFolderView, ModelFolderView, etc.)
 
@@ -63,6 +64,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         detailLevelOptionUnderQualityMenu = job.primaryDetailLevel.toFrameworkType
         detailLevelOptionsUnderAdvancedMenu = job.additionalDetailLevels
         exportFormats = job.exportFormats
+        textSculptureOptions = job.textSculptureOptions ?? TextSculptureOptions()
     }
 
     // MARK: - Conversion
@@ -86,6 +88,7 @@ private let logger = Logger(subsystem: ObjectCaptureReconstructionApp.subsystem,
         )
         job.boundingBoxAvailable = boundingBoxAvailable
         job.exportFormats = exportFormats
+        job.textSculptureOptions = textSculptureOptions
         return job
     }
 

@@ -187,8 +187,8 @@ enum USDZToGLTFConverter {
             try GLTFWriter.writeGLB(document: document, binaryData: builder.data, to: outputURL)
         case .gltf:
             try GLTFWriter.writeGLTF(document: document, binaryData: builder.data, to: outputURL)
-        case .gaussianSplat:
-            // Splats are produced by `SplatSampleGenerator`, not this converter.
+        case .gaussianSplat, .textSculpture:
+            // Splats and text sculptures have their own generators, not this converter.
             throw USDZToGLTFConverterError.unsupportedExportFormat(format)
         }
 
@@ -501,7 +501,7 @@ enum USDZToGLTFConverter {
         return pngData(from: output)
     }
 
-    private nonisolated static func pngData(from image: CGImage) -> Data? {
+    nonisolated static func pngData(from image: CGImage) -> Data? {
         let data = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(
             data,
@@ -571,6 +571,13 @@ enum ModelExportService {
                     switch format {
                     case .gaussianSplat:
                         try SplatSampleGenerator.generate(usdzURL: usdzURL, outputURL: outputURL)
+                    case .textSculpture:
+                        try TextSculptureGenerator.generate(
+                            usdzURL: usdzURL,
+                            outputURL: outputURL,
+                            options: job.textSculptureOptions ?? TextSculptureOptions(),
+                            fallbackText: job.modelName
+                        )
                     case .gltf, .glb:
                         try USDZToGLTFConverter.convert(
                             usdzURL: usdzURL,

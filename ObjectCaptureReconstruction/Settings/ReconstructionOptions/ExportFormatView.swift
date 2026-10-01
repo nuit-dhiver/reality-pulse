@@ -2,7 +2,8 @@
 See the LICENSE.txt file for this sample's licensing information.
 
 Abstract:
-Optional glTF and glb export formats generated from each completed USDZ output.
+Optional additional export formats (glTF, glb, Gaussian splat, text sculpture)
+generated from each completed USDZ output.
 */
 
 import SwiftUI
@@ -24,6 +25,11 @@ struct ExportFormatView: View {
                 ForEach(ModelExportFormat.allCases, id: \.self) { format in
                     Toggle(isOn: binding(for: format)) {
                         Text(format.displayName)
+                    }
+
+                    if format == .textSculpture && draft.exportFormats.contains(format) {
+                        TextSculptureOptionsView()
+                            .padding(.leading, 20)
                     }
                 }
             }
