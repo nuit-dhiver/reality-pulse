@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Rebuilds a reconstructed USDZ out of words: shaped glyphs are laid on the
