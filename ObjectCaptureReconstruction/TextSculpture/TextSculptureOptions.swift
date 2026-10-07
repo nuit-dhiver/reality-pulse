@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Per-job settings for the text-sculpture export: how letters are laid out on the

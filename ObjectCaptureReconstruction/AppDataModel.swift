@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Data model for maintaining the app state and the job queue.

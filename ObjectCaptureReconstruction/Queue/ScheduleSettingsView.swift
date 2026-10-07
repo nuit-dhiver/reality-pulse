@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Configure delayed start and allowed-hours window for the scheduler.
@@ -21,6 +21,8 @@ struct ScheduleSettingsView: View {
     @State private var windowStartHour = 22
     @State private var windowEndHour = 6
     @State private var preventSleepWhileQueueActive = false
+    @State private var notifyOnQueueEvents = false
+    @State private var notificationsDenied = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -74,6 +76,33 @@ struct ScheduleSettingsView: View {
                         "Prevent system sleep while queue is active",
                         isOn: $preventSleepWhileQueueActive
                     )
+
+                    Toggle(
+                        "Notify me when jobs finish",
+                        isOn: Binding(
+                            get: { notifyOnQueueEvents },
+                            set: { isOn in
+                                notificationsDenied = false
+                                guard isOn else {
+                                    notifyOnQueueEvents = false
+                                    return
+                                }
+                                Task {
+                                    if await JobScheduler.requestNotificationAuthorization() {
+                                        notifyOnQueueEvents = true
+                                    } else {
+                                        notificationsDenied = true
+                                    }
+                                }
+                            }
+                        )
+                    )
+
+                    if notificationsDenied {
+                        Text("Notifications are turned off for Reality Pulse. Allow them in System Settings › Notifications, then try again.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .padding()
@@ -82,7 +111,9 @@ struct ScheduleSettingsView: View {
 
             HStack {
                 Button("Clear") {
-                    appDataModel.scheduler.scheduleConfig = ScheduleConfig()
+                    appDataModel.scheduler.scheduleConfig = ScheduleConfig(
+                        notifyOnQueueEvents: appDataModel.scheduler.scheduleConfig.notifyOnQueueEvents
+                    )
                     appDataModel.scheduler.persist()
                     dismiss()
                 }
@@ -103,6 +134,7 @@ struct ScheduleSettingsView: View {
                         config.allowedWindowEnd = windowEndHour
                     }
                     config.preventSleepWhileQueueActive = preventSleepWhileQueueActive
+                    config.notifyOnQueueEvents = notifyOnQueueEvents
                     appDataModel.scheduler.scheduleConfig = config
                     appDataModel.scheduler.persist()
                     dismiss()
@@ -120,6 +152,7 @@ struct ScheduleSettingsView: View {
             windowStartHour = config.allowedWindowStart ?? 22
             windowEndHour = config.allowedWindowEnd ?? 6
             preventSleepWhileQueueActive = config.preventSleepWhileQueueActive
+            notifyOnQueueEvents = config.notifyOnQueueEvents
         }
     }
 

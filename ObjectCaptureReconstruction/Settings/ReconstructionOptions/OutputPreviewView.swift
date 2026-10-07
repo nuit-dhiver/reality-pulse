@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Live preview of the output files that will be generated based on the

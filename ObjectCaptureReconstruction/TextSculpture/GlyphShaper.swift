@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Shapes the sculpture's text with Core Text, so any script works: Latin, CJK, and

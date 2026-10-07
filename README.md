@@ -2,8 +2,8 @@
 
 [![Build macOS app](https://github.com/nuit-dhiver/reality-pulse/actions/workflows/swift.yml/badge.svg)](https://github.com/nuit-dhiver/reality-pulse/actions/workflows/swift.yml)
 [![Swift](https://img.shields.io/badge/Swift-5-orange.svg)](https://www.swift.org/)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-blue.svg)](https://developer.apple.com/macos/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![macOS](https://img.shields.io/badge/macOS-15%2B-blue.svg)](https://developer.apple.com/macos/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Reality Pulse is a macOS photogrammetry queue for Apple Object Capture.** It turns folders of photos into USDZ 3D models with a SwiftUI batch interface, RealityKit reconstruction settings, scheduled processing windows, SwiftData persistence, and crash-aware retry recovery.
 
@@ -44,8 +44,8 @@ Reality Pulse restores the queue on launch, but it does not automatically start 
 
 ## Requirements
 
-- macOS 14.0 or newer
-- Xcode 15.0 or newer
+- macOS 15.0 or newer
+- Xcode 16.0 or newer
 - A Mac supported by Apple Object Capture / RealityKit photogrammetry
 - Photo sets suitable for `PhotogrammetrySession`
 
@@ -92,6 +92,32 @@ git push origin v1.1.0
 The release workflow builds `Reality Pulse.app` in Release configuration, runs the test suite, packages the app as a zip, writes a SHA-256 checksum, and attaches both files to the GitHub Release.
 
 The current release artifact is ad-hoc signed for local/open-source distribution, not notarized.
+
+### Versioning
+
+Bump the version before tagging or uploading to App Store Connect. Every command except `show` also increments the build number, which App Store Connect requires to increase with each upload:
+
+```bash
+scripts/bump-version.sh patch
+```
+
+Use `show`, `build`, `patch`, `minor`, `major`, or `set 1.4.0`.
+
+### Mac App Store
+
+The app target is sandboxed (`com.apple.security.files.user-selected.read-write` only), ships a privacy manifest (`PrivacyInfo.xcprivacy`), and declares `ITSAppUsesNonExemptEncryption = NO`. The bundle identifier is `com.openmuseum.realitypulse`. The privacy policy is in [PRIVACY.md](PRIVACY.md).
+
+The **Mac App Store build** workflow (`.github/workflows/app-store.yml`) is started manually from the Actions tab. It runs the tests, archives, signs, and exports the `.pkg` using [scripts/ExportOptions.plist](scripts/ExportOptions.plist). With **upload** unticked it's a dry run that attaches the signed package as an artifact; ticked, it also uploads the build to App Store Connect for TestFlight and review.
+
+One-time setup after joining the Apple Developer Program:
+
+1. Create the explicit App ID `com.openmuseum.realitypulse` and the app record in App Store Connect.
+2. Create an **Apple Distribution** certificate and a **Mac Installer Distribution** certificate, then export both identities from Keychain Access into one `.p12`.
+3. Create a **Mac App Store** provisioning profile for the App ID named exactly `Reality Pulse Mac App Store`.
+4. Create an App Store Connect API key (Users and Access › Integrations) with the App Manager role.
+5. In the repository's Actions settings, add the variable `APPLE_TEAM_ID` and the secrets `SIGNING_CERTIFICATES_P12` (`base64 -i certificates.p12 | pbcopy`), `SIGNING_CERTIFICATES_PASSWORD`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, and `ASC_PRIVATE_KEY` (the `.p8` file contents).
+
+Run `scripts/bump-version.sh` before each upload; App Store Connect rejects a build number it has already seen.
 
 ## Usage Notes
 
@@ -168,4 +194,4 @@ These topics help developers find the project when searching for SwiftUI photogr
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. It also contains components originally provided by Apple Inc. under the MIT License. See [LICENSE](LICENSE) for the full license text and retain upstream notices in sample-derived files.
+This project is licensed under the MIT License. It also contains components originally provided by Apple Inc. under the MIT License. See [LICENSE](LICENSE) for the full license text, including the Apple notice.

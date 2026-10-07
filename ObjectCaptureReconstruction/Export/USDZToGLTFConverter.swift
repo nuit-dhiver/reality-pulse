@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Converts Object Capture USDZ models to glTF 2.0 (.gltf) or binary glb (.glb)

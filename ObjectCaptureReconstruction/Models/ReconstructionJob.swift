@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Data model for a single reconstruction job in the batch queue.
@@ -299,6 +299,11 @@ enum ModelExportFormat: String, Codable, CaseIterable, Hashable {
     /// Filename for a conversion job's output, which has no detail level.
     func conversionFilename(modelName: String) -> String {
         "\(modelName)\(filenameSuffix).\(fileExtension)"
+    }
+
+    /// Formats that are still under development and may produce rough results.
+    var isExperimental: Bool {
+        self == .gaussianSplat
     }
 }
 

@@ -44,6 +44,7 @@
 		BBBB000BBBBB000BBBBB000B /* TextSculptureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000BAAAA000BAAAA000B /* TextSculptureGenerator.swift */; };
 		BBBB000CBBBB000CBBBB000C /* TextSculptureOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000CAAAA000CAAAA000C /* TextSculptureOptions.swift */; };
 		BBBB000DBBBB000DBBBB000D /* TextSculptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000DAAAA000DAAAA000D /* TextSculptureTests.swift */; };
+		EEEE0001EEEE0001EEEE0001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EEEE0002EEEE0002EEEE0002 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,8 +61,7 @@
 		26B095462C091BC80097324A /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		26B095482C091BEA0097324A /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
 		26B0954A2C091C770097324A /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
-		3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
-		79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		3C5F7AF546F9B84B57A6DCB2 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		971147DC9E6FE3FF0398B220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F974D1162BE0484500EFACBA /* Reality Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Reality Pulse.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5A38ACB50CF47AE95A5E30A /* ObjectCaptureReconstructionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectCaptureReconstructionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,6 +105,9 @@
 		AAAA000BAAAA000BAAAA000B /* TextSculptureGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureGenerator.swift; sourceTree = "<group>"; };
 		AAAA000CAAAA000CAAAA000C /* TextSculptureOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureOptions.swift; sourceTree = "<group>"; };
 		AAAA000DAAAA000DAAAA000D /* TextSculptureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSculptureTests.swift; sourceTree = "<group>"; };
+		EEEE0002EEEE0002EEEE0002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		EEEE0003EEEE0003EEEE0003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EEEE0004EEEE0004EEEE0004 /* ObjectCaptureReconstruction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ObjectCaptureReconstruction.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -175,14 +178,6 @@
 			path = Processing;
 			sourceTree = "<group>";
 		};
-		BD87F13DD4B2159CCB69FFA2 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */,
-			);
-			name = Configuration;
-			sourceTree = "<group>";
-		};
 		F974D10D2BE0484500EFACBA = {
 			isa = PBXGroup;
 			children = (
@@ -190,7 +185,6 @@
 				F974D1182BE0484500EFACBA /* ObjectCaptureReconstruction */,
 				FA6C5F5E612145E7A0847A6A /* ObjectCaptureReconstructionTests */,
 				F974D1172BE0484500EFACBA /* Products */,
-				BD87F13DD4B2159CCB69FFA2 /* Configuration */,
 				FE08FBE5E15C9B39D4421FC8 /* LICENSE */,
 			);
 			sourceTree = "<group>";
@@ -223,6 +217,9 @@
 				CCCC0001CCCC0001CCCC0001 /* GaussianSplat */,
 				CCCC0002CCCC0002CCCC0002 /* TextSculpture */,
 				F974D11D2BE0484700EFACBA /* Assets.xcassets */,
+				EEEE0002EEEE0002EEEE0002 /* PrivacyInfo.xcprivacy */,
+				EEEE0003EEEE0003EEEE0003 /* Info.plist */,
+				EEEE0004EEEE0004EEEE0004 /* ObjectCaptureReconstruction.entitlements */,
 			);
 			path = ObjectCaptureReconstruction;
 			sourceTree = "<group>";
@@ -230,7 +227,7 @@
 		FE08FBE5E15C9B39D4421FC8 /* LICENSE */ = {
 			isa = PBXGroup;
 			children = (
-				3C5F7AF546F9B84B57A6DCB2 /* LICENSE.txt */,
+				3C5F7AF546F9B84B57A6DCB2 /* LICENSE */,
 			);
 			name = LICENSE;
 			path = .;
@@ -369,7 +366,7 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
-				ORGANIZATIONNAME = Apple;
+				ORGANIZATIONNAME = "Open Museum";
 				TargetAttributes = {
 					3FF53D6DB5C4409ABA48B27A = {
 						CreatedOnToolsVersion = 16.0;
@@ -405,6 +402,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F974D11E2BE0484700EFACBA /* Assets.xcassets in Resources */,
+				EEEE0001EEEE0001EEEE0001 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,7 +479,6 @@
 /* Begin XCBuildConfiguration section */
 		F974D1222BE0484700EFACBA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -532,12 +529,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx15.0;
+				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -545,7 +542,6 @@
 		};
 		F974D1232BE0484700EFACBA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -590,11 +586,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx15.0;
+				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -602,29 +598,27 @@
 		};
 		F974D1252BE0484700EFACBA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ObjectCaptureReconstruction/ObjectCaptureReconstruction.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ObjectCaptureReconstruction/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sayed Mohammad Hossein Emami. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openmuseum.realitypulse;
 				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
 				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
@@ -636,35 +630,33 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
 		F974D1262BE0484700EFACBA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ObjectCaptureReconstruction/ObjectCaptureReconstruction.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ObjectCaptureReconstruction/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Sayed Mohammad Hossein Emami. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstruction${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openmuseum.realitypulse;
 				INFOPLIST_KEY_CFBundleDisplayName = "Reality Pulse";
 				INFOPLIST_KEY_CFBundleName = "Reality Pulse";
 				PRODUCT_MODULE_NAME = Object_Capture_Reconstruction;
@@ -676,18 +668,17 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
 		CA11244782FA4192B413EB10 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -696,26 +687,25 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openmuseum.realitypulse.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				VERSIONING_SYSTEM = "apple-generic";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
 			};
 			name = Debug;
 		};
 		631DAC632DE04FB9A8393549 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79ACD3BEE87FD0408B1A71F5 /* SampleCode.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -724,14 +714,14 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.ObjectCaptureReconstructionTests${SAMPLE_CODE_DISAMBIGUATOR}";
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openmuseum.realitypulse.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 6;
+				VERSIONING_SYSTEM = "apple-generic";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Reality Pulse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Reality Pulse";
 			};
 			name = Release;

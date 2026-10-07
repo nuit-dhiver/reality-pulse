@@ -1,5 +1,5 @@
 /*
-See the LICENSE.txt file for this sample's licensing information.
+See the LICENSE file for licensing information.
 
 Abstract:
 Sequential job scheduler that processes reconstruction jobs one at a time,
@@ -574,19 +574,36 @@ class JobScheduler {
 
     // MARK: - Notifications
 
-    private var notificationAuthorized = false
+    /// Asks for notification permission. Called only when the user turns on
+    /// notifications in Schedule Settings, never implicitly.
+    static func requestNotificationAuthorization() async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        do {
+            return try await center.requestAuthorization(options: [.alert, .sound])
+        } catch {
+            logger.warning("Notification authorization failed: \(error)")
+            return false
+        }
+    }
 
     private func sendNotification(title: String, body: String) {
+        guard scheduleConfig.notifyOnQueueEvents else { return }
         let center = UNUserNotificationCenter.current()
 
         Task {
-            if !notificationAuthorized {
-                let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
-                notificationAuthorized = granted
-                if !granted {
-                    logger.warning("Notification permission not granted.")
-                    return
-                }
+            let settings = await center.notificationSettings()
+            let isAuthorized: Bool
+            switch settings.authorizationStatus {
+            case .authorized, .provisional:
+                isAuthorized = true
+            case .notDetermined:
+                isAuthorized = await Self.requestNotificationAuthorization()
+            default:
+                isAuthorized = false
+            }
+            guard isAuthorized else {
+                logger.warning("Notifications enabled in settings but not authorized by the system.")
+                return
             }
 
             let content = UNMutableNotificationContent()
